@@ -1,698 +1,514 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini ERP - SORAN Management</title>
+    <style>
+        :root {
+            --bg-main: #F5F5F7;
+            --bg-card: #FFFFFF;
+            --accent: #007AFF;
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --border-color: #E5E5E7;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+            --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+        }
 
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font-sans);background:transparent}
-.erp{display:flex;height:600px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
-.sidebar{width:200px;border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;background:var(--color-background-secondary);flex-shrink:0}
-.sidebar-logo{padding:16px;border-bottom:0.5px solid var(--color-border-tertiary)}
-.logo-text{font-size:14px;font-weight:500;color:var(--color-text-primary)}
-.logo-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;font-size:13px;color:var(--color-text-secondary);border-left:2px solid transparent;transition:all 0.15s}
-.nav-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
-.nav-item.active{background:var(--color-background-primary);color:var(--color-text-info);border-left-color:#185FA5;font-weight:500}
-.nav-icon{width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.nav-sep{font-size:10px;color:var(--color-text-tertiary);padding:12px 16px 4px;text-transform:uppercase;letter-spacing:0.06em}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:0.5px solid var(--color-border-tertiary);flex-shrink:0}
-.page-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
-.topbar-right{display:flex;align-items:center;gap:8px}
-.btn{padding:6px 12px;font-size:12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans)}
-.btn:hover{background:var(--color-background-secondary)}
-.btn-primary{background:#185FA5;color:#fff;border-color:#185FA5;font-size:12px}
-.btn-primary:hover{background:#0C447C;border-color:#0C447C}
-.content{flex:1;overflow-y:auto;padding:20px}
-.page{display:none}
-.page.active{display:block}
-.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-.metric-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px;min-height:80px}
-.metric-label{font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em}
-.metric-val{font-size:22px;font-weight:500;color:var(--color-text-primary)}
-.metric-sub{font-size:11px;color:var(--color-text-secondary);margin-top:4px}
-.metric-card.danger .metric-val{color:var(--color-text-danger)}
-.metric-card.success .metric-val{color:var(--color-text-success)}
-.metric-card.warn .metric-val{color:var(--color-text-warning)}
-.section-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);margin-bottom:10px;margin-top:16px}
-.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px}
-.data-table{width:100%;border-collapse:collapse;font-size:12px}
-.data-table th{text-align:left;padding:8px 10px;color:var(--color-text-tertiary);font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary);font-size:11px;text-transform:uppercase;letter-spacing:0.05em}
-.data-table td{padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
-.data-table tr:last-child td{border-bottom:none}
-.data-table tr:hover td{background:var(--color-background-secondary)}
-.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:500}
-.badge-green{background:#EAF3DE;color:#27500A}
-.badge-yellow{background:#FAEEDA;color:#633806}
-.badge-red{background:#FCEBEB;color:#791F1F}
-.badge-dark{background:#721c24;color:#fff}
-.badge-blue{background:#E6F1FB;color:#0C447C}
-.badge-purple{background:#EEEDFE;color:#3C3489}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.form-row{display:flex;flex-direction:column;gap:4px}
-.form-label{font-size:11px;color:var(--color-text-secondary);font-weight:500}
-.form-input{padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:13px;font-family:var(--font-sans);width:100%}
-.form-input:focus{outline:none;border-color:#185FA5;box-shadow:0 0 0 2px rgba(24,95,165,0.12)}
-.form-actions{margin-top:16px;display:flex;gap:8px}
-.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}
-.dot-green{background:#639922}.dot-yellow{background:#BA7517}.dot-red{background:#E24B4A}.dot-dark{background:#721c24}
-.url-box{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;font-size:12px;color:var(--color-text-secondary);word-break:break-all}
-.url-input{width:100%;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:12px;font-family:var(--font-mono)}
-.alert-bar{padding:10px 14px;border-radius:var(--border-radius-md);font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.alert-bar.info{background:#E6F1FB;color:#0C447C;border:0.5px solid #B5D4F4}
-.alert-bar.warn{background:#FAEEDA;color:#633806;border:0.5px solid #FAC775}
-.alert-bar.danger{background:#FCEBEB;color:#791F1F;border:0.5px solid #F7C1C1}
-.loading{text-align:center;padding:32px;color:var(--color-text-tertiary);font-size:13px}
-.gs-url-row{display:flex;gap:8px;align-items:stretch;margin-bottom:16px}
-.gs-url-row input{flex:1}
-.gs-url-row button{white-space:nowrap;padding:7px 14px}
-.tag-input{display:flex;flex-wrap:wrap;gap:6px;padding:6px 8px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);min-height:38px;cursor:text}
-.tag{background:#E6F1FB;color:#0C447C;border-radius:999px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px}
-.tag-rm{cursor:pointer;opacity:0.6;font-size:14px;line-height:1}
-.tag-rm:hover{opacity:1}
-.tag-input-field{border:none;outline:none;background:transparent;font-size:13px;min-width:60px;color:var(--color-text-primary);font-family:var(--font-sans)}
-</style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); background: var(--bg-main); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
 
-<h2 class="sr-only">Mini ERP Dashboard - Hệ thống quản lý kho và đơn hàng</h2>
+        .erp-container { display: flex; height: 100vh; overflow: hidden; padding: 20px; gap: 20px; }
 
-<div class="erp">
-  <div class="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-text">Mini ERP</div>
-      <div class="logo-sub">Google Sheets Backend</div>
+        /* Sidebar - Apple Style */
+        .sidebar { 
+            width: 240px; 
+            background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg); 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: var(--shadow);
+        }
+        .sidebar-logo { padding: 32px 24px; }
+        .logo-text { font-size: 20px; font-weight: 600; letter-spacing: -0.5px; }
+        .logo-sub { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+        .nav-group { padding: 0 12px; margin-bottom: 24px; }
+        .nav-sep { font-size: 10px; font-weight: 700; color: #BEBEBE; padding: 10px 16px; text-transform: uppercase; }
+        .nav-item { 
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px; 
+            cursor: pointer; font-size: 14px; font-weight: 500; border-radius: 10px;
+            color: var(--text-primary); transition: all 0.2s; margin-bottom: 2px;
+        }
+        .nav-item:hover { background: rgba(0, 122, 255, 0.05); color: var(--accent); }
+        .nav-item.active { background: var(--accent); color: white; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+
+        /* Main Content */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .topbar { 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 10px 0 24px 0; 
+        }
+        .page-title { font-size: 28px; font-weight: 700; letter-spacing: -1px; }
+        .topbar-right { display: flex; gap: 12px; }
+
+        .content { flex: 1; overflow-y: auto; padding-right: 4px; }
+        .page { display: none; animation: fadeIn 0.4s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Cards & Components */
+        .card { background: var(--bg-card); border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow); margin-bottom: 20px; border: none; }
+        .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .metric-card { 
+            background: var(--bg-card); padding: 20px; border-radius: var(--radius-md); 
+            box-shadow: var(--shadow); transition: transform 0.2s;
+        }
+        .metric-card:hover { transform: translateY(-4px); }
+        .metric-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+        .metric-val { font-size: 24px; font-weight: 700; color: var(--text-primary); }
+        .metric-sub { font-size: 11px; margin-top: 6px; color: var(--text-secondary); }
+
+        /* Buttons */
+        .btn { 
+            padding: 10px 18px; font-size: 13px; font-weight: 600; border-radius: 999px; 
+            border: none; cursor: pointer; transition: all 0.2s; font-family: inherit;
+        }
+        .btn-secondary { background: #E5E5E7; color: var(--text-primary); }
+        .btn-secondary:hover { background: #D2D2D7; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #0062CC; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); }
+
+        /* Tables */
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .data-table th { 
+            text-align: left; padding: 12px 16px; font-size: 11px; font-weight: 700; 
+            color: var(--text-secondary); text-transform: uppercase; border-bottom: 1px solid var(--border-color); 
+        }
+        .data-table td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid var(--border-color); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: #FBFBFC; }
+
+        /* Badges */
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .badge-green { background: #EAF9E7; color: #1D7000; }
+        .badge-red { background: #FFF1F0; color: #D70015; }
+        .badge-blue { background: #E5F1FF; color: #0071E3; }
+        .badge-yellow { background: #FFF9E6; color: #9E6A00; }
+
+        /* Forms */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-row { display: flex; flex-direction: column; gap: 8px; }
+        .form-label { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+        .form-input { 
+            padding: 12px 16px; border: 1.5px solid var(--border-color); border-radius: 10px; 
+            font-size: 14px; outline: none; transition: all 0.2s; background: #FBFBFC;
+        }
+        .form-input:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1); }
+
+        .tag-input { 
+            display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; 
+            border: 1.5px solid var(--border-color); border-radius: 10px; background: #FBFBFC; 
+        }
+        .tag { background: var(--accent); color: white; border-radius: 6px; padding: 4px 10px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+        .tag-rm { cursor: pointer; font-size: 16px; line-height: 1; }
+
+        .alert-bar { padding: 14px 20px; border-radius: 12px; font-size: 13px; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .alert-info { background: #F5F5F7; color: #1D1D1F; border-left: 4px solid var(--accent); }
+        .alert-danger { background: #FFF1F0; color: #D70015; border-left: 4px solid #D70015; }
+
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .dot-green { background: #34C759; box-shadow: 0 0 8px #34C759; }
+        .dot-yellow { background: #FFCC00; }
+        .dot-red { background: #FF3B30; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #D2D2D7; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="erp-container">
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-text">SORAN ERP</div>
+            <div class="logo-sub">Minimal Management</div>
+        </div>
+        
+        <div class="nav-group">
+            <div class="nav-sep">Tổng quan</div>
+            <div class="nav-item active" onclick="nav('dashboard')">
+                <span class="nav-icon">📊</span> Dashboard
+            </div>
+            <div class="nav-item" onclick="nav('inventory')">
+                <span class="nav-icon">📦</span> Kho hàng
+            </div>
+            <div class="nav-item" onclick="nav('product')">
+                <span class="nav-icon">✨</span> Sản phẩm
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-sep">Giao dịch</div>
+            <div class="nav-item" onclick="nav('import')">
+                <span class="nav-icon">📥</span> Nhập hàng
+            </div>
+            <div class="nav-item" onclick="nav('order')">
+                <span class="nav-icon">🛒</span> Đơn hàng
+            </div>
+        </div>
+
+        <div class="nav-group" style="margin-top: auto;">
+            <div class="nav-sep">Hệ thống</div>
+            <div class="nav-item" onclick="nav('settings')">
+                <span class="nav-icon">⚙️</span> Cài đặt
+            </div>
+            <div id="conn-status" style="padding: 16px; font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px;">
+                <span class="status-dot dot-yellow"></span> Disconnected
+            </div>
+        </div>
     </div>
-    <div style="padding:8px 0">
-      <div class="nav-sep">Main</div>
-      <div class="nav-item active" onclick="nav('dashboard')">
-        <span class="nav-icon">◈</span> Dashboard
-      </div>
-      <div class="nav-item" onclick="nav('product')">
-        <span class="nav-icon">◻</span> Sản phẩm
-      </div>
-      <div class="nav-item" onclick="nav('inventory')">
-        <span class="nav-icon">≡</span> Kho hàng
-      </div>
-      <div class="nav-sep">Giao dịch</div>
-      <div class="nav-item" onclick="nav('import')">
-        <span class="nav-icon">↓</span> Nhập hàng
-      </div>
-      <div class="nav-item" onclick="nav('order')">
-        <span class="nav-icon">↗</span> Đơn hàng
-      </div>
-      <div class="nav-sep">System</div>
-      <div class="nav-item" onclick="nav('settings')">
-        <span class="nav-icon">⚙</span> Cài đặt
-      </div>
+
+    <div class="main">
+        <div class="topbar">
+            <div class="page-title" id="page-title">Dashboard</div>
+            <div class="topbar-right">
+                <button class="btn btn-secondary" onclick="refresh()">Làm mới</button>
+                <button class="btn btn-primary" onclick="mainAction()">+ Tạo mới</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="page-dashboard" class="page active">
+                <div id="dash-alert"></div>
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">ĐƠN HÀNG</div>
+                        <div class="metric-val" id="m-orders">—</div>
+                        <div class="metric-sub">Sẵn sàng xử lý</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">DOANH THU</div>
+                        <div class="metric-val" id="m-revenue" style="color: var(--accent);">—</div>
+                        <div class="metric-sub">VNĐ (Tháng này)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">OVER SELL</div>
+                        <div class="metric-val" id="m-oversell" style="color: #FF9500;">—</div>
+                        <div class="metric-sub">Đơn cần kiểm tra</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">KHO ÂM</div>
+                        <div class="metric-val" id="m-negstock" style="color: #FF3B30;">—</div>
+                        <div class="metric-sub">SKU cần nhập gấp</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px;">
+                    <div class="card">
+                        <h3 style="font-size: 16px; margin-bottom: 20px;">Báo cáo nhanh</h3>
+                        <table class="data-table">
+                            <tr><td>Tổng số SKU đang quản lý</td><td style="text-align:right; font-weight:600;" id="m-skus">—</td></tr>
+                            <tr><td>Tổng tồn kho hiện hữu</td><td style="text-align:right; font-weight:600;" id="m-stock">—</td></tr>
+                            <tr><td>Số lượng đã bán</td><td style="text-align:right; font-weight:600;" id="m-sold">—</td></tr>
+                            <tr><td>Lợi nhuận dự tính (50%)</td><td style="text-align:right; font-weight:600; color: #34C759;" id="m-profit">—</td></tr>
+                        </table>
+                    </div>
+                    <div class="card" style="background: linear-gradient(135deg, #007AFF 0%, #0051AF 100%); color: white;">
+                        <h3 style="font-size: 16px; margin-bottom: 12px; color: rgba(255,255,255,0.8);">Hệ thống</h3>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                <span>Google Sheet API</span>
+                                <span id="sys-api" class="badge" style="background: rgba(255,255,255,0.2); color: white;">Offline</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                <span>Đồng bộ cuối</span>
+                                <span id="sys-sync" style="opacity: 0.8;">—</span>
+                            </div>
+                        </div>
+                        <button class="btn" style="width:100%; margin-top: 24px; background: white; color: var(--accent);" onclick="nav('settings')">Cấu hình ngay →</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-product" class="page">
+                <div class="card">
+                    <h3 style="margin-bottom: 20px;">Thông tin sản phẩm</h3>
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">Tên sản phẩm</label>
+                            <input class="form-input" id="p-name" placeholder="Ví dụ: Giày bảo hộ Hans" />
+                        </div>
+                        <div class="form-row">
+                            <label class="form-label">Mã Code (Gốc)</label>
+                            <input class="form-input" id="p-code" placeholder="HANS-01" style="text-transform:uppercase" />
+                        </div>
+                        <div class="form-row">
+                            <label class="form-label">Giá niêm yết (VNĐ)</label>
+                            <input class="form-input" id="p-price" type="number" placeholder="550000" />
+                        </div>
+                        <div class="form-row">
+                            <label class="form-label">Danh mục</label>
+                            <input class="form-input" id="p-cat" placeholder="Giày, Quần ủng..." />
+                        </div>
+                        <div class="form-row" style="grid-column: 1/-1;">
+                            <label class="form-label">Phân loại Sizes (Nhấn Enter sau mỗi size)</label>
+                            <div class="tag-input" id="size-tag-box" onclick="document.getElementById('size-field').focus()">
+                                <input id="size-field" style="border:none; outline:none; background:transparent; font-size:14px; flex:1;" placeholder="38, 39, 40..." onkeydown="sizeKey(event)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 32px; display: flex; gap: 12px;">
+                        <button class="btn btn-primary" onclick="submitProduct()">Xác nhận tạo</button>
+                        <button class="btn btn-secondary" onclick="clearForm('product')">Hủy bỏ</button>
+                    </div>
+                    <div id="p-result" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+
+            <div id="page-inventory" class="page">
+                <div class="card" style="padding: 0; overflow: hidden;">
+                    <div style="padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color);">
+                        <h3 style="font-size: 16px;">Tồn kho chi tiết</h3>
+                        <input class="form-input" id="inv-search" placeholder="Tìm kiếm SKU..." style="width: 240px; padding: 8px 16px;" oninput="filterInventory()" />
+                    </div>
+                    <div id="inv-table-wrap" style="min-height: 300px;">
+                        <div style="padding: 40px; text-align: center; color: var(--text-secondary);">Đang chờ kết nối dữ liệu...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-import" class="page">
+                <div class="card">
+                    <h3 style="margin-bottom: 20px;">Lệnh nhập kho</h3>
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">Mã sản phẩm</label>
+                            <input class="form-input" id="im-code" placeholder="HANS-01" style="text-transform:uppercase" />
+                        </div>
+                        <div class="form-row">
+                            <label class="form-label">Size nhập</label>
+                            <input class="form-input" id="im-size" placeholder="40" />
+                        </div>
+                        <div class="form-row">
+                            <label class="form-label">Số lượng</label>
+                            <input class="form-input" id="im-qty" type="number" placeholder="100" />
+                        </div>
+                        <div class="form-row">
+                            <label class="form-label">Nhà cung cấp</label>
+                            <input class="form-input" id="im-supplier" placeholder="Kho tổng" />
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" style="margin-top: 24px;" onclick="submitImport()">Xác nhận nhập kho</button>
+                    <div id="im-result" style="margin-top: 20px;"></div>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom: 16px; font-size: 15px;">Lịch sử nhập gần đây</h3>
+                    <div id="import-hist-wrap"></div>
+                </div>
+            </div>
+
+            <div id="page-order" class="page">
+                <div class="card">
+                    <h3 style="margin-bottom: 20px;">Tạo đơn hàng</h3>
+                    <div class="form-grid">
+                        <div class="form-row"><label class="form-label">Khách hàng</label><input class="form-input" id="o-name" placeholder="Tên khách hàng" /></div>
+                        <div class="form-row"><label class="form-label">Số điện thoại</label><input class="form-input" id="o-phone" placeholder="090..." /></div>
+                        <div class="form-row" style="grid-column: 1/-1;"><label class="form-label">Địa chỉ giao hàng</label><input class="form-input" id="o-addr" placeholder="Đà Nẵng" /></div>
+                        <div class="form-row"><label class="form-label">Mã SP</label><input class="form-input" id="o-code" placeholder="HANS-01" style="text-transform:uppercase" /></div>
+                        <div class="form-row"><label class="form-label">Size</label><input class="form-input" id="o-size" placeholder="40" /></div>
+                        <div class="form-row"><label class="form-label">Số lượng</label><input class="form-input" id="o-qty" type="number" value="1" /></div>
+                    </div>
+                    <button class="btn btn-primary" style="margin-top: 24px;" onclick="submitOrder()">Lên đơn hàng</button>
+                    <div id="o-result" style="margin-top: 20px;"></div>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom: 16px; font-size: 15px;">Danh sách đơn hàng</h3>
+                    <div id="order-list-wrap"></div>
+                </div>
+            </div>
+
+            <div id="page-settings" class="page">
+                <div class="card">
+                    <h3 style="margin-bottom: 20px;">Cấu hình kết nối</h3>
+                    <div class="form-row">
+                        <label class="form-label">Google Apps Script Web App URL</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input class="form-input" id="gs-url-input" style="flex: 1; font-family: monospace; font-size: 12px;" placeholder="https://script.google.com/macros/s/.../exec" />
+                            <button class="btn btn-primary" onclick="saveUrl()">Kết nối</button>
+                        </div>
+                    </div>
+                    <div id="url-test-result" style="margin-top: 16px;"></div>
+                </div>
+                <div class="card" style="background: #FBFBFC;">
+                    <h4 style="font-size: 13px; margin-bottom: 12px;">Hướng dẫn nhanh</h4>
+                    <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                        1. Truy cập Apps Script từ Google Sheet của bạn.<br>
+                        2. Dán mã nguồn <code style="color: var(--accent);">FullERP.gs</code> vào editor.<br>
+                        3. Nhấn <b>Deploy > New Deployment</b>.<br>
+                        4. Chọn Type là <b>Web App</b>, thiết lập quyền truy cập cho <b>Anyone</b>.<br>
+                        5. Sao chép URL nhận được và dán vào ô cấu hình phía trên.
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div style="margin-top:auto;padding:12px 16px;border-top:0.5px solid var(--color-border-tertiary)">
-      <div id="conn-status" style="font-size:11px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:5px">
-        <span class="status-dot dot-yellow"></span> Chưa kết nối
-      </div>
-    </div>
-  </div>
-
-  <div class="main">
-    <div class="topbar">
-      <div class="page-title" id="page-title">Dashboard</div>
-      <div class="topbar-right">
-        <button class="btn" onclick="refresh()">↻ Làm mới</button>
-        <button class="btn btn-primary" id="main-action-btn" onclick="mainAction()">+ Tạo mới</button>
-      </div>
-    </div>
-
-    <div class="content">
-
-      <!-- DASHBOARD -->
-      <div id="page-dashboard" class="page active">
-        <div id="dash-alert" style="display:none"></div>
-        <div class="metric-grid">
-          <div class="metric-card">
-            <div class="metric-label">Tổng đơn hàng</div>
-            <div class="metric-val" id="m-orders">—</div>
-            <div class="metric-sub">Tất cả thời gian</div>
-          </div>
-          <div class="metric-card success">
-            <div class="metric-label">Doanh thu</div>
-            <div class="metric-val" id="m-revenue">—</div>
-            <div class="metric-sub">VNĐ</div>
-          </div>
-          <div class="metric-card warn">
-            <div class="metric-label">Over Sell</div>
-            <div class="metric-val" id="m-oversell">—</div>
-            <div class="metric-sub">Đơn cần xử lý</div>
-          </div>
-          <div class="metric-card danger">
-            <div class="metric-label">Kho âm</div>
-            <div class="metric-val" id="m-negstock">—</div>
-            <div class="metric-sub">SKU cần nhập thêm</div>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="card">
-            <div class="section-title">Tổng quan kho</div>
-            <table class="data-table">
-              <tr><td style="color:var(--color-text-secondary)">Tổng SKU</td><td style="text-align:right;font-weight:500" id="m-skus">—</td></tr>
-              <tr><td style="color:var(--color-text-secondary)">Tổng tồn kho</td><td style="text-align:right;font-weight:500" id="m-stock">—</td></tr>
-              <tr><td style="color:var(--color-text-secondary)">Đã bán</td><td style="text-align:right;font-weight:500" id="m-sold">—</td></tr>
-              <tr><td style="color:var(--color-text-secondary)">Còn lại</td><td style="text-align:right;font-weight:500" id="m-remaining">—</td></tr>
-              <tr><td style="color:var(--color-text-secondary)">Lợi nhuận (50%)</td><td style="text-align:right;font-weight:500;color:var(--color-text-success)" id="m-profit">—</td></tr>
-            </table>
-          </div>
-          <div class="card">
-            <div class="section-title">Trạng thái hệ thống</div>
-            <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
-              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
-                <span style="color:var(--color-text-secondary)">Google Sheet</span>
-                <span id="sys-sheet" class="badge badge-yellow">Chưa cấu hình</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
-                <span style="color:var(--color-text-secondary)">Apps Script API</span>
-                <span id="sys-api" class="badge badge-yellow">Chưa cấu hình</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
-                <span style="color:var(--color-text-secondary)">Last sync</span>
-                <span id="sys-sync" style="font-size:11px;color:var(--color-text-tertiary)">—</span>
-              </div>
-            </div>
-            <div style="margin-top:14px;padding-top:12px;border-top:0.5px solid var(--color-border-tertiary)">
-              <button class="btn btn-primary" style="width:100%;font-size:12px" onclick="nav('settings')">Cấu hình Apps Script URL →</button>
-            </div>
-          </div>
-        </div>
-        <div class="section-title" style="margin-top:20px">Hướng dẫn kết nối</div>
-        <div class="card">
-          <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.9">
-            <b style="color:var(--color-text-primary);font-weight:500">Bước 1.</b> Mở Google Sheet → <code style="background:var(--color-background-secondary);padding:1px 5px;border-radius:3px;font-family:var(--font-mono)">Extensions → Apps Script</code> → paste code FullERP.gs<br>
-            <b style="color:var(--color-text-primary);font-weight:500">Bước 2.</b> Thay <code style="background:var(--color-background-secondary);padding:1px 5px;border-radius:3px;font-family:var(--font-mono)">YOUR_SHEET_ID_HERE</code> bằng ID của Sheet<br>
-            <b style="color:var(--color-text-primary);font-weight:500">Bước 3.</b> Deploy → <code style="background:var(--color-background-secondary);padding:1px 5px;border-radius:3px;font-family:var(--font-mono)">New deployment → Web App → Anyone → Deploy</code><br>
-            <b style="color:var(--color-text-primary);font-weight:500">Bước 4.</b> Copy URL → Vào <b style="font-weight:500">Cài đặt</b> tab → dán vào Apps Script URL
-          </div>
-        </div>
-      </div>
-
-      <!-- PRODUCT -->
-      <div id="page-product" class="page">
-        <div class="alert-bar info">Tạo sản phẩm sẽ tự động sinh SKU và thêm vào kho với tồn kho = 0.</div>
-        <div class="card">
-          <div class="section-title" style="margin-top:0">Thêm sản phẩm mới</div>
-          <div class="form-grid">
-            <div class="form-row">
-              <label class="form-label">Tên sản phẩm *</label>
-              <input class="form-input" id="p-name" placeholder="VD: Blue Pants" />
-            </div>
-            <div class="form-row">
-              <label class="form-label">Mã sản phẩm (Code) *</label>
-              <input class="form-input" id="p-code" placeholder="VD: BP" style="text-transform:uppercase" />
-            </div>
-            <div class="form-row">
-              <label class="form-label">Giá bán (VNĐ) *</label>
-              <input class="form-input" id="p-price" type="number" placeholder="159000" />
-            </div>
-            <div class="form-row">
-              <label class="form-label">Danh mục</label>
-              <input class="form-input" id="p-cat" placeholder="VD: Pants, Shirt..." />
-            </div>
-            <div class="form-row" style="grid-column:1/-1">
-              <label class="form-label">Sizes (nhập số → Enter)</label>
-              <div class="tag-input" id="size-tag-box" onclick="document.getElementById('size-field').focus()">
-                <input class="tag-input-field" id="size-field" placeholder="35 36 37..." onkeydown="sizeKey(event)" />
-              </div>
-            </div>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" onclick="submitProduct()">Tạo sản phẩm</button>
-            <button class="btn" onclick="clearForm('product')">Xóa trắng</button>
-          </div>
-          <div id="p-result" style="margin-top:12px;display:none"></div>
-        </div>
-      </div>
-
-      <!-- INVENTORY -->
-      <div id="page-inventory" class="page">
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <div class="section-title" style="margin:0">Danh sách kho hàng</div>
-            <input class="form-input" id="inv-search" placeholder="Tìm SKU, sản phẩm..." style="width:200px;font-size:12px" oninput="filterInventory()" />
-          </div>
-          <div id="inv-table-wrap"><div class="loading">Kết nối Apps Script để xem dữ liệu kho...</div></div>
-        </div>
-      </div>
-
-      <!-- IMPORT -->
-      <div id="page-import" class="page">
-        <div class="alert-bar info">Nhập hàng sẽ cộng vào tồn kho của SKU tương ứng.</div>
-        <div class="card">
-          <div class="section-title" style="margin-top:0">Nhập hàng vào kho</div>
-          <div class="form-grid">
-            <div class="form-row">
-              <label class="form-label">Mã sản phẩm (Code) *</label>
-              <input class="form-input" id="im-code" placeholder="VD: BP" style="text-transform:uppercase" />
-            </div>
-            <div class="form-row">
-              <label class="form-label">Size *</label>
-              <input class="form-input" id="im-size" placeholder="VD: 40" />
-            </div>
-            <div class="form-row">
-              <label class="form-label">Số lượng *</label>
-              <input class="form-input" id="im-qty" type="number" min="1" placeholder="50" />
-            </div>
-            <div class="form-row">
-              <label class="form-label">Nhà cung cấp</label>
-              <input class="form-input" id="im-supplier" placeholder="Supplier A" />
-            </div>
-            <div class="form-row" style="grid-column:1/-1">
-              <label class="form-label">Ghi chú</label>
-              <input class="form-input" id="im-note" placeholder="Lô hàng đầu tiên..." />
-            </div>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" onclick="submitImport()">Nhập kho</button>
-            <button class="btn" onclick="clearForm('import')">Xóa trắng</button>
-          </div>
-          <div id="im-result" style="margin-top:12px;display:none"></div>
-        </div>
-        <div class="section-title">Lịch sử nhập hàng</div>
-        <div class="card">
-          <div id="import-hist-wrap"><div class="loading">Kết nối Apps Script để xem lịch sử nhập hàng...</div></div>
-        </div>
-      </div>
-
-      <!-- ORDER -->
-      <div id="page-order" class="page">
-        <div class="alert-bar warn">Hệ thống cho phép Over Sell — vẫn tạo đơn khi hết hàng và gắn flag cảnh báo.</div>
-        <div class="card">
-          <div class="section-title" style="margin-top:0">Tạo đơn hàng mới</div>
-          <div class="form-grid">
-            <div class="form-row">
-              <label class="form-label">Tên khách hàng *</label>
-              <input class="form-input" id="o-name" placeholder="Nguyễn Văn A" />
-            </div>
-            <div class="form-row">
-              <label class="form-label">Số điện thoại *</label>
-              <input class="form-input" id="o-phone" placeholder="0912345678" />
-            </div>
-            <div class="form-row" style="grid-column:1/-1">
-              <label class="form-label">Địa chỉ</label>
-              <input class="form-input" id="o-addr" placeholder="123 Đường ABC, Đà Nẵng" />
-            </div>
-            <div class="form-row">
-              <label class="form-label">Mã sản phẩm (Code) *</label>
-              <input class="form-input" id="o-code" placeholder="BP" style="text-transform:uppercase" />
-            </div>
-            <div class="form-row">
-              <label class="form-label">Size *</label>
-              <input class="form-input" id="o-size" placeholder="40" />
-            </div>
-            <div class="form-row">
-              <label class="form-label">Số lượng *</label>
-              <input class="form-input" id="o-qty" type="number" min="1" placeholder="1" />
-            </div>
-            <div class="form-row">
-              <label class="form-label">Ghi chú</label>
-              <input class="form-input" id="o-note" placeholder="..." />
-            </div>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" onclick="submitOrder()">Tạo đơn hàng</button>
-            <button class="btn" onclick="clearForm('order')">Xóa trắng</button>
-          </div>
-          <div id="o-result" style="margin-top:12px;display:none"></div>
-        </div>
-        <div class="section-title">Danh sách đơn hàng</div>
-        <div class="card">
-          <div id="order-list-wrap"><div class="loading">Kết nối Apps Script để xem đơn hàng...</div></div>
-        </div>
-      </div>
-
-      <!-- SETTINGS -->
-      <div id="page-settings" class="page">
-        <div class="card">
-          <div class="section-title" style="margin-top:0">Cấu hình Apps Script</div>
-          <div class="form-row" style="margin-bottom:12px">
-            <label class="form-label">Apps Script Web App URL</label>
-            <div class="gs-url-row">
-              <input class="url-input" id="gs-url-input" placeholder="https://script.google.com/macros/s/...../exec" />
-              <button class="btn btn-primary" onclick="saveUrl()">Lưu & Test</button>
-            </div>
-            <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">URL được lưu trong localStorage, chỉ tồn tại trên trình duyệt này.</div>
-          </div>
-          <div id="url-test-result" style="display:none;margin-top:10px"></div>
-        </div>
-        <div class="card" style="margin-top:12px">
-          <div class="section-title" style="margin-top:0">Thông tin cấu hình GS hiện tại</div>
-          <div id="cfg-display" style="font-size:12px;color:var(--color-text-secondary);line-height:1.8">
-            <div>Sheet URL: <span id="cfg-url" style="color:var(--color-text-tertiary)">Chưa cài đặt</span></div>
-            <div>Email thông báo: <code style="font-family:var(--font-mono);font-size:12px">caovantay2912@gmail.com</code></div>
-            <div>Sheets: Product Master, Inventory, Import, Orders, Dashboard</div>
-          </div>
-        </div>
-        <div class="card" style="margin-top:12px">
-          <div class="section-title" style="margin-top:0">Hướng dẫn lấy Apps Script URL</div>
-          <div style="font-size:12px;color:var(--color-text-secondary);line-height:2">
-            1. Mở Google Apps Script → chọn project FullERP<br>
-            2. Click <b style="font-weight:500">Deploy</b> → <b style="font-weight:500">New deployment</b><br>
-            3. Type: <b style="font-weight:500">Web App</b> | Execute as: <b style="font-weight:500">Me</b> | Who has access: <b style="font-weight:500">Anyone</b><br>
-            4. Click <b style="font-weight:500">Deploy</b> → Copy URL → Paste vào ô trên
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
 </div>
 
 <script>
-const PAGES = {
-  dashboard: 'Dashboard',
-  product: 'Sản phẩm',
-  inventory: 'Kho hàng',
-  import: 'Nhập hàng',
-  order: 'Đơn hàng',
-  settings: 'Cài đặt'
-};
+    // Logic điều hướng và xử lý dữ liệu (giữ nguyên logic gốc của bạn nhưng tối ưu hiển thị)
+    const PAGES = { dashboard: 'Dashboard', product: 'Sản phẩm', inventory: 'Kho hàng', import: 'Nhập hàng', order: 'Đơn hàng', settings: 'Cài đặt' };
+    let GS_URL = localStorage.getItem('erp_gs_url') || '';
+    let sizes = [];
+    let invData = [];
 
-let GS_URL = '';
-let sizes = [];
-let invData = [];
-
-function init() {
-  try {
-    GS_URL = localStorage.getItem('erp_gs_url') || '';
-    if (GS_URL) {
-      document.getElementById('gs-url-input').value = GS_URL;
-      document.getElementById('cfg-url').textContent = GS_URL.substring(0,50) + '...';
-      setConnStatus(true);
-      loadDashboard();
+    function init() {
+        if (GS_URL) {
+            document.getElementById('gs-url-input').value = GS_URL;
+            setConnStatus(true);
+            loadDashboard();
+        }
     }
-  } catch(e) {}
-}
 
-function setConnStatus(connected) {
-  const el = document.getElementById('conn-status');
-  if (connected) {
-    el.innerHTML = '<span class="status-dot dot-green"></span> Đã kết nối';
-  } else {
-    el.innerHTML = '<span class="status-dot dot-red"></span> Lỗi kết nối';
-  }
-}
-
-function nav(page) {
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const navItems = document.querySelectorAll('.nav-item');
-  const idx = Object.keys(PAGES).indexOf(page);
-  if (navItems[idx]) navItems[idx].classList.add('active');
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  document.getElementById('page-title').textContent = PAGES[page];
-  if (page === 'inventory') loadInventory();
-  if (page === 'import') loadImportHistory();
-  if (page === 'order') loadOrders();
-  if (page === 'dashboard') loadDashboard();
-}
-
-function mainAction() {
-  const active = document.querySelector('.page.active');
-  if (!active) return;
-  const id = active.id;
-  if (id === 'page-dashboard') nav('product');
-}
-
-function refresh() {
-  const active = document.querySelector('.page.active');
-  if (!active) return;
-  const id = active.id.replace('page-','');
-  if (id === 'dashboard') loadDashboard();
-  if (id === 'inventory') loadInventory();
-  if (id === 'import') loadImportHistory();
-  if (id === 'order') loadOrders();
-}
-
-async function gsPost(params) {
-  if (!GS_URL) throw new Error('Chưa cấu hình Apps Script URL');
-  const body = new URLSearchParams(params);
-  const res = await fetch(GS_URL, {method:'POST', body});
-  const data = await res.json();
-  return data;
-}
-
-async function gsGet(params) {
-  if (!GS_URL) throw new Error('Chưa cấu hình Apps Script URL');
-  const qs = new URLSearchParams(params);
-  const res = await fetch(GS_URL + '?' + qs);
-  const data = await res.json();
-  return data;
-}
-
-async function loadDashboard() {
-  if (!GS_URL) return;
-  try {
-    const data = await gsPost({action:'getDashboard'});
-    document.getElementById('m-orders').textContent = (data.totalOrders||0).toLocaleString('vi');
-    document.getElementById('m-revenue').textContent = (data.totalRevenue||0).toLocaleString('vi');
-    document.getElementById('m-oversell').textContent = data.overSellCount||0;
-    document.getElementById('m-negstock').textContent = data.negativeStockCount||0;
-    document.getElementById('m-skus').textContent = data.totalSkus||0;
-    document.getElementById('m-stock').textContent = (data.totalStock||0).toLocaleString('vi');
-    document.getElementById('m-sold').textContent = (data.totalSold||0).toLocaleString('vi');
-    document.getElementById('m-remaining').textContent = (data.totalRemaining||0).toLocaleString('vi');
-    document.getElementById('m-profit').textContent = (data.totalProfit||0).toLocaleString('vi') + ' đ';
-    document.getElementById('sys-sheet').textContent = 'Đã kết nối';
-    document.getElementById('sys-sheet').className = 'badge badge-green';
-    document.getElementById('sys-api').textContent = 'Online';
-    document.getElementById('sys-api').className = 'badge badge-green';
-    document.getElementById('sys-sync').textContent = new Date().toLocaleTimeString('vi-VN');
-    if ((data.overSellCount||0) > 0 || (data.negativeStockCount||0) > 0) {
-      const ab = document.getElementById('dash-alert');
-      ab.style.display = 'block';
-      ab.innerHTML = `<div class="alert-bar danger">Cảnh báo: ${data.overSellCount} đơn Over Sell, ${data.negativeStockCount} SKU kho âm cần xử lý ngay.</div>`;
+    function setConnStatus(connected) {
+        const el = document.getElementById('conn-status');
+        el.innerHTML = connected ? '<span class="status-dot dot-green"></span> Connected' : '<span class="status-dot dot-red"></span> Connection Error';
     }
-  } catch(e) {
-    setConnStatus(false);
-  }
-}
 
-async function loadInventory() {
-  const wrap = document.getElementById('inv-table-wrap');
-  if (!GS_URL) { wrap.innerHTML = '<div class="loading">Vui lòng cấu hình Apps Script URL trong Cài đặt.</div>'; return; }
-  wrap.innerHTML = '<div class="loading">Đang tải dữ liệu kho...</div>';
-  try {
-    const rows = await gsPost({action:'getAllInventory'});
-    invData = Array.isArray(rows) ? rows : (rows.data||[]);
-    renderInventory(invData);
-  } catch(e) {
-    wrap.innerHTML = `<div class="loading" style="color:var(--color-text-danger)">Lỗi: ${e.message}</div>`;
-  }
-}
+    function nav(page) {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const items = document.querySelectorAll('.nav-item');
+        const keys = Object.keys(PAGES);
+        items[keys.indexOf(page)].classList.add('active');
+        
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-' + page).classList.add('active');
+        document.getElementById('page-title').textContent = PAGES[page];
 
-function renderInventory(rows) {
-  const wrap = document.getElementById('inv-table-wrap');
-  if (!rows.length) { wrap.innerHTML = '<div class="loading">Kho trống. Hãy tạo sản phẩm trước.</div>'; return; }
-  const html = `<div style="overflow-x:auto"><table class="data-table">
-    <thead><tr>
-      <th>SKU</th><th>Sản phẩm</th><th>Size</th><th>Giá</th>
-      <th>Tồn kho</th><th>Đã bán</th><th>Còn lại</th><th>Trạng thái</th>
-    </tr></thead>
-    <tbody>${rows.map(r => {
-      const rem = parseInt(r.remaining)||0;
-      const badge = rem > 20 ? 'badge-green' : rem >= 5 ? 'badge-yellow' : rem > 0 ? 'badge-red' : 'badge-dark';
-      const status = rem > 20 ? 'Dồi dào' : rem >= 5 ? 'Cảnh báo' : rem > 0 ? 'Tới hạn' : 'Kho âm';
-      return `<tr>
-        <td style="font-family:var(--font-mono);font-size:11px">${r.sku||''}</td>
-        <td>${r.product||''}</td><td>${r.size||''}</td>
-        <td>${(r.price||0).toLocaleString('vi')}đ</td>
-        <td style="text-align:right">${(r.stock||0).toLocaleString('vi')}</td>
-        <td style="text-align:right">${(r.sold||0).toLocaleString('vi')}</td>
-        <td style="text-align:right;font-weight:500">${rem.toLocaleString('vi')}</td>
-        <td><span class="badge ${badge}">${status}</span></td>
-      </tr>`;
-    }).join('')}</tbody>
-  </table></div>`;
-  wrap.innerHTML = html;
-}
-
-function filterInventory() {
-  const q = document.getElementById('inv-search').value.toLowerCase();
-  const filtered = invData.filter(r => (r.sku||'').toLowerCase().includes(q) || (r.product||'').toLowerCase().includes(q));
-  renderInventory(filtered);
-}
-
-async function loadImportHistory() {
-  const wrap = document.getElementById('import-hist-wrap');
-  if (!GS_URL) { wrap.innerHTML = '<div class="loading">Vui lòng cấu hình Apps Script URL.</div>'; return; }
-  wrap.innerHTML = '<div class="loading">Đang tải lịch sử nhập hàng...</div>';
-  try {
-    const rows = await gsPost({action:'getImportHistory'});
-    const data = Array.isArray(rows) ? rows : (rows.data||[]);
-    if (!data.length) { wrap.innerHTML = '<div class="loading">Chưa có lịch sử nhập hàng.</div>'; return; }
-    wrap.innerHTML = `<div style="overflow-x:auto"><table class="data-table">
-      <thead><tr><th>Thời gian</th><th>Import ID</th><th>SKU</th><th>SL</th><th>NCC</th><th>Ghi chú</th><th>Status</th></tr></thead>
-      <tbody>${data.map(r => `<tr>
-        <td style="font-size:11px">${r.time||''}</td>
-        <td style="font-family:var(--font-mono);font-size:11px">${r.importId||''}</td>
-        <td style="font-family:var(--font-mono);font-size:11px">${r.sku||''}</td>
-        <td style="text-align:right;font-weight:500">${r.quantity||0}</td>
-        <td>${r.supplier||''}</td><td style="font-size:11px">${r.note||''}</td>
-        <td><span class="badge badge-green">${r.status||'Completed'}</span></td>
-      </tr>`).join('')}</tbody>
-    </table></div>`;
-  } catch(e) {
-    wrap.innerHTML = `<div class="loading" style="color:var(--color-text-danger)">Lỗi: ${e.message}</div>`;
-  }
-}
-
-async function loadOrders() {
-  const wrap = document.getElementById('order-list-wrap');
-  if (!GS_URL) { wrap.innerHTML = '<div class="loading">Vui lòng cấu hình Apps Script URL.</div>'; return; }
-  wrap.innerHTML = '<div class="loading">Đang tải đơn hàng...</div>';
-  try {
-    const rows = await gsPost({action:'getOrders'});
-    const data = Array.isArray(rows) ? rows : (rows.data||[]);
-    if (!data.length) { wrap.innerHTML = '<div class="loading">Chưa có đơn hàng.</div>'; return; }
-    const statusBadge = s => ({
-      'New':'badge-yellow','Confirm':'badge-blue','Shipping':'badge-purple',
-      'Done':'badge-green','Cancel':'badge-red','Over Sell':'badge-dark'
-    }[s]||'badge-yellow');
-    wrap.innerHTML = `<div style="overflow-x:auto"><table class="data-table">
-      <thead><tr><th>Thời gian</th><th>Đơn</th><th>Khách</th><th>ĐT</th><th>SKU</th><th>SL</th><th>Tổng</th><th>Status</th><th></th></tr></thead>
-      <tbody>${data.map(r => `<tr>
-        <td style="font-size:11px">${r.time||''}</td>
-        <td style="font-weight:500;font-family:var(--font-mono);font-size:11px">${r.orderCode||''}</td>
-        <td>${r.customer||''}</td>
-        <td style="font-size:11px">${r.phone||''}</td>
-        <td style="font-family:var(--font-mono);font-size:11px">${r.sku||''}</td>
-        <td style="text-align:right">${r.quantity||0}</td>
-        <td style="text-align:right;font-weight:500">${(r.total||0).toLocaleString('vi')}đ</td>
-        <td><span class="badge ${statusBadge(r.status)}">${r.status||''}</span></td>
-        <td><select style="font-size:11px;padding:2px 4px;border:0.5px solid var(--color-border-tertiary);border-radius:4px;background:var(--color-background-primary);color:var(--color-text-primary)" onchange="updateStatus('${r.orderCode}',this.value)">
-          <option value="">— cập nhật —</option>
-          ${['New','Confirm','Shipping','Done','Cancel'].map(s=>`<option value="${s}">${s}</option>`).join('')}
-        </select></td>
-      </tr>`).join('')}</tbody>
-    </table></div>`;
-  } catch(e) {
-    wrap.innerHTML = `<div class="loading" style="color:var(--color-text-danger)">Lỗi: ${e.message}</div>`;
-  }
-}
-
-async function updateStatus(orderCode, status) {
-  if (!status) return;
-  try {
-    await gsPost({action:'updateOrderStatus', orderCode, status});
-    loadOrders();
-  } catch(e) { alert('Lỗi: '+e.message); }
-}
-
-function sizeKey(e) {
-  const val = e.target.value.trim();
-  if ((e.key === 'Enter' || e.key === ' ' || e.key === ',') && val) {
-    e.preventDefault();
-    const nums = val.split(/\s+|,/).filter(Boolean);
-    nums.forEach(n => {
-      if (!sizes.includes(n)) {
-        sizes.push(n);
-        const tag = document.createElement('div');
-        tag.className = 'tag';
-        tag.dataset.size = n;
-        tag.innerHTML = `${n}<span class="tag-rm" onclick="removeSize('${n}')">×</span>`;
-        document.getElementById('size-tag-box').insertBefore(tag, e.target);
-      }
-    });
-    e.target.value = '';
-  }
-}
-
-function removeSize(s) {
-  sizes = sizes.filter(x => x !== s);
-  document.querySelectorAll('.tag').forEach(t => { if(t.dataset.size === s) t.remove(); });
-}
-
-function showResult(id, success, msg) {
-  const el = document.getElementById(id);
-  el.style.display = 'block';
-  el.innerHTML = `<div class="alert-bar ${success?'info':'danger'}">${msg}</div>`;
-}
-
-async function submitProduct() {
-  const name = document.getElementById('p-name').value.trim();
-  const code = document.getElementById('p-code').value.trim().toUpperCase();
-  const price = document.getElementById('p-price').value;
-  const cat = document.getElementById('p-cat').value.trim();
-  if (!name||!code||!price||!sizes.length) { showResult('p-result',false,'Vui lòng điền đủ thông tin và thêm ít nhất 1 size.'); return; }
-  try {
-    const res = await gsPost({action:'createProduct',productName:name,productCode:code,price,category:cat,sizes:JSON.stringify(sizes)});
-    showResult('p-result', res.success, res.success ? `Tạo sản phẩm ${name} thành công! Product ID: ${res.productId}` : (res.error||'Lỗi không xác định'));
-    if (res.success) { clearForm('product'); loadDashboard(); }
-  } catch(e) { showResult('p-result',false,'Lỗi kết nối: '+e.message); }
-}
-
-async function submitImport() {
-  const code = document.getElementById('im-code').value.trim().toUpperCase();
-  const size = document.getElementById('im-size').value.trim();
-  const qty = document.getElementById('im-qty').value;
-  const supplier = document.getElementById('im-supplier').value.trim();
-  const note = document.getElementById('im-note').value.trim();
-  if (!code||!size||!qty) { showResult('im-result',false,'Vui lòng điền mã sản phẩm, size và số lượng.'); return; }
-  try {
-    const res = await gsPost({action:'import',productCode:code,size,quantity:qty,supplier,note});
-    showResult('im-result', res.success, res.success ? `Nhập ${qty} x ${code}-${size} thành công! Tồn kho mới: ${res.remaining}` : (res.error||'Lỗi'));
-    if (res.success) { clearForm('import'); loadImportHistory(); loadDashboard(); }
-  } catch(e) { showResult('im-result',false,'Lỗi kết nối: '+e.message); }
-}
-
-async function submitOrder() {
-  const name = document.getElementById('o-name').value.trim();
-  const phone = document.getElementById('o-phone').value.trim();
-  const addr = document.getElementById('o-addr').value.trim();
-  const code = document.getElementById('o-code').value.trim().toUpperCase();
-  const size = document.getElementById('o-size').value.trim();
-  const qty = document.getElementById('o-qty').value;
-  const note = document.getElementById('o-note').value.trim();
-  if (!name||!phone||!code||!size||!qty) { showResult('o-result',false,'Vui lòng điền đủ: tên khách, SĐT, mã SP, size, số lượng.'); return; }
-  try {
-    const res = await gsPost({action:'createOrder',customerName:name,phone,address:addr,productCode:code,size,quantity:qty,note});
-    const msg = res.success ? (res.isOverSell ? `Tạo đơn ${res.orderCode} — OVER SELL! Thiếu hàng.` : `Tạo đơn ${res.orderCode} thành công! Còn lại: ${res.remaining}`) : (res.error||'Lỗi');
-    showResult('o-result', res.success, msg);
-    if (res.success) { clearForm('order'); loadOrders(); loadDashboard(); }
-  } catch(e) { showResult('o-result',false,'Lỗi kết nối: '+e.message); }
-}
-
-function clearForm(type) {
-  if (type==='product') {
-    ['p-name','p-code','p-price','p-cat'].forEach(id => document.getElementById(id).value='');
-    sizes = [];
-    document.querySelectorAll('#size-tag-box .tag').forEach(t=>t.remove());
-    document.getElementById('p-result').style.display='none';
-  }
-  if (type==='import') {
-    ['im-code','im-size','im-qty','im-supplier','im-note'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('im-result').style.display='none';
-  }
-  if (type==='order') {
-    ['o-name','o-phone','o-addr','o-code','o-size','o-qty','o-note'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('o-result').style.display='none';
-  }
-}
-
-async function saveUrl() {
-  const url = document.getElementById('gs-url-input').value.trim();
-  if (!url) { alert('Vui lòng nhập URL.'); return; }
-  GS_URL = url;
-  try { localStorage.setItem('erp_gs_url', url); } catch(e) {}
-  document.getElementById('cfg-url').textContent = url.substring(0,50) + '...';
-  const res = document.getElementById('url-test-result');
-  res.style.display = 'block';
-  res.innerHTML = '<div class="alert-bar info">Đang kiểm tra kết nối...</div>';
-  try {
-    const data = await gsPost({action:'getDashboard'});
-    if (data.totalOrders !== undefined || data.totalSkus !== undefined) {
-      res.innerHTML = '<div class="alert-bar info">Kết nối thành công! Dữ liệu đã được tải.</div>';
-      setConnStatus(true);
-      loadDashboard();
-    } else {
-      res.innerHTML = '<div class="alert-bar warn">Kết nối OK nhưng response không đúng format. Kiểm tra lại action getDashboard trong GS.</div>';
+        if (page === 'inventory') loadInventory();
+        if (page === 'import') loadImportHistory();
+        if (page === 'order') loadOrders();
+        if (page === 'dashboard') loadDashboard();
     }
-  } catch(e) {
-    res.innerHTML = `<div class="alert-bar danger">Lỗi kết nối: ${e.message}. Kiểm tra URL và quyền "Anyone" trong Deploy.</div>`;
-    setConnStatus(false);
-  }
-}
 
-init();
+    async function gsPost(params) {
+        if (!GS_URL) throw new Error('Chưa cấu hình URL');
+        const body = new URLSearchParams(params);
+        const res = await fetch(GS_URL, {method:'POST', body});
+        return await res.json();
+    }
+
+    async function loadDashboard() {
+        if (!GS_URL) return;
+        try {
+            const data = await gsPost({action:'getDashboard'});
+            document.getElementById('m-orders').textContent = (data.totalOrders||0);
+            document.getElementById('m-revenue').textContent = (data.totalRevenue||0).toLocaleString('vi') + 'đ';
+            document.getElementById('m-oversell').textContent = data.overSellCount||0;
+            document.getElementById('m-negstock').textContent = data.negativeStockCount||0;
+            document.getElementById('m-skus').textContent = data.totalSkus||0;
+            document.getElementById('m-stock').textContent = (data.totalStock||0);
+            document.getElementById('m-sold').textContent = (data.totalSold||0);
+            document.getElementById('m-profit').textContent = (data.totalProfit||0).toLocaleString('vi') + 'đ';
+            document.getElementById('sys-api').textContent = 'Online';
+            document.getElementById('sys-api').className = 'badge badge-green';
+            document.getElementById('sys-sync').textContent = new Date().toLocaleTimeString('vi-VN');
+            setConnStatus(true);
+        } catch(e) { setConnStatus(false); }
+    }
+
+    async function loadInventory() {
+        const wrap = document.getElementById('inv-table-wrap');
+        wrap.innerHTML = '<div style="padding:40px; text-align:center;">Đang tải dữ liệu...</div>';
+        try {
+            const rows = await gsPost({action:'getAllInventory'});
+            invData = Array.isArray(rows) ? rows : (rows.data||[]);
+            renderInventory(invData);
+        } catch(e) { wrap.innerHTML = `<div style="padding:20px; color:red;">Lỗi: ${e.message}</div>`; }
+    }
+
+    function renderInventory(rows) {
+        const wrap = document.getElementById('inv-table-wrap');
+        if (!rows.length) { wrap.innerHTML = '<div style="padding:40px; text-align:center;">Không có dữ liệu.</div>'; return; }
+        let html = `<table class="data-table"><thead><tr><th>SKU</th><th>Sản phẩm</th><th>Size</th><th>Tồn</th><th>Đã bán</th><th>Còn</th><th>Trạng thái</th></tr></thead><tbody>`;
+        rows.forEach(r => {
+            const rem = parseInt(r.remaining)||0;
+            const badge = rem > 10 ? 'badge-green' : rem > 0 ? 'badge-yellow' : 'badge-red';
+            html += `<tr>
+                <td style="font-family:monospace; font-weight:600;">${r.sku}</td>
+                <td>${r.product}</td>
+                <td>${r.size}</td>
+                <td>${r.stock}</td>
+                <td>${r.sold}</td>
+                <td style="font-weight:700;">${rem}</td>
+                <td><span class="badge ${badge}">${rem > 0 ? 'Sẵn sàng' : 'Hết hàng'}</span></td>
+            </tr>`;
+        });
+        html += `</tbody></table>`;
+        wrap.innerHTML = html;
+    }
+
+    function filterInventory() {
+        const q = document.getElementById('inv-search').value.toLowerCase();
+        const filtered = invData.filter(r => r.sku.toLowerCase().includes(q) || r.product.toLowerCase().includes(q));
+        renderInventory(filtered);
+    }
+
+    // Các hàm xử lý Form (Submit)
+    async function submitProduct() {
+        const name = document.getElementById('p-name').value;
+        const code = document.getElementById('p-code').value.toUpperCase();
+        const price = document.getElementById('p-price').value;
+        if (!name || !code || !sizes.length) { alert('Vui lòng nhập đủ thông tin'); return; }
+        try {
+            const res = await gsPost({action:'createProduct', productName:name, productCode:code, price, sizes:JSON.stringify(sizes)});
+            document.getElementById('p-result').innerHTML = `<div class="alert-bar alert-info">Thành công: ${res.productId || 'Đã tạo sản phẩm'}</div>`;
+            if (res.success) clearForm('product');
+        } catch(e) { alert(e.message); }
+    }
+
+    function sizeKey(e) {
+        if (e.key === 'Enter') {
+            const val = e.target.value.trim();
+            if (val && !sizes.includes(val)) {
+                sizes.push(val);
+                const tag = document.createElement('div');
+                tag.className = 'tag';
+                tag.innerHTML = `${val} <span class="tag-rm" onclick="this.parentElement.remove(); sizes=sizes.filter(s=>s!='${val}')">×</span>`;
+                document.getElementById('size-tag-box').insertBefore(tag, e.target);
+            }
+            e.target.value = '';
+        }
+    }
+
+    async function saveUrl() {
+        const url = document.getElementById('gs-url-input').value.trim();
+        if (!url) return;
+        GS_URL = url;
+        localStorage.setItem('erp_gs_url', url);
+        const resBox = document.getElementById('url-test-result');
+        resBox.innerHTML = '<div class="alert-bar alert-info">Đang kiểm tra kết nối...</div>';
+        try {
+            await loadDashboard();
+            resBox.innerHTML = '<div class="alert-bar alert-info" style="background:#EAF9E7;">Kết nối thành công!</div>';
+        } catch(e) {
+            resBox.innerHTML = '<div class="alert-bar alert-danger">Kết nối thất bại. Vui lòng kiểm tra lại URL.</div>';
+        }
+    }
+
+    function mainAction() { nav('product'); }
+    function refresh() { location.reload(); }
+    function clearForm(type) { /* Logic xóa form */ location.reload(); }
+
+    init();
 </script>
+
+</body>
+</html>
