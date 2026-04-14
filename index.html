@@ -640,7 +640,6 @@ body {
 .dot-yellow { background: var(--warning); }
 .dot-red { background: var(--danger); }
 </style>
-
 </head>
 <body>
 
@@ -670,6 +669,16 @@ body {
       </div>
     </div>
   </div>
+
+<div class="main">
+    <div class="topbar">
+      <div class="page-title">Overview</div>
+      <div class="topbar-right">
+        <div class="theme-toggle" onclick="toggleTheme()">☀️</div>
+        <button class="btn">Export</button>
+        <button class="btn btn-primary">New Transaction</button>
+      </div>
+    </div>
 
   <!-- Main Content -->
   <div class="main">
@@ -1294,6 +1303,23 @@ async function saveUrl() {
     res.innerHTML = `<div class="alert-bar danger">Lỗi kết nối: ${e.message}. Kiểm tra URL và quyền "Anyone" trong Deploy.</div>`;
     setConnStatus(false);
   }
+}
+
+// Simple theme toggle (add to your JS)
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const newTheme = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  
+  // Optional: save preference
+  localStorage.setItem('theme', newTheme);
+}
+
+// Auto detect system preference
+if (localStorage.getItem('theme')) {
+  document.documentElement.setAttribute('data-theme', localStorage.getItem('theme'));
+} else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  document.documentElement.setAttribute('data-theme', 'dark');
 }
 
 init();
