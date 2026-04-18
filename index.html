@@ -1224,10 +1224,18 @@ function refreshPage() {
 // ===== GOOGLE SHEETS API (READ) =====
 async function sheetsApiGet(range) {
   if (!GS_SHEET_ID || !GS_API_KEY) throw new Error('Chưa cấu hình Sheet ID & API Key');
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${GS_SHEET_ID}/values/${range}?key=${GS_API_KEY}`;
+  // URL encode range để handle khoảng trắng & ký tự đặc biệt
+  const encodedRange = encodeURIComponent(range);
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${GS_SHEET_ID}/values/${encodedRange}?key=${GS_API_KEY}`;
+  console.log('📊 Sheets API:', range);
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`Sheet API error: ${res.status}`);
   const data = await res.json();
+  if (data.error) {
+    console.error('🔴 Sheet API Error:', data.error);
+    throw new Error(`Sheet API: ${data.error.message}`);
+  }
+  if (!res.ok) throw new Error(`Sheet API error: ${res.status}`);
+  console.log('  → Got', (data.values || []).length, 'rows');
   return data.values || [];
 }
 
@@ -1260,60 +1268,137 @@ function getGoogleDriveImageUrl(shareLink) {
   return null;
 }
 
-// ===== LOAD DATA FROM GOOGLE SHEETS =====
+// ===== DEBUG API ERROR =====
+async function debugSheetApi(range) {
+  if (!GS_SHEET_ID || !GS_API_KEY) {
+    console.error('Missing Sheet ID or API Key');
+    return;
+  }
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${GS_SHEET_ID}/values/${range}?key=${GS_API_KEY}`;
+  console.log('🔍 Debug Sheet API:');
+  console.log('URL:', url);
+  console.log('Range:', range);
+  console.log('Sheet ID:', GS_SHEET_ID);
+  
+  try {
+    const res = await fetch(url);
+    console.log('Status:', res.status);
+    const data = await res.json();
+    console.log('Response:', data);
+    if (data.error) {
+      console.error('API Error:', data.error.message);
+      return data.error;
+    }
+    return data;
+  } catch (e) {
+    console.error('Fetch error:', e);
+    return e;
+  }
+}
+
+// ===== LOAD DATA - Dùng Apps Script API (WRITE) + Google Sheets API (READ) =====
 async function loadData() {
   try {
-    // READ từ Google Sheets API
-    const productsData = await sheetsApiGet('Product Master!A2:H');
-    const inventoryData = await sheetsApiGet('Inventory!A2:G');
-    const ordersData = await sheetsApiGet('Orders!A2:H');
-    const eventsData = await sheetsApiGet('Event Log!A2:D');
+    console.log('🚀 Loading data from Apps Script...');
+    
+    // READ từ Apps Script - nó sẽ đọc từ Sheets
+    let inventoryData = [];
+    let ordersData = [];
+    let dashboardMetrics = {};
 
-    // Parse Products
-    products = productsData.map(row => ({
-      id: row[0] || '',
-      name: row[1] || '',
-      code: row[2] || '',
-      price: parseInt(row[3]) || 0,
-      imageLink: row[4] || '', // Google Drive link
-      imageSrc: getGoogleDriveImageUrl(row[4]), // Converted URL
-      emoji: row[5] || '📦',
-      sizes: (row[6] || '').split(',').map(s => s.trim()).filter(Boolean),
-      status: row[7] || 'active'
-    })).filter(p => p.id);
+    // Get Inventory từ Apps Script
+    try {
+      const invRes = await gsPost('getAllInventory', {});
+      inventoryData = Array.isArray(invRes) ? invRes : (invRes.data || []);
+      console.log('✓ Inventory loaded:', inventoryData.length);
+    } catch (e) {
+      console.warn('⚠️ Inventory load failed:', e.message);
+    }
 
-    // Parse Inventory
-    inventory = inventoryData.map(row => ({
-      sku: row[0] || '',
-      product: row[1] || '',
-      size: row[2] || '',
-      price: parseInt(row[3]) || 0,
-      stock: parseInt(row[4]) || 0,
-      sold: parseInt(row[5]) || 0,
-      emoji: row[6] || '📦'
-    })).filter(i => i.sku);
+    // Get Orders từ Apps Script
+    try {
+      const ordersRes = await gsPost('getOrders', {});
+      ordersData = Array.isArray(ordersRes) ? ordersRes : (ordersRes.data || []);
+      console.log('✓ Orders loaded:', ordersData.length);
+    } catch (e) {
+      console.warn('⚠️ Orders load failed:', e.message);
+    }
 
-    // Parse Orders
-    orders = ordersData.map(row => ({
-      id: row[0] || '',
-      code: row[1] || '',
-      customer: row[2] || '',
-      phone: row[3] || '',
-      sku: row[4] || '',
-      qty: parseInt(row[5]) || 0,
-      total: parseInt(row[6]) || 0,
-      status: row[7] || 'new',
-      tracking: row[8] || '',
-      createdAt: new Date()
-    })).filter(o => o.id);
+    // Get Dashboard metrics từ Apps Script
+    try {
+      dashboardMetrics = await gsPost('getDashboard', {});
+      console.log('✓ Dashboard metrics loaded');
+    } catch (e) {
+      console.warn('⚠️ Dashboard load failed:', e.message);
+    }
 
-    // Parse Events
-    events = eventsData.map(row => ({
-      type: row[0] || '',
-      message: row[1] || '',
-      payload: row[2] || '',
+    // READ Products từ Google Sheets API (vì chứa image link)
+    let productsData = [];
+    try {
+      productsData = await sheetsApiGet('Product Master!A2:I');
+      console.log('✓ Products loaded:', productsData.length);
+    } catch (e) {
+      console.warn('⚠️ Products load failed:', e.message);
+    }
+
+    // Parse Products từ Sheets API
+    products = productsData.map((row, idx) => {
+      const skus = (row[6] || '').split(',').map(s => s.trim()).filter(Boolean);
+      return {
+        id: row[1] || 'P' + idx,
+        name: row[2] || '',
+        code: row[3] || '',
+        price: parseInt(row[4]) || 0,
+        imageLink: row[5] || '', // Column E - Google Drive link
+        imageSrc: getGoogleDriveImageUrl(row[5]), // Convert to view URL
+        emoji: '📦',
+        sizes: skus,
+        status: row[8] || 'Active'
+      };
+    }).filter(p => p.name);
+
+    // Parse Inventory từ Apps Script
+    inventory = Array.isArray(inventoryData) ? inventoryData.map(row => ({
+      sku: row.sku || '',
+      product: row.product || '',
+      size: row.size || '',
+      price: parseInt(row.price) || 0,
+      stock: parseInt(row.stock) || 0,
+      sold: parseInt(row.sold) || 0,
+      remaining: parseInt(row.remaining) || 0,
+      status: row.status || 'Active'
+    })) : [];
+
+    // Parse Orders từ Apps Script
+    orders = Array.isArray(ordersData) ? ordersData.map(row => ({
+      code: row.orderCode || row.code || '',
+      customer: row.customer || '',
+      phone: row.phone || '',
+      sku: row.sku || '',
+      qty: parseInt(row.quantity || row.qty) || 0,
+      total: parseInt(row.total) || 0,
+      status: row.status || 'New',
+      tracking: row.tracking || '',
+      time: row.time || new Date().toLocaleTimeString('vi-VN')
+    })) : [];
+
+    // Create events từ Orders
+    events = orders.map(o => ({
+      type: o.status === 'Over Sell' ? 'oversell' : 'order_create',
+      message: `${o.code}: ${o.sku} x${o.qty} = ${o.total.toLocaleString('vi')}đ (${o.status})`,
       timestamp: new Date()
-    })).filter(e => e.type);
+    }));
+
+    console.log('📊 Data summary:', {
+      products: products.length,
+      inventory: inventory.length,
+      orders: orders.length,
+      events: events.length,
+      metrics: dashboardMetrics
+    });
+
+    // Store metrics globally
+    window.dashboardMetrics = dashboardMetrics;
 
     renderDashboard();
   } catch (e) {
@@ -1326,14 +1411,16 @@ async function loadData() {
 
 // ===== RENDER DASHBOARD =====
 function renderDashboard() {
-  const todayOrders = orders.filter(o => o.status === 'new').length;
-  const todayRevenue = orders.filter(o => o.status === 'new').reduce((s, o) => s + o.total, 0);
-  const oversellCount = orders.filter(o => o.status === 'oversell').length;
-  const negstockCount = inventory.filter(inv => inv.stock < 0).length;
-  const totalSku = inventory.length;
-  const totalStock = inventory.reduce((s, inv) => s + inv.stock, 0);
-  const totalSold = inventory.reduce((s, inv) => s + inv.sold, 0);
-  const profit = totalSold * 159000 * 0.5; // Rough estimate
+  const m = window.dashboardMetrics || {};
+  
+  const todayOrders = m.totalOrders || 0;
+  const todayRevenue = m.totalRevenue || 0;
+  const oversellCount = m.overSellCount || 0;
+  const negstockCount = m.negativeStockCount || 0;
+  const totalSku = m.totalSkus || 0;
+  const totalStock = m.totalStock || 0;
+  const totalSold = m.totalSold || 0;
+  const profit = m.totalProfit || 0;
 
   document.getElementById('m-today-orders').textContent = todayOrders;
   document.getElementById('m-today-revenue').textContent = todayRevenue.toLocaleString('vi');
@@ -1599,15 +1686,17 @@ async function updateTracking(orderId) {
 
 // ===== ANALYTICS =====
 function renderAnalytics() {
-  const successOrders = orders.filter(o => o.status === 'done').length;
-  const revenue = orders.reduce((s, o) => s + o.total, 0);
-  const oversell = orders.filter(o => o.status === 'oversell').length;
-  const errors = orders.filter(o => o.status === 'cancel').length;
+  const m = window.dashboardMetrics || {};
+  
+  const successOrders = orders.filter(o => o.status === 'Done').length;
+  const revenue = m.totalRevenue || 0;
+  const oversell = m.overSellCount || 0;
+  const errors = orders.filter(o => o.status === 'Cancel').length;
 
-  const stockHigh = inventory.filter(i => i.stock >= 20).length;
-  const stockWarn = inventory.filter(i => i.stock >= 5 && i.stock < 20).length;
-  const stockLow = inventory.filter(i => i.stock > 0 && i.stock < 5).length;
-  const stockNeg = inventory.filter(i => i.stock < 0).length;
+  const stockHigh = inventory.filter(i => i.remaining >= 20).length;
+  const stockWarn = inventory.filter(i => i.remaining >= 5 && i.remaining < 20).length;
+  const stockLow = inventory.filter(i => i.remaining > 0 && i.remaining < 5).length;
+  const stockNeg = inventory.filter(i => i.remaining < 0).length;
 
   document.getElementById('a-success-orders').textContent = successOrders;
   document.getElementById('a-revenue').textContent = revenue.toLocaleString('vi') + 'đ';
@@ -1697,10 +1786,30 @@ async function testGsConnection() {
   result.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Đang kiểm tra kết nối...</div>';
 
   try {
-    // Test READ
+    // Test READ - Debug chi tiết
+    console.log('📝 Testing Sheet API...');
+    const debugResult = await debugSheetApi('Product Master!A1:H1');
+    
+    if (debugResult && debugResult.error) {
+      const errorMsg = debugResult.error.message || 'Unknown error';
+      result.innerHTML = `
+        <div class="alert-bar error">
+          ❌ Sheet API Error 400<br><br>
+          <b>Lỗi:</b> ${errorMsg}<br><br>
+          <b>Kiểm tra:</b><br>
+          1. Sheet ID đúng không?<br>
+          2. Sheets API đã enable trong Google Cloud?<br>
+          3. Sheet có tên "Product Master" đúng không?<br>
+          4. API Key có quyền truy cập sheet này?<br><br>
+          👉 Mở F12 → Console xem chi tiết lỗi
+        </div>
+      `;
+      return;
+    }
+
     const productsData = await sheetsApiGet('Product Master!A1:H1');
     if (!productsData || productsData.length === 0) {
-      result.innerHTML = '<div class="alert-bar error">❌ Sheet API: Không tìm được Sheet hoặc API Key lỗi</div>';
+      result.innerHTML = '<div class="alert-bar warning">⚠️ Sheet API: Kết nối OK nhưng không tìm được dữ liệu. Sheet "Product Master" tồn tại không?</div>';
       return;
     }
 
@@ -1723,7 +1832,8 @@ async function testGsConnection() {
     
     setTimeout(loadData, 1500);
   } catch (e) {
-    result.innerHTML = `<div class="alert-bar error">❌ Lỗi: ${e.message}<br><br>Kiểm tra:<br>- Sheet ID đúng?<br>- API Key hợp lệ?<br>- Sheet có public/shared?</div>`;
+    result.innerHTML = `<div class="alert-bar error">❌ Lỗi: ${e.message}<br><br>👉 Mở F12 → Console xem chi tiết</div>`;
+    console.error('Connection test error:', e);
   }
 }
 
