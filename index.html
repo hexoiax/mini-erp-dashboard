@@ -1,1097 +1,1819 @@
-// ========================================
-// 🔥 FULL MINI ERP SYSTEM - APPSCRIPT V2
-// OPTIMIZED: Cache + Batch Sync + Multi-Status Orders
-// ========================================
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini ERP - Event-Driven Sales Operating System</title>
+  <style>
+:root {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  --accent-green: #10b981;
+  --accent-green-dark: #059669;
+  --accent-green-light: #34d399;
+  --accent-green-subtle: #d1fae5;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-// ========================================
-// CONFIG
-// ========================================
-const CONFIG = {
-  SHEET_ID: "10TFKTHIpzE-SK9xSO53CacZ98BnvvNgY7yiSBEJAogc",
-  EMAIL_NOTIFY: "caovantay2912@gmail.com",
-  SHEETS: {
-    PRODUCT_MASTER: "Product Master",
-    INVENTORY: "Inventory",
-    IMPORT: "Import",
-    ORDERS: "Orders",
-    DASHBOARD: "Dashboard"
-  },
-  CACHE_TIME: 1800 // 30 minutes
+[data-theme="dark"] {
+  --bg-primary: #0a0f1c;
+  --bg-secondary: #111827;
+  --bg-tertiary: #1f2937;
+  --border-primary: #334155;
+  --border-secondary: #475569;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #94a3b8;
+  --accent-green: #34d399;
+  --accent-green-dark: #10b981;
+  --accent-green-subtle: #064e3b;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.erp-container {
+  display: flex;
+  height: 100vh;
+  background: var(--bg-primary);
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-primary);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--border-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-logo {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent-green);
+  letter-spacing: -0.02em;
+}
+
+.sidebar-sub {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.nav-section {
+  padding: 16px 12px 8px;
+}
+
+.nav-section-title {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  padding: 8px 12px;
+  letter-spacing: 0.08em;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin: 0 4px;
+  transition: var(--transition);
+  border: 2px solid transparent;
+}
+
+.nav-item:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  transform: translateX(4px);
+}
+
+.nav-item.active {
+  background: var(--accent-green-subtle);
+  color: var(--accent-green-dark);
+  border-color: var(--accent-green);
+  font-weight: 600;
+}
+
+.nav-icon {
+  font-size: 18px;
+  width: 20px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px;
+  border-top: 1px solid var(--border-primary);
+  font-size: 12px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+
+.status-dot.connected { background: var(--success); }
+.status-dot.error { background: var(--danger); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* MAIN AREA */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.page-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+  background: var(--accent-green);
+  color: white;
+  border-color: var(--accent-green);
+}
+
+.btn-primary:hover {
+  background: var(--accent-green-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+  border-color: var(--danger);
+}
+
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: var(--transition);
+}
+
+.theme-toggle:hover {
+  transform: rotate(20deg);
+}
+
+/* CONTENT */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ALERT BARS */
+.alert-bar {
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid;
+}
+
+.alert-bar.success {
+  background: #ecfdf5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+.alert-bar.warning {
+  background: #fffbeb;
+  color: #92400e;
+  border-color: #fcd34d;
+}
+
+.alert-bar.error {
+  background: #fef2f2;
+  color: #7f1d1d;
+  border-color: #fecaca;
+}
+
+.alert-bar.info {
+  background: #eff6ff;
+  color: #0c2340;
+  border-color: #bfdbfe;
+}
+
+/* METRIC CARDS */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.metric-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: var(--transition);
+  position: relative;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-green), var(--accent-green-light));
+}
+
+.metric-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
+}
+
+.metric-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.metric-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.metric-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+/* CARD */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+  transition: var(--transition);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* PRODUCT CARD (KEY UI) */
+.product-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  transition: var(--transition);
+  cursor: default;
+}
+
+.product-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+}
+
+.product-image {
+  width: 100%;
+  height: 140px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  margin-bottom: 12px;
+  font-weight: 300;
+}
+
+.product-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.product-code {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  font-family: 'Monaco', monospace;
+  margin-bottom: 12px;
+}
+
+.product-stock {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  padding: 8px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.size-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.size-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}
+
+.size-label {
+  font-weight: 500;
+}
+
+.size-stock {
+  color: var(--text-secondary);
+}
+
+.size-btn-group {
+  display: flex;
+  gap: 6px;
+}
+
+.size-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-secondary);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.size-btn:hover {
+  background: var(--accent-green-subtle);
+  color: var(--accent-green-dark);
+  border-color: var(--accent-green);
+}
+
+/* FORM */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-grid.full {
+  grid-template-columns: 1fr;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.form-input {
+  padding: 10px 14px;
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent-green);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.form-select {
+  padding: 10px 14px;
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* TABLE */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 12px 16px;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-tertiary);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+.data-table tr:hover td {
+  background: var(--bg-tertiary);
+}
+
+/* BADGE */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  gap: 4px;
+}
+
+.badge.new { background: #dbeafe; color: #1e40af; }
+.badge.confirm { background: #ddd6fe; color: #5b21b6; }
+.badge.shipping { background: #fce7f3; color: #831843; }
+.badge.done { background: #dcfce7; color: #166534; }
+.badge.cancel { background: #fee2e2; color: #991b1b; }
+.badge.oversell { background: #fed7aa; color: #92400e; }
+
+/* STATUS BADGE */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ACTION PANELS */
+.action-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.action-card {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.action-card:hover {
+  border-color: var(--accent-green);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+}
+
+.action-card.highlight {
+  border-color: var(--warning);
+  background: rgba(245, 158, 11, 0.03);
+}
+
+.action-icon {
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+
+.action-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.action-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-tertiary);
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-tertiary);
+}
+
+.loading-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--border-primary);
+  border-top-color: var(--accent-green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* GRID LAYOUTS */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 1024px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .sidebar { width: 200px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .metric-grid { grid-template-columns: 1fr; }
+  .action-panel { grid-template-columns: 1fr; }
+}
+  </style>
+</head>
+<body>
+
+<div class="erp-container">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">Mini ERP</div>
+      <div class="sidebar-sub">Event-Driven System</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Control Center</div>
+      <div class="nav-item active" onclick="nav('dashboard')">
+        <span class="nav-icon">📊</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="nav('sales')">
+        <span class="nav-icon">💳</span> Bán hàng
+      </div>
+      <div class="nav-item" onclick="nav('processing')">
+        <span class="nav-icon">⚙️</span> Xử lý đơn
+      </div>
+      <div class="nav-item" onclick="nav('inventory')">
+        <span class="nav-icon">📦</span> Kho hàng
+      </div>
+      <div class="nav-item" onclick="nav('analytics')">
+        <span class="nav-icon">📈</span> Báo cáo
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Management</div>
+      <div class="nav-item" onclick="nav('products')">
+        <span class="nav-icon">🏷️</span> Sản phẩm
+      </div>
+      <div class="nav-item" onclick="nav('events')">
+        <span class="nav-icon">📝</span> Event Log
+      </div>
+      <div class="nav-item" onclick="nav('settings')">
+        <span class="nav-icon">⚙️</span> Cài đặt
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="status-indicator">
+        <span class="status-dot connected"></span>
+        <span>Đã kết nối</span>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text-tertiary)">
+        Last sync: <span id="last-sync">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+    <div class="topbar">
+      <div class="page-title" id="page-title">Dashboard</div>
+      <div class="topbar-actions">
+        <button class="btn" onclick="refreshPage()">🔄 Refresh</button>
+        <button class="theme-toggle" onclick="toggleTheme()">☀️</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div id="page-dashboard" class="page active">
+        <div id="dashboard-alerts"></div>
+
+        <div class="metric-grid">
+          <div class="metric-card">
+            <div class="metric-label">Đơn hôm nay</div>
+            <div class="metric-value" id="m-today-orders">—</div>
+            <div class="metric-sub">Chưa xác nhận</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Doanh thu</div>
+            <div class="metric-value" id="m-today-revenue">—</div>
+            <div class="metric-sub">VNĐ</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Over Sell</div>
+            <div class="metric-value" id="m-oversell-count">0</div>
+            <div class="metric-sub">Cần xử lý</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Kho âm</div>
+            <div class="metric-value" id="m-negstock-count">0</div>
+            <div class="metric-sub">SKU</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="section-title">⚡ Hành động nhanh</div>
+            <div class="action-panel">
+              <div class="action-card" onclick="nav('sales')">
+                <div class="action-icon">🛒</div>
+                <div class="action-title">Tạo đơn hàng</div>
+                <div class="action-sub">Nhập nhanh từ UI</div>
+              </div>
+              <div class="action-card" onclick="nav('inventory')">
+                <div class="action-icon">📥</div>
+                <div class="action-title">Nhập hàng</div>
+                <div class="action-sub">Cập nhật kho</div>
+              </div>
+              <div class="action-card" onclick="nav('processing')">
+                <div class="action-icon">🚚</div>
+                <div class="action-title">Xác nhận & Tracking</div>
+                <div class="action-sub">Xử lý đơn</div>
+              </div>
+              <div class="action-card" onclick="nav('products')">
+                <div class="action-icon">➕</div>
+                <div class="action-title">Thêm sản phẩm</div>
+                <div class="action-sub">Sản phẩm mới</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-title">📌 Tổng quan kho</div>
+            <table class="data-table">
+              <tr>
+                <td style="color:var(--text-secondary)">Tổng SKU</td>
+                <td style="text-align:right;font-weight:600" id="m-total-sku">—</td>
+              </tr>
+              <tr>
+                <td style="color:var(--text-secondary)">Tồn kho</td>
+                <td style="text-align:right;font-weight:600" id="m-total-stock">—</td>
+              </tr>
+              <tr>
+                <td style="color:var(--text-secondary)">Đã bán</td>
+                <td style="text-align:right;font-weight:600" id="m-total-sold">—</td>
+              </tr>
+              <tr>
+                <td style="color:var(--text-secondary)">Lợi nhuận (50%)</td>
+                <td style="text-align:right;font-weight:600;color:var(--success)" id="m-profit">—</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:20px">
+          <div class="section-title">🔗 Trạng thái kết nối</div>
+          <div style="display:flex;gap:20px;font-size:13px">
+            <div>
+              <div style="color:var(--text-secondary)">Google Sheets API</div>
+              <div style="margin-top:4px;font-size:11px">
+                <span class="badge new">Sẵn sàng</span>
+              </div>
+            </div>
+            <div>
+              <div style="color:var(--text-secondary)">Apps Script</div>
+              <div style="margin-top:4px">
+                <span class="badge new">Online</span>
+              </div>
+            </div>
+            <div>
+              <div style="color:var(--text-secondary)">Sync cuối</div>
+              <div style="margin-top:4px;color:var(--text-secondary);font-size:12px" id="sync-time">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SALES (QUICK ORDER) -->
+      <div id="page-sales" class="page">
+        <div class="alert-bar info">
+          ✨ UI không dùng SKU — chỉ chọn sản phẩm + size + nhập số lượng
+        </div>
+
+        <div class="card">
+          <div class="section-title">💳 Tạo đơn hàng nhanh</div>
+
+          <div class="form-grid">
+            <div class="form-row">
+              <label class="form-label">Khách hàng *</label>
+              <input class="form-input" id="order-customer" placeholder="Nguyễn Văn A" />
+            </div>
+            <div class="form-row">
+              <label class="form-label">Điện thoại *</label>
+              <input class="form-input" id="order-phone" placeholder="0912345678" />
+            </div>
+            <div class="form-row full">
+              <label class="form-label">Địa chỉ</label>
+              <input class="form-input" id="order-address" placeholder="123 Đường ABC, Đà Nẵng" />
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px">
+            <label class="form-label" style="margin-bottom:12px;display:block">Chọn sản phẩm *</label>
+            <div id="product-selector" class="action-panel"></div>
+          </div>
+
+          <div id="order-items" style="margin-bottom:16px"></div>
+
+          <div class="form-row">
+            <label class="form-label">Ghi chú</label>
+            <input class="form-input" id="order-note" placeholder="..." />
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-primary" onclick="submitOrder()">✓ Tạo đơn hàng</button>
+            <button class="btn" onclick="clearOrderForm()">Xóa trắng</button>
+          </div>
+
+          <div id="order-result" style="margin-top:12px;display:none"></div>
+        </div>
+      </div>
+
+      <!-- PROCESSING (ORDER MANAGEMENT) -->
+      <div id="page-processing" class="page">
+        <div class="alert-bar info">
+          📋 Xác nhận đơn, cập nhật tracking, xử lý lỗi
+        </div>
+
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <button class="btn" onclick="filterOrders('new')">🔔 Mới</button>
+          <button class="btn" onclick="filterOrders('oversell')">⚠️ Over Sell</button>
+          <button class="btn" onclick="filterOrders('pending')">⏳ Chưa tracking</button>
+          <button class="btn" onclick="filterOrders('all')">Tất cả</button>
+        </div>
+
+        <div id="orders-grid" class="action-panel"></div>
+      </div>
+
+      <!-- INVENTORY (PRODUCT CARDS) -->
+      <div id="page-inventory" class="page">
+        <div class="alert-bar info">
+          📦 Các sản phẩm & tồn kho — chọn size để nhập thêm
+        </div>
+
+        <input class="form-input" id="inv-search" placeholder="🔍 Tìm sản phẩm..." style="max-width:300px;margin-bottom:16px" oninput="filterProducts()" />
+
+        <div id="inventory-grid" class="action-panel"></div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div id="page-products" class="page">
+        <div class="alert-bar info">
+          ➕ Tạo sản phẩm mới + chọn size tự động tạo SKU
+        </div>
+
+        <div class="card">
+          <div class="section-title">➕ Thêm sản phẩm mới</div>
+
+          <div class="form-grid">
+            <div class="form-row">
+              <label class="form-label">Tên sản phẩm *</label>
+              <input class="form-input" id="prod-name" placeholder="VD: Blue Pants" />
+            </div>
+            <div class="form-row">
+              <label class="form-label">Mã (Code) *</label>
+              <input class="form-input" id="prod-code" placeholder="BP" style="text-transform:uppercase" />
+            </div>
+            <div class="form-row">
+              <label class="form-label">Giá (VNĐ) *</label>
+              <input class="form-input" id="prod-price" type="number" placeholder="159000" />
+            </div>
+            <div class="form-row">
+              <label class="form-label">Emoji/Icon</label>
+              <input class="form-input" id="prod-emoji" placeholder="👕" />
+            </div>
+          </div>
+
+          <div class="form-row full">
+            <label class="form-label">Size (tách bằng dấu cách) *</label>
+            <input class="form-input" id="prod-sizes" placeholder="35 36 37 38 39 40 41 42" />
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-primary" onclick="submitProduct()">✓ Tạo sản phẩm</button>
+            <button class="btn" onclick="clearProductForm()">Xóa trắng</button>
+          </div>
+
+          <div id="product-result" style="margin-top:12px;display:none"></div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS -->
+      <div id="page-analytics" class="page">
+        <div class="grid-2">
+          <div class="card">
+            <div class="section-title">📊 Tổng hợp hôm nay</div>
+            <table class="data-table">
+              <tr>
+                <td>Đơn thành công</td>
+                <td style="text-align:right;font-weight:600" id="a-success-orders">—</td>
+              </tr>
+              <tr>
+                <td>Doanh thu</td>
+                <td style="text-align:right;font-weight:600;color:var(--success)" id="a-revenue">—</td>
+              </tr>
+              <tr>
+                <td>Over Sell</td>
+                <td style="text-align:right;font-weight:600;color:var(--warning)" id="a-oversell">—</td>
+              </tr>
+              <tr>
+                <td>Lỗi/Hủy</td>
+                <td style="text-align:right;font-weight:600;color:var(--danger)" id="a-errors">—</td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="card">
+            <div class="section-title">📦 Tồn kho</div>
+            <table class="data-table">
+              <tr>
+                <td>Tồn ≥ 20</td>
+                <td style="text-align:right;font-weight:600;color:var(--success)" id="a-stock-high">—</td>
+              </tr>
+              <tr>
+                <td>Tồn 5-20</td>
+                <td style="text-align:right;font-weight:600;color:var(--warning)" id="a-stock-warn">—</td>
+              </tr>
+              <tr>
+                <td>Tồn < 5</td>
+                <td style="text-align:right;font-weight:600;color:var(--danger)" id="a-stock-low">—</td>
+              </tr>
+              <tr>
+                <td>Kho âm</td>
+                <td style="text-align:right;font-weight:600;color:var(--danger)" id="a-stock-neg">—</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">📝 Sự kiện gần đây (Events)</div>
+          <div id="events-log" class="data-table" style="display:block;font-size:12px"></div>
+        </div>
+      </div>
+
+      <!-- EVENT LOG -->
+      <div id="page-events" class="page">
+        <div class="card">
+          <div class="section-title">📝 Nhật ký sự kiện</div>
+          <div style="margin-bottom:12px">
+            <button class="btn" onclick="filterEvents('all')">Tất cả</button>
+            <button class="btn" onclick="filterEvents('product')">Sản phẩm</button>
+            <button class="btn" onclick="filterEvents('order')">Đơn hàng</button>
+            <button class="btn" onclick="filterEvents('inventory')">Kho hàng</button>
+          </div>
+          <div id="full-event-log" style="font-size:12px;max-height:600px;overflow-y:auto"></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="page-settings" class="page">
+        <div class="card">
+          <div class="section-title">⚙️ Apps Script Web App URL</div>
+
+          <div class="form-row" style="margin-bottom:16px">
+            <label class="form-label">Web App URL *</label>
+            <input class="form-input" id="gs-url" placeholder="https://script.google.com/macros/s/...../exec" />
+            <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">Từ Google Apps Script → Deploy → Web App</div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-primary" onclick="saveGsConfig()">✓ Lưu & Test</button>
+            <button class="btn" onclick="testConnection()">🔌 Test kết nối</button>
+          </div>
+
+          <div id="gs-test-result" style="display:none;margin-top:16px"></div>
+        </div>
+
+        <div class="card" style="margin-top:20px">
+          <div class="section-title">📖 Hướng dẫn Deploy</div>
+          <div style="font-size:13px;line-height:2;color:var(--text-secondary)">
+            <b style="color:var(--text-primary)">1.</b> Mở Google Sheet → Extensions → Apps Script<br>
+            <b style="color:var(--text-primary)">2.</b> Copy file FullERP_AppScript_V2.gs paste vào<br>
+            <b style="color:var(--text-primary)">3.</b> Deploy → New → Web App → Execute as Me → Anyone<br>
+            <b style="color:var(--text-primary)">4.</b> Copy URL → Paste vào ô trên → Save<br>
+            <br>
+            <b style="color:var(--text-primary)">✅ Hệ thống:</b><br>
+            → Dùng Apps Script Cache (tối ưu tốc độ)<br>
+            → 1 request = tất cả data (Products, Inventory, Orders, Dashboard)<br>
+            → Không cần Google Sheets API Key
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== SYSTEM STATE =====
+let GS_URL = '';
+let GS_SHEET_ID = '';
+let GS_API_KEY = '';
+let products = [];
+let orders = [];
+let inventory = [];
+let events = [];
+let selectedProduct = null;
+let selectedSize = null;
+let orderItems = [];
+
+const PAGES = {
+  dashboard: 'Dashboard',
+  sales: 'Bán hàng',
+  processing: 'Xử lý đơn',
+  inventory: 'Kho hàng',
+  analytics: 'Báo cáo',
+  products: 'Sản phẩm',
+  events: 'Event Log',
+  settings: 'Cài đặt'
 };
 
-const scriptProperties = PropertiesService.getScriptProperties();
-const cache = CacheService.getScriptCache();
-
-// ========================================
-// TIER 0: CACHE SYSTEM
-// ========================================
-
-function invalidateCache() {
-  cache.removeAll(['syncData', 'allProducts', 'allInventory', 'allOrders', 'dashboardMetrics']);
-  Logger.log('Cache invalidated');
-}
-
-function getCachedData(key, fetchFunction) {
-  let data = cache.get(key);
-  if (!data) {
-    data = JSON.stringify(fetchFunction());
-    cache.put(key, data, CONFIG.CACHE_TIME);
+// ===== INIT =====
+function init() {
+  GS_URL = localStorage.getItem('erp_gs_url') || '';
+  if (GS_URL) {
+    document.getElementById('gs-url').value = GS_URL;
   }
-  return JSON.parse(data);
+  updateLastSync();
+  setInterval(updateLastSync, 60000);
 }
 
-// ========================================
-// TIER 0.5: BATCH SYNC (KEY FUNCTION)
-// ========================================
-
-function getAllDataSync() {
-  const data = {
-    products: getAllProducts(),
-    inventory: getAllInventory(),
-    orders: getAllOrders(),
-    imports: getImportHistory(),
-    dashboard: calculateMetrics()
-  };
-  return data;
+function updateLastSync() {
+  const now = new Date().toLocaleTimeString('vi-VN');
+  document.getElementById('last-sync').textContent = now;
+  document.getElementById('sync-time').textContent = now;
 }
 
-function getAllProducts() {
-  try {
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    const sheet = ss.getSheetByName(CONFIG.SHEETS.PRODUCT_MASTER);
-    if (!sheet) return [];
-    
-    const data = sheet.getDataRange().getValues();
-    return data.slice(1).map(row => ({
-      id: row[1] || '',
-      name: row[2] || '',
-      code: row[3] || '',
-      price: parseInt(row[4]) || 0,
-      category: row[5] || '',
-      skus: (row[6] || '').split(',').map(s => s.trim()).filter(Boolean),
-      totalVariants: parseInt(row[7]) || 0,
-      status: row[8] || 'Active'
-    })).filter(p => p.id);
-  } catch (e) {
-    Logger.log('getAllProducts error: ' + e);
-    return [];
+// ===== NAVIGATION =====
+function nav(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('page-title').textContent = PAGES[page] || 'Page';
+  
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.target.closest('.nav-item')?.classList.add('active');
+
+  if (page === 'inventory') renderInventory();
+  if (page === 'sales') renderProductSelector();
+  if (page === 'processing') renderOrders();
+  if (page === 'analytics') renderAnalytics();
+  if (page === 'events') renderEventLog();
+}
+
+function refreshPage() {
+  loadData();
+}
+
+// ===== GOOGLE SHEETS API (READ) =====
+async function sheetsApiGet(range) {
+  if (!GS_SHEET_ID || !GS_API_KEY) throw new Error('Chưa cấu hình Sheet ID & API Key');
+  // URL encode range để handle khoảng trắng & ký tự đặc biệt
+  const encodedRange = encodeURIComponent(range);
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${GS_SHEET_ID}/values/${encodedRange}?key=${GS_API_KEY}`;
+  console.log('📊 Sheets API:', range);
+  const res = await fetch(url);
+  const data = await res.json();
+  if (data.error) {
+    console.error('🔴 Sheet API Error:', data.error);
+    throw new Error(`Sheet API: ${data.error.message}`);
   }
+  if (!res.ok) throw new Error(`Sheet API error: ${res.status}`);
+  console.log('  → Got', (data.values || []).length, 'rows');
+  return data.values || [];
 }
 
-// ========================================
-// TIER 1: PRODUCT MASTER
-// ========================================
+// ===== APPS SCRIPT (WRITE) =====
+async function gsPost(action, params = {}) {
+  if (!GS_URL) throw new Error('Chưa cấu hình Apps Script URL');
+  const body = new URLSearchParams({ action, ...params });
+  const res = await fetch(GS_URL, { method: 'POST', body });
+  return res.json();
+}
 
-function createProduct(productName, productCode, price, category, sizes) {
+async function gsGet(action, params = {}) {
+  if (!GS_URL) throw new Error('Chưa cấu hình Apps Script URL');
+  const qs = new URLSearchParams({ action, ...params });
+  const res = await fetch(GS_URL + '?' + qs);
+  return res.json();
+}
+
+// ===== CONVERT GOOGLE DRIVE LINK TO IMAGE URL =====
+function getGoogleDriveImageUrl(shareLink) {
+  // Chuyển từ https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+  // Thành https://drive.google.com/uc?id=FILE_ID&export=download
+  if (!shareLink) return null;
   try {
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    let sheet = ss.getSheetByName(CONFIG.SHEETS.PRODUCT_MASTER);
-    
-    if (!sheet) {
-      sheet = ss.insertSheet(CONFIG.SHEETS.PRODUCT_MASTER);
-      createProductMasterHeader(sheet);
+    const match = shareLink.match(/\/d\/([a-zA-Z0-9-_]+)\//);
+    if (match && match[1]) {
+      return `https://drive.google.com/uc?id=${match[1]}&export=view`;
     }
+  } catch (e) {}
+  return null;
+}
 
-    const productId = getNextProductId();
-    const lastRow = sheet.getLastRow();
-    const newRow = lastRow + 1;
-    const skus = sizes.map(size => `${productCode}-${size}`).join(", ");
+// ===== DEBUG API ERROR =====
+async function debugSheetApi(range) {
+  if (!GS_SHEET_ID || !GS_API_KEY) {
+    console.error('Missing Sheet ID or API Key');
+    return;
+  }
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${GS_SHEET_ID}/values/${range}?key=${GS_API_KEY}`;
+  console.log('🔍 Debug Sheet API:');
+  console.log('URL:', url);
+  console.log('Range:', range);
+  console.log('Sheet ID:', GS_SHEET_ID);
+  
+  try {
+    const res = await fetch(url);
+    console.log('Status:', res.status);
+    const data = await res.json();
+    console.log('Response:', data);
+    if (data.error) {
+      console.error('API Error:', data.error.message);
+      return data.error;
+    }
+    return data;
+  } catch (e) {
+    console.error('Fetch error:', e);
+    return e;
+  }
+}
 
-    const row = [
-      new Date(),
-      productId,
-      productName,
-      productCode,
-      price,
-      category,
-      skus,
-      sizes.length,
-      "Active"
-    ];
+// ===== LOAD DATA - Dùng Apps Script Cache (TỐI ƯU) =====
+async function loadData() {
+  try {
+    console.log('🚀 Syncing data from Apps Script cache...');
+    const startTime = performance.now();
 
-    sheet.getRange(newRow, 1, 1, row.length).setValues([row]);
-    formatProductRow(sheet, newRow);
-
-    // Create inventory rows
-    sizes.forEach(size => {
-      const sku = `${productCode}-${size}`;
-      addToInventory(sku, productName, size, price, 0, 0);
+    // 1 request = tất cả data
+    const data = await gsPost('syncAll', {});
+    
+    const endTime = performance.now();
+    console.log(`✓ Data synced in ${(endTime - startTime).toFixed(0)}ms`);
+    console.log('📊 Data:', {
+      products: data.products?.length || 0,
+      inventory: data.inventory?.length || 0,
+      orders: data.orders?.length || 0,
+      imports: data.imports?.length || 0
     });
 
-    invalidateCache();
-    return {
-      success: true,
-      message: `Tạo sản phẩm ${productName} thành công`,
-      productId,
-      skus: skus.split(", ")
-    };
-
-  } catch (error) {
-    Logger.log("createProduct Error: " + error);
-    return { success: false, error: error.toString() };
-  }
-}
-
-function createProductMasterHeader(sheet) {
-  const headers = [
-    "Created",
-    "Product ID",
-    "Product Name",
-    "Product Code",
-    "Price",
-    "Category",
-    "SKUs",
-    "Total Variants",
-    "Status"
-  ];
-
-  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-  const headerRange = sheet.getRange(1, 1, 1, headers.length);
-  headerRange
-    .setBackground("#1f77d4")
-    .setFontColor("#FFFFFF")
-    .setFontWeight("bold")
-    .setHorizontalAlignment("center");
-
-  for (let i = 1; i <= headers.length; i++) {
-    sheet.setColumnWidth(i, 120);
-  }
-}
-
-function formatProductRow(sheet, rowNum) {
-  const range = sheet.getRange(rowNum, 1, 1, 9);
-  if (rowNum % 2 === 0) {
-    range.setBackground("#f8f9fa");
-  }
-  range.setHorizontalAlignment("center");
-  sheet.getRange(rowNum, 1).setNumberFormat("dd/MM/yyyy HH:mm:ss");
-}
-
-function getNextProductId() {
-  let id = scriptProperties.getProperty("productCounter");
-  if (!id) {
-    id = 100;
-  } else {
-    id = parseInt(id) + 1;
-  }
-  scriptProperties.setProperty("productCounter", id.toString());
-  return id;
-}
-
-// ========================================
-// TIER 2: INVENTORY
-// ========================================
-
-function addToInventory(sku, productName, size, price, stock, sold) {
-  try {
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    let sheet = ss.getSheetByName(CONFIG.SHEETS.INVENTORY);
-
-    if (!sheet) {
-      sheet = ss.insertSheet(CONFIG.SHEETS.INVENTORY);
-      createInventoryHeader(sheet);
-    }
-
-    const data = sheet.getDataRange().getValues();
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][1] === sku) {
-        return { success: true, message: "SKU already exists", isNew: false };
-      }
-    }
-
-    const lastRow = sheet.getLastRow();
-    const newRow = lastRow + 1;
-    const remaining = stock - sold;
-
-    const row = [
-      new Date(),
-      sku,
-      productName,
-      size,
-      price,
-      stock,
-      sold,
-      remaining,
-      getStockStatus(remaining),
-      "Active"
-    ];
-
-    sheet.getRange(newRow, 1, 1, row.length).setValues([row]);
-    formatInventoryRow(sheet, newRow, remaining);
-
-    return { success: true, message: "Add to inventory", isNew: true };
-
-  } catch (error) {
-    Logger.log("addToInventory Error: " + error);
-    return { success: false, error: error.toString() };
-  }
-}
-
-function updateInventoryStock(sku, quantityAdded) {
-  try {
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    const sheet = ss.getSheetByName(CONFIG.SHEETS.INVENTORY);
-
-    const data = sheet.getDataRange().getValues();
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][1] === sku) {
-        const rowNum = i + 1;
-        const currentStock = parseInt(data[i][5]) || 0;
-        const newStock = currentStock + quantityAdded;
-        const sold = parseInt(data[i][6]) || 0;
-        const remaining = newStock - sold;
-
-        sheet.getRange(rowNum, 6).setValue(newStock);
-        sheet.getRange(rowNum, 8).setValue(remaining);
-        sheet.getRange(rowNum, 9).setValue(getStockStatus(remaining));
-
-        formatInventoryRow(sheet, rowNum, remaining);
-        return { success: true, newStock, remaining };
-      }
-    }
-
-    return { success: false, error: "SKU not found" };
-
-  } catch (error) {
-    Logger.log("updateInventoryStock Error: " + error);
-    return { success: false, error: error.toString() };
-  }
-}
-
-function updateInventorySold(sku, quantityAdded) {
-  try {
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    const sheet = ss.getSheetByName(CONFIG.SHEETS.INVENTORY);
-
-    const data = sheet.getDataRange().getValues();
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][1] === sku) {
-        const rowNum = i + 1;
-        const stock = parseInt(data[i][5]) || 0;
-        const currentSold = parseInt(data[i][6]) || 0;
-        const newSold = currentSold + quantityAdded;
-        const previousRemaining = stock - currentSold;
-        const newRemaining = stock - newSold;
-
-        sheet.getRange(rowNum, 7).setValue(newSold);
-        sheet.getRange(rowNum, 8).setValue(newRemaining);
-        sheet.getRange(rowNum, 9).setValue(getStockStatus(newRemaining));
-
-        formatInventoryRow(sheet, rowNum, newRemaining);
-
-        // Alert kho âm
-        if (previousRemaining >= 0 && newRemaining < 0) {
-          sendNegativeStockAlert(sku, newRemaining);
-        }
-
-        return {
-          success: true,
-          newSold,
-          newRemaining,
-          isNegative: newRemaining < 0
-        };
-      }
-    }
-
-    return { success: false, error: "SKU not found" };
-
-  } catch (error) {
-    Logger.log("updateInventorySold Error: " + error);
-    return { success: false, error: error.toString() };
-  }
-}
-
-function getInventoryBySku(sku) {
-  try {
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    const sheet = ss.getSheetByName(CONFIG.SHEETS.INVENTORY);
-    const data = sheet.getDataRange().getValues();
-
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][1] === sku) {
-        return {
-          sku: data[i][1],
-          product: data[i][2],
-          size: data[i][3],
-          price: data[i][4],
-          stock: parseInt(data[i][5]) || 0,
-          sold: parseInt(data[i][6]) || 0,
-          remaining: parseInt(data[i][7]) || 0,
-          status: data[i][8]
-        };
-      }
-    }
-
-    return null;
-
-  } catch (error) {
-    Logger.log("getInventoryBySku Error: " + error);
-    return null;
-  }
-}
-
-function getStockStatus(remaining) {
-  if (remaining > 20) return "🟢 Abundant";
-  if (remaining >= 5 && remaining <= 20) return "🟡 Warning";
-  if (remaining > 0 && remaining < 5) return "🔴 Critical";
-  if (remaining <= 0) return "💀 Negative";
-  return "Unknown";
-}
-
-function createInventoryHeader(sheet) {
-  const headers = [
-    "Updated",
-    "SKU",
-    "Product",
-    "Size",
-    "Price",
-    "Stock",
-    "Sold",
-    "Remaining",
-    "Status",
-    "Active"
-  ];
-
-  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-  const headerRange = sheet.getRange(1, 1, 1, headers.length);
-  headerRange
-    .setBackground("#dc3545")
-    .setFontColor("#FFFFFF")
-    .setFontWeight("bold")
-    .setHorizontalAlignment("center");
-
-  for (let i = 1; i <= headers.length; i++) {
-    sheet.setColumnWidth(i, 120);
-  }
-}
-
-function formatInventoryRow(sheet, rowNum, remaining) {
-  const range = sheet.getRange(rowNum, 1, 1, 10);
-
-  let bgColor = "#ffffff";
-  if (remaining > 20) bgColor = "#d4edda";
-  if (remaining >= 5 && remaining <= 20) bgColor = "#fff3cd";
-  if (remaining > 0 && remaining < 5) bgColor = "#f8d7da";
-  if (remaining <= 0) bgColor = "#721c24";
-
-  range.setBackground(bgColor);
-  if (remaining <= 0) {
-    range.setFontColor("#ffffff");
-    range.setFontWeight("bold");
-  }
-
-  range.setHorizontalAlignment("center");
-  sheet.getRange(rowNum, 1).setNumberFormat("dd/MM/yyyy HH:mm:ss");
-}
-
-// ========================================
-// TIER 3: IMPORT
-// ========================================
-
-function doImport(productCode, size, quantity, supplier = "", note = "") {
-  try {
-    const sku = `${productCode}-${size}`;
-    const timestamp = new Date();
-
-    const invResult = updateInventoryStock(sku, quantity);
-    if (!invResult.success) {
-      return { success: false, error: "SKU not found in inventory" };
-    }
-
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    let sheet = ss.getSheetByName(CONFIG.SHEETS.IMPORT);
-
-    if (!sheet) {
-      sheet = ss.insertSheet(CONFIG.SHEETS.IMPORT);
-      createImportHeader(sheet);
-    }
-
-    const lastRow = sheet.getLastRow();
-    const newRow = lastRow + 1;
-    const importId = getNextImportId();
-
-    const row = [
-      timestamp,
-      importId,
-      sku,
-      quantity,
-      supplier,
-      note,
-      "Completed"
-    ];
-
-    sheet.getRange(newRow, 1, 1, row.length).setValues([row]);
-    formatImportRow(sheet, newRow);
-
-    invalidateCache();
-    return {
-      success: true,
-      message: `Import ${quantity} x ${sku} thành công`,
-      importId,
-      newStock: invResult.newStock,
-      remaining: invResult.remaining
-    };
-
-  } catch (error) {
-    Logger.log("doImport Error: " + error);
-    return { success: false, error: error.toString() };
-  }
-}
-
-function getNextImportId() {
-  let id = scriptProperties.getProperty("importCounter");
-  if (!id) {
-    id = 2000;
-  } else {
-    id = parseInt(id) + 1;
-  }
-  scriptProperties.setProperty("importCounter", id.toString());
-  return id;
-}
-
-function createImportHeader(sheet) {
-  const headers = [
-    "Time",
-    "Import ID",
-    "SKU",
-    "Quantity",
-    "Supplier",
-    "Note",
-    "Status"
-  ];
-
-  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-  const headerRange = sheet.getRange(1, 1, 1, headers.length);
-  headerRange
-    .setBackground("#28a745")
-    .setFontColor("#FFFFFF")
-    .setFontWeight("bold")
-    .setHorizontalAlignment("center");
-
-  for (let i = 1; i <= headers.length; i++) {
-    sheet.setColumnWidth(i, 120);
-  }
-}
-
-function formatImportRow(sheet, rowNum) {
-  const range = sheet.getRange(rowNum, 1, 1, 7);
-  if (rowNum % 2 === 0) {
-    range.setBackground("#f8f9fa");
-  }
-  range.setHorizontalAlignment("center");
-  sheet.getRange(rowNum, 1).setNumberFormat("dd/MM/yyyy HH:mm:ss");
-}
-
-function getImportHistory() {
-  try {
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    const sheet = ss.getSheetByName(CONFIG.SHEETS.IMPORT);
-    if (!sheet) return [];
-    
-    const data = sheet.getDataRange().getValues();
-    return data.slice(1).map(r => ({
-      time: Utilities.formatDate(new Date(r[0]),'Asia/Ho_Chi_Minh','dd/MM HH:mm'),
-      importId: r[1],
-      sku: r[2],
-      quantity: r[3],
-      supplier: r[4],
-      note: r[5],
-      status: r[6]
+    // Parse data
+    products = (data.products || []).map(p => ({
+      id: p.id,
+      name: p.name,
+      code: p.code,
+      price: p.price,
+      category: p.category,
+      sizes: p.skus || [],
+      status: p.status,
+      emoji: '📦'
     }));
-  } catch (e) {
-    Logger.log('getImportHistory error: ' + e);
-    return [];
-  }
-}
 
-// ========================================
-// TIER 4: ORDERS - MULTI STATUS
-// ========================================
+    inventory = (data.inventory || []);
+    orders = (data.orders || []);
+    imports = (data.imports || []);
+    window.dashboardMetrics = data.dashboard || {};
 
-function createOrder(customerName, phone, address, productCode, size, quantity, note = "") {
-  try {
-    const sku = `${productCode}-${size}`;
-    const timestamp = new Date();
-
-    const inv = getInventoryBySku(sku);
-    if (!inv) {
-      return { success: false, error: "SKU not found" };
-    }
-
-    const orderId = getNextOrderId();
-    const orderCode = "#" + orderId;
-
-    const enoughStock = inv.remaining >= quantity;
-    const status = enoughStock ? "New" : "Over Sell";
-
-    const soldResult = updateInventorySold(sku, quantity);
-    if (!soldResult.success) {
-      return { success: false, error: "Failed to update inventory" };
-    }
-
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    let sheet = ss.getSheetByName(CONFIG.SHEETS.ORDERS);
-
-    if (!sheet) {
-      sheet = ss.insertSheet(CONFIG.SHEETS.ORDERS);
-      createOrdersHeader(sheet);
-    }
-
-    const lastRow = sheet.getLastRow();
-    const newRow = lastRow + 1;
-
-    const row = [
-      timestamp,
-      orderCode,
-      customerName,
-      phone,
-      address,
-      sku,
-      quantity,
-      inv.price,
-      inv.price * quantity,
-      status,
-      "",  // tracking
-      note
-    ];
-
-    sheet.getRange(newRow, 1, 1, row.length).setValues([row]);
-    formatOrderRow(sheet, newRow, status);
-
-    invalidateCache();
-
-    sendOrderEmail({
-      orderCode,
-      customerName,
-      phone,
-      address,
-      sku,
-      quantity,
-      price: inv.price,
-      status,
-      note,
-      isOverSell: !enoughStock,
-      shortage: !enoughStock ? quantity - inv.remaining : 0
-    });
-
-    return {
-      success: true,
-      message: `Tạo đơn ${orderCode} thành công`,
-      orderCode,
-      status,
-      isOverSell: !enoughStock,
-      remaining: soldResult.newRemaining
-    };
-
-  } catch (error) {
-    Logger.log("createOrder Error: " + error);
-    return { success: false, error: error.toString() };
-  }
-}
-
-function updateOrderStatus(orderCode, newStatus) {
-  try {
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    const sheet = ss.getSheetByName(CONFIG.SHEETS.ORDERS);
-    const data = sheet.getDataRange().getValues();
-
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][1] === orderCode) {
-        const rowNum = i + 1;
-        sheet.getRange(rowNum, 10).setValue(newStatus);
-        formatOrderRow(sheet, rowNum, newStatus);
-        invalidateCache();
-        return { success: true, message: "Status updated", status: newStatus };
-      }
-    }
-
-    return { success: false, error: "Order not found" };
-
-  } catch (error) {
-    Logger.log("updateOrderStatus Error: " + error);
-    return { success: false, error: error.toString() };
-  }
-}
-
-function updateOrderTracking(orderCode, trackingCode) {
-  try {
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    const sheet = ss.getSheetByName(CONFIG.SHEETS.ORDERS);
-    const data = sheet.getDataRange().getValues();
-
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][1] === orderCode) {
-        const rowNum = i + 1;
-        sheet.getRange(rowNum, 11).setValue(trackingCode);
-        
-        // Auto update status to Shipping if not already done
-        const currentStatus = data[i][9];
-        if (currentStatus === "Confirm" || currentStatus === "New") {
-          sheet.getRange(rowNum, 10).setValue("Shipping");
-        }
-        
-        formatOrderRow(sheet, rowNum, currentStatus);
-        invalidateCache();
-        return { success: true, message: "Tracking updated", tracking: trackingCode };
-      }
-    }
-
-    return { success: false, error: "Order not found" };
-
-  } catch (error) {
-    Logger.log("updateOrderTracking Error: " + error);
-    return { success: false, error: error.toString() };
-  }
-}
-
-function getNextOrderId() {
-  let id = scriptProperties.getProperty("orderCounter");
-  if (!id) {
-    id = 1000;
-  } else {
-    id = parseInt(id) + 1;
-  }
-  scriptProperties.setProperty("orderCounter", id.toString());
-  return id;
-}
-
-function createOrdersHeader(sheet) {
-  const headers = [
-    "Time",
-    "Order Code",
-    "Customer",
-    "Phone",
-    "Address",
-    "SKU",
-    "Quantity",
-    "Price/Unit",
-    "Total",
-    "Status",
-    "Tracking",
-    "Note"
-  ];
-
-  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-  const headerRange = sheet.getRange(1, 1, 1, headers.length);
-  headerRange
-    .setBackground("#fd7e14")
-    .setFontColor("#FFFFFF")
-    .setFontWeight("bold")
-    .setHorizontalAlignment("center");
-
-  for (let i = 1; i <= headers.length; i++) {
-    sheet.setColumnWidth(i, 120);
-  }
-}
-
-function formatOrderRow(sheet, rowNum, status) {
-  const range = sheet.getRange(rowNum, 1, 1, 12);
-
-  let bgColor = "#ffffff";
-  if (status === "New") bgColor = "#fff3cd";
-  if (status === "Confirm") bgColor = "#cfe2ff";
-  if (status === "Shipping") bgColor = "#e0cfff";
-  if (status === "Done") bgColor = "#d1e7dd";
-  if (status === "Cancel") bgColor = "#f8d7da";
-  if (status === "Over Sell") bgColor = "#721c24";
-
-  range.setBackground(bgColor);
-  if (status === "Over Sell") {
-    range.setFontColor("#ffffff");
-    range.setFontWeight("bold");
-  }
-
-  range.setHorizontalAlignment("center");
-  sheet.getRange(rowNum, 1).setNumberFormat("dd/MM/yyyy HH:mm:ss");
-  sheet.getRange(rowNum, 9).setNumberFormat("#,##0");
-}
-
-function getAllOrders() {
-  try {
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    const sheet = ss.getSheetByName(CONFIG.SHEETS.ORDERS);
-    if (!sheet) return [];
-    
-    const data = sheet.getDataRange().getValues();
-    return data.slice(1).map(r => ({
-      time: Utilities.formatDate(new Date(r[0]),'Asia/Ho_Chi_Minh','dd/MM HH:mm'),
-      orderCode: r[1],
-      customer: r[2],
-      phone: r[3],
-      address: r[4],
-      sku: r[5],
-      quantity: r[6],
-      price: r[7],
-      total: r[8],
-      status: r[9],
-      tracking: r[10],
-      note: r[11]
+    // Events từ orders
+    events = orders.map(o => ({
+      type: o.status === 'Over Sell' ? 'oversell' : 'order_create',
+      message: `${o.orderCode}: ${o.sku} x${o.quantity} = ${o.total.toLocaleString('vi')}đ`,
+      timestamp: new Date()
     }));
+
+    renderDashboard();
   } catch (e) {
-    Logger.log('getAllOrders error: ' + e);
-    return [];
+    console.error('Load error:', e);
+    showAlert('error', 'Lỗi tải dữ liệu: ' + e.message);
   }
 }
 
-function getAllInventory() {
-  try {
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    const sheet = ss.getSheetByName(CONFIG.SHEETS.INVENTORY);
-    if (!sheet) return [];
-    
-    const data = sheet.getDataRange().getValues();
-    return data.slice(1).map(r => ({
-      sku: r[1],
-      product: r[2],
-      size: r[3],
-      price: r[4],
-      stock: r[5],
-      sold: r[6],
-      remaining: r[7],
-      status: r[8]
-    }));
-  } catch (e) {
-    Logger.log('getAllInventory error: ' + e);
-    return [];
-  }
+
+
+// ===== RENDER DASHBOARD =====
+function renderDashboard() {
+  const m = window.dashboardMetrics || {};
+  
+  const todayOrders = m.totalOrders || 0;
+  const todayRevenue = m.totalRevenue || 0;
+  const oversellCount = m.overSellCount || 0;
+  const negstockCount = m.negativeStockCount || 0;
+  const totalSku = m.totalSkus || 0;
+  const totalStock = m.totalStock || 0;
+  const totalSold = m.totalSold || 0;
+  const profit = m.totalProfit || 0;
+
+  document.getElementById('m-today-orders').textContent = todayOrders;
+  document.getElementById('m-today-revenue').textContent = todayRevenue.toLocaleString('vi');
+  document.getElementById('m-oversell-count').textContent = oversellCount;
+  document.getElementById('m-negstock-count').textContent = negstockCount;
+  document.getElementById('m-total-sku').textContent = totalSku;
+  document.getElementById('m-total-stock').textContent = totalStock;
+  document.getElementById('m-total-sold').textContent = totalSold;
+  document.getElementById('m-profit').textContent = profit.toLocaleString('vi') + ' ₫';
+
+  // Alerts
+  const alerts = [];
+  if (oversellCount > 0) alerts.push(`<div class="alert-bar warning">⚠️ ${oversellCount} đơn Over Sell cần xử lý</div>`);
+  if (negstockCount > 0) alerts.push(`<div class="alert-bar error">❌ ${negstockCount} SKU kho âm</div>`);
+  document.getElementById('dashboard-alerts').innerHTML = alerts.join('');
 }
 
-// ========================================
-// TIER 5: DASHBOARD
-// ========================================
-
-function updateDashboard() {
-  try {
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    let sheet = ss.getSheetByName(CONFIG.SHEETS.DASHBOARD);
-
-    if (!sheet) {
-      sheet = ss.insertSheet(CONFIG.SHEETS.DASHBOARD);
-    }
-
-    sheet.clearContents();
-    const metrics = calculateMetrics();
-
-    sheet.getRange(1, 1).setValue("📊 DASHBOARD").setFontSize(20).setFontWeight("bold");
-
-    let row = 3;
-    sheet.getRange(row++, 1).setValue("📈 Sales Metrics").setFontWeight("bold").setFontSize(14);
-    sheet.getRange(row, 1).setValue("Total Orders:");
-    sheet.getRange(row++, 2).setValue(metrics.totalOrders).setNumberFormat("#,##0");
-
-    sheet.getRange(row, 1).setValue("Total Revenue:");
-    sheet.getRange(row++, 2).setValue(metrics.totalRevenue).setNumberFormat("#,##0");
-
-    sheet.getRange(row, 1).setValue("Profit (50%):");
-    sheet.getRange(row++, 2).setValue(metrics.totalProfit).setNumberFormat("#,##0");
-
-    row++;
-    sheet.getRange(row++, 1).setValue("⚠️ Alerts").setFontWeight("bold").setFontSize(14);
-
-    sheet.getRange(row, 1).setValue("Over Sell Orders:");
-    sheet.getRange(row++, 2).setValue(metrics.overSellCount).setBackground("#f8d7da");
-
-    sheet.getRange(row, 1).setValue("Negative Stock SKUs:");
-    sheet.getRange(row++, 2).setValue(metrics.negativeStockCount).setBackground("#721c24").setFontColor("#ffffff");
-
-    row++;
-    sheet.getRange(row++, 1).setValue("📦 Inventory").setFontWeight("bold").setFontSize(14);
-
-    sheet.getRange(row, 1).setValue("Total SKUs:");
-    sheet.getRange(row++, 2).setValue(metrics.totalSkus);
-
-    sheet.getRange(row, 1).setValue("Total Stock:");
-    sheet.getRange(row++, 2).setValue(metrics.totalStock);
-
-    sheet.getRange(row, 1).setValue("Total Sold:");
-    sheet.getRange(row++, 2).setValue(metrics.totalSold);
-
-    sheet.getRange(row, 1).setValue("Total Remaining:");
-    sheet.getRange(row++, 2).setValue(metrics.totalRemaining);
-
-  } catch (error) {
-    Logger.log("updateDashboard Error: " + error);
-  }
-}
-
-function calculateMetrics() {
-  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-
-  let metrics = {
-    totalOrders: 0,
-    totalRevenue: 0,
-    totalProfit: 0,
-    overSellCount: 0,
-    negativeStockCount: 0,
-    totalSkus: 0,
-    totalStock: 0,
-    totalSold: 0,
-    totalRemaining: 0
-  };
-
-  try {
-    const ordersSheet = ss.getSheetByName(CONFIG.SHEETS.ORDERS);
-    if (ordersSheet) {
-      const data = ordersSheet.getDataRange().getValues();
-      for (let i = 1; i < data.length; i++) {
-        metrics.totalOrders++;
-        metrics.totalRevenue += parseInt(data[i][8]) || 0;
-        if (data[i][9] === "Over Sell") {
-          metrics.overSellCount++;
-        }
-      }
-      metrics.totalProfit = Math.floor(metrics.totalRevenue * 0.5);
-    }
-  } catch (e) {
-    Logger.log("Orders calculation error");
-  }
-
-  try {
-    const invSheet = ss.getSheetByName(CONFIG.SHEETS.INVENTORY);
-    if (invSheet) {
-      const data = invSheet.getDataRange().getValues();
-      for (let i = 1; i < data.length; i++) {
-        metrics.totalSkus++;
-        metrics.totalStock += parseInt(data[i][5]) || 0;
-        metrics.totalSold += parseInt(data[i][6]) || 0;
-        metrics.totalRemaining += parseInt(data[i][7]) || 0;
-
-        if (parseInt(data[i][7]) < 0) {
-          metrics.negativeStockCount++;
-        }
-      }
-    }
-  } catch (e) {
-    Logger.log("Inventory calculation error");
-  }
-
-  return metrics;
-}
-
-// ========================================
-// EMAIL ALERTS
-// ========================================
-
-function sendOrderEmail(orderData) {
-  try {
-    let statusColor = "#0d6efd";
-    if (orderData.status === "New") statusColor = "#ffc107";
-    if (orderData.status === "Over Sell") statusColor = "#721c24";
-
-    const emailBody = `
-<html>
-  <body style="font-family: Arial, sans-serif; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-      <h2 style="color: ${statusColor}; border-bottom: 2px solid ${statusColor}; padding-bottom: 10px;">
-        ${orderData.isOverSell ? "⚠️ OVER SELL ORDER" : "✅ NEW ORDER"}
-      </h2>
-      
-      <div style="margin: 20px 0;">
-        <h3 style="color: ${statusColor};">Order Code: <strong>${orderData.orderCode}</strong></h3>
+// ===== PRODUCT SELECTOR =====
+function renderProductSelector() {
+  const html = products.map(p => `
+    <div class="action-card" onclick="selectProduct(this, '${p.id}')">
+      <div class="product-image" style="height:100px;margin-bottom:8px">
+        ${p.imageSrc ? `<img src="${p.imageSrc}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-md)">` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:48px">${p.emoji}</div>`}
       </div>
-      
-      <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
-        <tr style="background-color: #f0f0f0;">
-          <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Customer Info</td>
-          <td style="padding: 10px; border: 1px solid #ddd;"></td>
-        </tr>
-        <tr>
-          <td style="padding: 10px; border: 1px solid #ddd;">Name:</td>
-          <td style="padding: 10px; border: 1px solid #ddd;"><strong>${orderData.customerName}</strong></td>
-        </tr>
-        <tr>
-          <td style="padding: 10px; border: 1px solid #ddd;">Phone:</td>
-          <td style="padding: 10px; border: 1px solid #ddd;"><strong>${orderData.phone}</strong></td>
-        </tr>
-        <tr>
-          <td style="padding: 10px; border: 1px solid #ddd;">Address:</td>
-          <td style="padding: 10px; border: 1px solid #ddd;"><strong>${orderData.address}</strong></td>
-        </tr>
-      </table>
+      <div class="action-title">${p.name}</div>
+      <div class="action-sub">${p.code} • ${p.price.toLocaleString('vi')}đ</div>
+    </div>
+  `).join('');
+  document.getElementById('product-selector').innerHTML = html;
+}
 
-      <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
-        <tr style="background-color: #f0f0f0;">
-          <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">Order Info</td>
-          <td style="padding: 10px; border: 1px solid #ddd;"></td>
-        </tr>
-        <tr>
-          <td style="padding: 10px; border: 1px solid #ddd;">SKU:</td>
-          <td style="padding: 10px; border: 1px solid #ddd;"><strong>${orderData.sku}</strong></td>
-        </tr>
-        <tr>
-          <td style="padding: 10px; border: 1px solid #ddd;">Quantity:</td>
-          <td style="padding: 10px; border: 1px solid #ddd;"><strong>${orderData.quantity}</strong></td>
-        </tr>
-        <tr>
-          <td style="padding: 10px; border: 1px solid #ddd;">Price:</td>
-          <td style="padding: 10px; border: 1px solid #ddd;"><strong>${orderData.price.toLocaleString()} VNĐ</strong></td>
-        </tr>
-        <tr>
-          <td style="padding: 10px; border: 1px solid #ddd;">Status:</td>
-          <td style="padding: 10px; border: 1px solid #ddd; background-color: ${statusColor}; color: white;"><strong>${orderData.status}</strong></td>
-        </tr>
-        ${orderData.isOverSell ? `
-        <tr>
-          <td style="padding: 10px; border: 1px solid #ddd; color: red; font-weight: bold;">⚠️ SHORTAGE:</td>
-          <td style="padding: 10px; border: 1px solid #ddd; color: red; font-weight: bold;">${orderData.shortage} units</td>
-        </tr>
-        ` : ""}
-      </table>
+function selectProduct(el, prodId) {
+  document.querySelectorAll('#product-selector .action-card').forEach(c => c.style.borderColor = '');
+  el.style.borderColor = 'var(--accent-green)';
+  selectedProduct = products.find(p => p.id === prodId);
+  renderSizeSelector();
+}
 
-      <div style="margin-top: 20px; color: #666; font-size: 12px; border-top: 1px solid #ddd; padding-top: 15px;">
-        <p>Automated email from Order Management System</p>
+function renderSizeSelector() {
+  if (!selectedProduct) return;
+  const html = `
+    <div style="margin-bottom:16px;padding:16px;background:var(--bg-tertiary);border-radius:var(--radius-md)">
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px">Chọn size cho ${selectedProduct.name}:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${selectedProduct.sizes.map(s => `
+          <button class="size-btn" onclick="selectSize(this, '${s}')" style="padding:8px 12px;font-size:12px">
+            ${s}
+          </button>
+        `).join('')}
       </div>
     </div>
-  </body>
-</html>
-    `;
-
-    const subject = `[${orderData.orderCode}] ${orderData.isOverSell ? "⚠️ OVER SELL - " : ""}Order from ${orderData.customerName}`;
-
-    GmailApp.sendEmail(CONFIG.EMAIL_NOTIFY, subject, "", {
-      htmlBody: emailBody
-    });
-
-    Logger.log("Order email sent: " + orderData.orderCode);
-  } catch (error) {
-    Logger.log("sendOrderEmail Error: " + error);
+  `;
+  if (!document.getElementById('size-selector')) {
+    const div = document.createElement('div');
+    div.id = 'size-selector';
+    document.getElementById('product-selector').after(div);
   }
+  document.getElementById('size-selector').innerHTML = html;
 }
 
-function sendNegativeStockAlert(sku, remaining) {
-  try {
-    const inv = getInventoryBySku(sku);
-    const emailBody = `
-<html>
-  <body style="font-family: Arial, sans-serif; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #721c24; color: white; border-radius: 8px;">
-      <h2>🚨 NEGATIVE STOCK ALERT</h2>
-      <p><strong>SKU:</strong> ${sku}</p>
-      <p><strong>Product:</strong> ${inv.product}</p>
-      <p><strong>Current Stock:</strong> ${remaining}</p>
-      <p><strong>Time:</strong> ${new Date().toLocaleString('vi-VN')}</p>
-      <p style="margin-top: 20px; background-color: rgba(255,255,255,0.1); padding: 10px; border-radius: 4px;">
-        ⚠️ Action needed: Import more stock or cancel orders
-      </p>
+function selectSize(el, size) {
+  if (!selectedProduct) return;
+  selectedSize = size;
+  el.style.background = 'var(--accent-green)';
+  el.style.color = 'white';
+  el.style.borderColor = 'var(--accent-green)';
+  el.parentElement.querySelectorAll('.size-btn').forEach(b => {
+    if (b !== el) { b.style.background = ''; b.style.color = ''; b.style.borderColor = ''; }
+  });
+  addOrderItem(selectedProduct, size);
+}
+
+function addOrderItem(product, size) {
+  const sku = product.code + '-' + size;
+  const invItem = inventory.find(i => i.sku === sku);
+  const stock = invItem ? invItem.stock : 0;
+  
+  const itemId = 'item-' + sku;
+  if (document.getElementById(itemId)) document.getElementById(itemId).remove();
+
+  const html = `
+    <div id="${itemId}" style="padding:12px;background:var(--bg-tertiary);border-radius:var(--radius-md);display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div>
+        <div style="font-weight:600">${product.emoji} ${product.name} - Size ${size}</div>
+        <div style="font-size:11px;color:var(--text-secondary)">Giá: ${product.price.toLocaleString('vi')}đ | Tồn: ${stock}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="number" min="1" value="1" class="form-input" style="width:60px;padding:6px" onchange="updateItemQty('${sku}', this.value)" />
+        <button class="btn btn-danger" style="padding:6px 12px;font-size:11px" onclick="removeOrderItem('${itemId}')">Xóa</button>
+      </div>
     </div>
-  </body>
-</html>
-    `;
+  `;
 
-    GmailApp.sendEmail(CONFIG.EMAIL_NOTIFY, `🚨 NEGATIVE STOCK: ${sku}`, "", {
-      htmlBody: emailBody
-    });
-
-    Logger.log("Negative stock alert sent for: " + sku);
-  } catch (error) {
-    Logger.log("sendNegativeStockAlert Error: " + error);
+  const container = document.getElementById('order-items');
+  if (!container.innerHTML.includes('Sản phẩm đã chọn')) {
+    container.innerHTML = '<div style="margin-bottom:12px;font-weight:600">Sản phẩm đã chọn:</div>' + container.innerHTML;
+  }
+  
+  const existingItem = document.getElementById(itemId);
+  if (existingItem) {
+    existingItem.outerHTML = html;
+  } else {
+    container.innerHTML += html;
   }
 }
 
-// ========================================
-// WEB APP - OPTIMIZED
-// ========================================
+function updateItemQty(sku, qty) {
+  // Update order items
+}
 
-function doPost(e) {
+function removeOrderItem(itemId) {
+  document.getElementById(itemId).remove();
+}
+
+// ===== SUBMIT FUNCTIONS =====
+async function submitOrder() {
+  const customer = document.getElementById('order-customer').value.trim();
+  const phone = document.getElementById('order-phone').value.trim();
+  const address = document.getElementById('order-address').value.trim();
+  const note = document.getElementById('order-note').value.trim();
+
+  if (!customer || !phone || document.querySelectorAll('#order-items > div[id^="item-"]').length === 0) {
+    showResult('order-result', false, 'Vui lòng nhập khách hàng, SĐT và chọn sản phẩm');
+    return;
+  }
+
   try {
-    const action = e.parameter.action;
+    const res = await gsPost('createOrder', { customer, phone, address, note });
+    if (res.success) {
+      showResult('order-result', true, `✓ Tạo đơn ${res.orderCode} thành công`);
+      clearOrderForm();
+      setTimeout(loadData, 1000);
+    } else {
+      showResult('order-result', false, res.error || 'Lỗi tạo đơn');
+    }
+  } catch (e) {
+    showResult('order-result', false, 'Lỗi kết nối: ' + e.message);
+  }
+}
 
-    switch (action) {
-      // SYNC - Return all data (cached)
-      case "syncAll":
-        return returnJson(getAllDataSync());
+async function submitProduct() {
+  const name = document.getElementById('prod-name').value.trim();
+  const code = document.getElementById('prod-code').value.trim().toUpperCase();
+  const price = document.getElementById('prod-price').value;
+  const emoji = document.getElementById('prod-emoji').value.trim() || '📦';
+  const sizes = document.getElementById('prod-sizes').value.trim().split(/\s+/).filter(Boolean);
 
-      // PRODUCT
-      case "createProduct":
-        return returnJson(createProduct(
-          e.parameter.productName,
-          e.parameter.productCode,
-          parseInt(e.parameter.price),
-          e.parameter.category,
-          JSON.parse(e.parameter.sizes)
-        ));
+  if (!name || !code || !price || !sizes.length) {
+    showResult('product-result', false, 'Vui lòng điền đủ thông tin');
+    return;
+  }
 
-      // IMPORT
-      case "import":
-        return returnJson(doImport(
-          e.parameter.productCode,
-          e.parameter.size,
-          parseInt(e.parameter.quantity),
-          e.parameter.supplier,
-          e.parameter.note
-        ));
+  try {
+    const res = await gsPost('createProduct', { productName: name, productCode: code, price, emoji, sizes: JSON.stringify(sizes) });
+    if (res.success) {
+      showResult('product-result', true, `✓ Tạo ${name} thành công`);
+      clearProductForm();
+      setTimeout(loadData, 1000);
+    } else {
+      showResult('product-result', false, res.error || 'Lỗi tạo sản phẩm');
+    }
+  } catch (e) {
+    showResult('product-result', false, 'Lỗi kết nối: ' + e.message);
+  }
+}
 
-      // ORDERS
-      case "createOrder":
-        return returnJson(createOrder(
-          e.parameter.customerName,
-          e.parameter.phone,
-          e.parameter.address,
-          e.parameter.productCode,
-          e.parameter.size,
-          parseInt(e.parameter.quantity),
-          e.parameter.note
-        ));
+// ===== RENDER INVENTORY =====
+let filteredProducts = [];
 
-      case "updateOrderStatus":
-        return returnJson(updateOrderStatus(
-          e.parameter.orderCode,
-          e.parameter.status
-        ));
+function renderInventory() {
+  filteredProducts = products;
+  const html = products.map(p => {
+    const relatedInv = inventory.filter(i => i.product === p.name);
+    const totalStock = relatedInv.reduce((s, i) => s + i.stock, 0);
+    const totalRemaining = relatedInv.reduce((s, i) => s + i.remaining, 0);
+    
+    const stockStatus = totalRemaining > 20 ? '🟢' : totalRemaining >= 5 ? '🟡' : totalRemaining > 0 ? '🔴' : '💀';
+    
+    return `
+      <div class="product-card">
+        <div class="product-name">${p.emoji} ${p.name}</div>
+        <div class="product-code">${p.code}</div>
+        <div class="product-stock">${stockStatus} ${totalRemaining} cái | Tồn: ${totalStock}</div>
+        <div class="product-stock" style="font-size:11px;color:var(--text-secondary)">Giá: ${p.price.toLocaleString('vi')}đ</div>
+        <div class="size-controls">
+          ${p.sizes.map(size => {
+            const inv = inventory.find(i => i.sku === p.code + '-' + size);
+            const stock = inv ? inv.stock : 0;
+            const remaining = inv ? inv.remaining : 0;
+            return `
+              <div class="size-row">
+                <div><span class="size-label">${size}</span> <span class="size-stock">${remaining}/${stock}</span></div>
+                <div class="size-btn-group">
+                  <button class="size-btn" onclick="quickImport('${p.code}', '${size}', 1)" title="Nhập 1">+1</button>
+                  <button class="size-btn" onclick="quickImport('${p.code}', '${size}', 5)" title="Nhập 5">+5</button>
+                  <button class="size-btn" onclick="openImportForm('${p.code}', '${size}')" title="Nhập số lượng tùy chọn">+N</button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('inventory-grid').innerHTML = html;
+}
 
-      case "updateOrderTracking":
-        return returnJson(updateOrderTracking(
-          e.parameter.orderCode,
-          e.parameter.tracking
-        ));
+function filterProducts() {
+  const q = document.getElementById('inv-search').value.toLowerCase();
+  const filtered = products.filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q));
+  const html = filtered.map(p => {
+    const relatedInv = inventory.filter(i => i.product === p.name);
+    const totalStock = relatedInv.reduce((s, i) => s + i.stock, 0);
+    return `
+      <div class="product-card">
+        <div class="product-name">${p.emoji} ${p.name}</div>
+        <div class="product-code">${p.code}</div>
+        <div class="product-stock">📦 Tồn: ${totalStock}</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('inventory-grid').innerHTML = html || '<div class="loading">Không tìm thấy sản phẩm</div>';
+}
 
-      default:
-        return returnJson({ success: false, error: "Unknown action" });
+async function quickImport(code, size, qty) {
+  try {
+    const res = await gsPost('import', { 
+      productCode: code, 
+      size, 
+      quantity: qty,
+      supplier: 'Quick Import',
+      note: ''
+    });
+    if (res.success) {
+      loadData();
+      showAlert('success', `✓ Nhập ${qty} x ${code}-${size} thành công!`);
+    } else {
+      showAlert('error', 'Lỗi: ' + res.error);
+    }
+  } catch (e) {
+    showAlert('error', 'Lỗi kết nối: ' + e.message);
+  }
+}
+
+function openImportForm(code, size) {
+  const qty = prompt(`Nhập số lượng cho ${code}-${size}:`);
+  if (qty && !isNaN(qty) && qty > 0) {
+    quickImport(code, size, parseInt(qty));
+  }
+}
+
+// ===== ORDERS & PROCESSING =====
+function renderOrders() {
+  const statusColors = {
+    'New': '#fff3cd',
+    'Confirm': '#cfe2ff',
+    'Shipping': '#e0cfff',
+    'Done': '#d1e7dd',
+    'Cancel': '#f8d7da',
+    'Over Sell': '#721c24'
+  };
+
+  const html = orders.map(o => {
+    const bgColor = statusColors[o.status] || '#ffffff';
+    const textColor = o.status === 'Over Sell' ? '#ffffff' : '#000';
+    
+    return `
+      <div class="action-card" style="background:${bgColor};color:${textColor}">
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">${o.orderCode}</div>
+        <div style="font-size:12px;margin-bottom:8px">
+          👤 ${o.customer} | 📱 ${o.phone}<br>
+          ${o.address ? `📍 ${o.address.substring(0, 30)}...` : ''}
+        </div>
+        <div style="font-size:11px;margin-bottom:12px;opacity:0.8">
+          ${o.sku} × ${o.quantity} = ${o.total.toLocaleString('vi')}đ
+        </div>
+        
+        <div style="margin-bottom:8px">
+          <select class="form-select" onchange="updateStatus('${o.orderCode}', this.value)" style="font-size:12px;padding:6px">
+            <option value="">▼ Trạng thái</option>
+            <option value="New" ${o.status === 'New' ? 'selected' : ''}>New</option>
+            <option value="Confirm" ${o.status === 'Confirm' ? 'selected' : ''}>Confirm</option>
+            <option value="Shipping" ${o.status === 'Shipping' ? 'selected' : ''}>Shipping</option>
+            <option value="Done" ${o.status === 'Done' ? 'selected' : ''}>Done</option>
+            <option value="Cancel" ${o.status === 'Cancel' ? 'selected' : ''}>Cancel</option>
+          </select>
+        </div>
+
+        <div style="display:flex;gap:6px;align-items:stretch;margin-bottom:8px">
+          <input class="form-input" id="tracking-${o.orderCode}" placeholder="Mã tracking..." value="${o.tracking || ''}" style="font-size:11px;padding:6px;flex:1" />
+          <button class="btn btn-primary" style="font-size:11px;padding:6px 12px;white-space:nowrap" onclick="updateTracking('${o.orderCode}')">Cập nhật</button>
+        </div>
+
+        ${o.status === 'Over Sell' ? `<div style="font-size:10px;font-weight:600;background:rgba(255,255,255,0.2);padding:4px;border-radius:4px">⚠️ OVER SELL</div>` : ''}
+      </div>
+    `;
+  }).join('');
+  document.getElementById('orders-grid').innerHTML = html || '<div class="loading">Không có đơn hàng</div>';
+}
+
+function filterOrders(type) {
+  // Filter by type if needed
+  renderOrders();
+}
+
+async function updateStatus(orderCode, status) {
+  if (!status) return;
+  try {
+    const res = await gsPost('updateOrderStatus', { orderCode, status });
+    if (res.success) {
+      loadData();
+      showAlert('success', `✓ Cập nhật status thành công`);
+    }
+  } catch (e) {
+    showAlert('error', 'Lỗi: ' + e.message);
+  }
+}
+
+async function updateTracking(orderCode) {
+  const tracking = document.getElementById('tracking-' + orderCode).value.trim();
+  if (!tracking) {
+    showAlert('error', 'Vui lòng nhập mã tracking');
+    return;
+  }
+  try {
+    const res = await gsPost('updateOrderTracking', { orderCode, tracking });
+    if (res.success) {
+      loadData();
+      showAlert('success', `✓ Cập nhật tracking thành công`);
+    }
+  } catch (e) {
+    showAlert('error', 'Lỗi: ' + e.message);
+  }
+}
+
+// ===== ANALYTICS =====
+function renderAnalytics() {
+  const m = window.dashboardMetrics || {};
+  
+  const successOrders = orders.filter(o => o.status === 'Done').length;
+  const revenue = m.totalRevenue || 0;
+  const oversell = m.overSellCount || 0;
+  const errors = orders.filter(o => o.status === 'Cancel').length;
+
+  const stockHigh = inventory.filter(i => i.remaining >= 20).length;
+  const stockWarn = inventory.filter(i => i.remaining >= 5 && i.remaining < 20).length;
+  const stockLow = inventory.filter(i => i.remaining > 0 && i.remaining < 5).length;
+  const stockNeg = inventory.filter(i => i.remaining < 0).length;
+
+  document.getElementById('a-success-orders').textContent = successOrders;
+  document.getElementById('a-revenue').textContent = revenue.toLocaleString('vi') + 'đ';
+  document.getElementById('a-oversell').textContent = oversell;
+  document.getElementById('a-errors').textContent = errors;
+  document.getElementById('a-stock-high').textContent = stockHigh;
+  document.getElementById('a-stock-warn').textContent = stockWarn;
+  document.getElementById('a-stock-low').textContent = stockLow;
+  document.getElementById('a-stock-neg').textContent = stockNeg;
+
+  const recentEvents = events.slice(-5).reverse().map(e => `
+    <div style="padding:8px 0;border-bottom:1px solid var(--border-primary);font-size:12px">
+      <div style="color:var(--text-secondary)">${e.message}</div>
+      <div style="color:var(--text-tertiary);font-size:11px">${e.timestamp.toLocaleTimeString('vi')}</div>
+    </div>
+  `).join('');
+  document.getElementById('events-log').innerHTML = recentEvents;
+}
+
+function renderEventLog() {
+  const html = events.slice().reverse().map(e => `
+    <div style="padding:12px;border:1px solid var(--border-primary);border-radius:var(--radius-md);margin-bottom:8px">
+      <div style="font-weight:600;color:var(--accent-green)">${e.type}</div>
+      <div style="margin-top:4px;color:var(--text-secondary)">${e.message}</div>
+      <div style="margin-top:4px;font-size:11px;color:var(--text-tertiary)">${e.timestamp.toLocaleString('vi')}</div>
+    </div>
+  `).join('');
+  document.getElementById('full-event-log').innerHTML = html;
+}
+
+function filterEvents(type) {
+  // Filter by type
+  renderEventLog();
+}
+
+// ===== UTILITY =====
+function showResult(id, success, msg) {
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  el.innerHTML = `<div class="alert-bar ${success ? 'success' : 'error'}">${msg}</div>`;
+}
+
+function clearOrderForm() {
+  document.getElementById('order-customer').value = '';
+  document.getElementById('order-phone').value = '';
+  document.getElementById('order-address').value = '';
+  document.getElementById('order-note').value = '';
+  document.getElementById('order-items').innerHTML = '';
+  selectedProduct = null;
+  selectedSize = null;
+}
+
+function clearProductForm() {
+  document.getElementById('prod-name').value = '';
+  document.getElementById('prod-code').value = '';
+  document.getElementById('prod-price').value = '';
+  document.getElementById('prod-emoji').value = '';
+  document.getElementById('prod-sizes').value = '';
+}
+
+async function saveGsConfig() {
+  const url = document.getElementById('gs-url').value.trim();
+  if (!url) {
+    showAlert('error', 'Vui lòng nhập Apps Script URL');
+    return;
+  }
+
+  GS_URL = url;
+  try { 
+    localStorage.setItem('erp_gs_url', url);
+  } catch(e) {}
+
+  await testConnection();
+}
+
+async function testConnection() {
+  const result = document.getElementById('gs-test-result');
+  result.style.display = 'block';
+  result.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Đang kiểm tra kết nối...</div>';
+
+  try {
+    console.log('Testing connection with syncAll...');
+    const data = await gsPost('syncAll', {});
+    
+    if (!data || !data.products) {
+      result.innerHTML = '<div class="alert-bar error">❌ Response không đúng format. Check Apps Script có method syncAll không?</div>';
+      return;
     }
 
-  } catch (error) {
-    Logger.log("doPost Error: " + error);
-    return returnJson({ success: false, error: error.toString() });
+    const info = `
+      <div class="alert-bar success">✓ Kết nối thành công!</div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text-secondary)">
+        📊 Data từ Apps Script:<br>
+        • Products: ${data.products?.length || 0}<br>
+        • Inventory: ${data.inventory?.length || 0}<br>
+        • Orders: ${data.orders?.length || 0}<br>
+        • Imports: ${data.imports?.length || 0}
+      </div>
+    `;
+    result.innerHTML = info;
+    
+    setTimeout(() => {
+      loadData();
+    }, 1500);
+  } catch (e) {
+    result.innerHTML = `<div class="alert-bar error">❌ Lỗi: ${e.message}<br><br>Kiểm tra:<br>- URL đúng?<br>- Apps Script đã deploy?<br>- Mở F12 Console xem chi tiết</div>`;
+    console.error('Connection test failed:', e);
   }
 }
 
-function returnJson(data) {
-  return ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MIME_TYPE_JSON);
+function showAlert(type, msg) {
+  const result = document.getElementById('gs-test-result');
+  if (!result) return;
+  result.style.display = 'block';
+  result.innerHTML = `<div class="alert-bar ${type}">${msg}</div>`;
 }
 
-// ========================================
-// TEST
-// ========================================
-
-function testSystem() {
-  Logger.log("=== Testing System ===");
-
-  const productResult = createProduct(
-    "Blue Pants",
-    "BP",
-    159000,
-    "Pants",
-    [35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
-  );
-  Logger.log("Product: " + JSON.stringify(productResult));
-
-  const importResult = doImport("BP", "40", 50, "Supplier A", "First batch");
-  Logger.log("Import: " + JSON.stringify(importResult));
-
-  const orderResult = createOrder(
-    "Cao Văn Tây",
-    "0912345678",
-    "Đà Nẵng",
-    "BP",
-    "40",
-    3,
-    "Test order"
-  );
-  Logger.log("Order: " + JSON.stringify(orderResult));
-
-  const dashResult = calculateMetrics();
-  Logger.log("Dashboard: " + JSON.stringify(dashResult));
-
-  Logger.log("=== Test Complete ===");
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  const newTheme = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
 }
+
+// Load saved theme
+if (localStorage.getItem('theme')) {
+  document.documentElement.setAttribute('data-theme', localStorage.getItem('theme'));
+}
+
+init();
+</script>
+
+</body>
+</html>
