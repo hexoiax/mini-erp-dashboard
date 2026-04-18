@@ -68,7 +68,6 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html, body { height: 100%; overflow: hidden; }
 
 body {
@@ -80,10 +79,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── APP SHELL ── */
 .shell { display: flex; height: 100vh; }
 
-/* ── SIDEBAR ── */
 .sb {
   width: 228px;
   flex-shrink: 0;
@@ -200,7 +197,6 @@ body {
 
 .sync-row { font-size: 10px; color: var(--txt-3); padding: 0 2px; font-family: var(--mono); }
 
-/* ── TOPBAR ── */
 .topbar {
   display: flex;
   align-items: center;
@@ -217,7 +213,6 @@ body {
 
 .topbar-right { display: flex; align-items: center; gap: 8px; }
 
-/* ── BUTTONS ── */
 .btn {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 7px 13px;
@@ -270,7 +265,6 @@ body {
 }
 .theme-btn:hover { background: var(--bg-hover); transform: rotate(20deg); }
 
-/* ── MAIN ── */
 .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 
 .content {
@@ -279,7 +273,6 @@ body {
   padding: 20px 24px;
 }
 
-/* ── PAGE ── */
 .page { display: none; }
 .page.active { display: block; animation: fadeUp .2s var(--ease); }
 
@@ -288,7 +281,6 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── METRIC STRIP ── */
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -330,7 +322,6 @@ body {
 
 .metric-sub { font-size: 10.5px; color: var(--txt-3); margin-top: 7px; }
 
-/* ── CARD ── */
 .card {
   background: var(--bg-1);
   border: 1px solid var(--line);
@@ -353,14 +344,12 @@ body {
 .card-title { font-size: 12px; font-weight: 700; color: var(--txt-1); letter-spacing: .01em; display: flex; align-items: center; gap: 7px; }
 .card-body { padding: 18px; }
 
-/* ── GRID ── */
 .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .gauto { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
 .gauto-sm { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
 
-/* ── ALERT ── */
 .alert {
   display: flex; align-items: center; gap: 10px;
   padding: 10px 14px;
@@ -374,7 +363,6 @@ body {
 .alert-yellow { background: rgba(245,158,11,.1); color: #fbbf24; border-color: rgba(245,158,11,.25); }
 .alert-blue { background: rgba(59,130,246,.1); color: #60a5fa; border-color: rgba(59,130,246,.25); }
 
-/* ── FORM ── */
 .f-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
 .f-label { font-size: 10.5px; font-weight: 700; color: var(--txt-2); text-transform: uppercase; letter-spacing: .07em; }
 
@@ -401,7 +389,6 @@ body {
 
 .f-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-/* ── TABLE ── */
 .tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 .tbl th {
   text-align: left;
@@ -412,12 +399,11 @@ body {
   background: var(--bg-2);
   border-bottom: 1px solid var(--line);
 }
-.tbl td { padding: 10px 14px; border-bottom: 1px solid var(--line); color: var(--txt-2); }
+.tbl td { padding: 10px 14px; border-bottom: 1px solid var(--line); color: var(--txt-2); vertical-align: middle; }
 .tbl tr:last-child td { border-bottom: none; }
 .tbl tr:hover td { background: var(--bg-hover); color: var(--txt-1); }
 .tbl td:first-child { color: var(--txt-1); }
 
-/* ── BADGE ── */
 .badge {
   display: inline-flex; align-items: center;
   padding: 3px 9px;
@@ -435,7 +421,6 @@ body {
 .bx { background: var(--badge-cancel-bg); color: var(--badge-cancel-c); }
 .bo { background: var(--badge-os-bg); color: var(--badge-os-c); }
 
-/* ── STOCK CHIP ── */
 .chip {
   display: inline-flex; align-items: center; gap: 4px;
   font-size: 10px; font-weight: 600; font-family: var(--mono);
@@ -447,7 +432,6 @@ body {
 .chip-low  { background: rgba(239,68,68,.12); color: #f87171; }
 .chip-neg  { background: rgba(239,68,68,.9); color: #fff; }
 
-/* ── PRODUCT CARD (INVENTORY) ── */
 .prod-card {
   background: var(--bg-1);
   border: 1px solid var(--line);
@@ -464,6 +448,25 @@ body {
 }
 
 .prod-emoji { font-size: 22px; line-height: 1; margin-bottom: 8px; display: block; }
+.prod-thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  display: block;
+  margin-bottom: 10px;
+  background: var(--bg-3);
+}
+.prod-thumb-sm {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  display: block;
+  background: var(--bg-3);
+}
 .prod-name { font-size: 13px; font-weight: 700; color: var(--txt-1); }
 .prod-code { font-size: 10px; color: var(--txt-3); font-family: var(--mono); margin-top: 2px; }
 .prod-price { font-size: 12px; font-weight: 600; color: var(--c-brand); font-family: var(--mono); margin-top: 5px; }
@@ -511,7 +514,6 @@ body {
 .sz-btn:hover { background: var(--c-brand); color: #000; border-color: var(--c-brand); }
 .sz-btn.busy { opacity: .5; pointer-events: none; }
 
-/* ── ORDER CARD ── */
 .order-card {
   background: var(--bg-1);
   border: 1px solid var(--line);
@@ -544,7 +546,6 @@ body {
 .oc-track { display: flex; gap: 6px; }
 .oc-track .f-input { flex: 1; padding: 6px 10px; font-size: 11.5px; }
 
-/* ── PRODUCT SELECTOR (SALES) ── */
 .sp-card {
   background: var(--bg-2);
   border: 1px solid var(--line);
@@ -556,6 +557,16 @@ body {
 }
 .sp-card:hover { border-color: var(--line-2); transform: translateY(-1px); }
 .sp-card.sel { border-color: var(--c-brand); background: var(--c-brand-glow); }
+.sp-thumb {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  margin: 0 auto 8px;
+  display: block;
+  background: var(--bg-3);
+}
 .sp-emoji { font-size: 26px; margin-bottom: 6px; }
 .sp-name { font-size: 12px; font-weight: 600; color: var(--txt-1); }
 .sp-price { font-size: 11px; color: var(--c-brand); font-family: var(--mono); margin-top: 2px; }
@@ -576,7 +587,6 @@ body {
 .sz-pill:hover { border-color: var(--c-brand); color: var(--c-brand); }
 .sz-pill.sel { background: var(--c-brand); color: #000; border-color: var(--c-brand); }
 
-/* ── ORDER ITEMS LIST ── */
 .oi-row {
   display: flex;
   align-items: center;
@@ -593,7 +603,6 @@ body {
 .oi-meta { font-size: 10.5px; color: var(--txt-3); font-family: var(--mono); margin-top: 1px; }
 .oi-qty { width: 56px; padding: 5px 8px; text-align: center; font-family: var(--mono); }
 
-/* ── QA CARD ── */
 .qa-card {
   background: var(--bg-2);
   border: 1px solid var(--line);
@@ -608,12 +617,10 @@ body {
 .qa-title { font-size: 12.5px; font-weight: 700; color: var(--txt-1); }
 .qa-sub { font-size: 10.5px; color: var(--txt-3); margin-top: 2px; }
 
-/* ── FILTER BAR ── */
 .filter-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
 .filter-bar .btn { font-size: 11.5px; padding: 6px 12px; }
 .filter-bar .btn.active-f { background: var(--c-brand-glow); color: var(--c-brand); border-color: rgba(0,194,124,.3); }
 
-/* ── TOAST ── */
 #toasts {
   position: fixed; bottom: 20px; right: 20px;
   display: flex; flex-direction: column; gap: 8px;
@@ -635,7 +642,6 @@ body {
 .t-info { border-color: rgba(59,130,246,.35); color: #60a5fa; }
 @keyframes tIn { from{opacity:0;transform:translateX(16px)} to{opacity:1;transform:none} }
 
-/* ── SPINNER ── */
 .spin {
   width: 16px; height: 16px;
   border: 2px solid var(--line-2);
@@ -646,26 +652,32 @@ body {
 }
 @keyframes rot { to { transform: rotate(360deg); } }
 
-/* ── EMPTY ── */
 .empty { text-align: center; padding: 40px 20px; color: var(--txt-3); font-size: 12px; }
 .empty-icon { font-size: 28px; margin-bottom: 10px; opacity: .5; }
 
-/* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--txt-3); }
 
-/* ── DIVIDER ── */
 .divider { height: 1px; background: var(--line); margin: 16px 0; }
 
-/* ── SECTION TITLE ── */
 .sec-title {
   font-size: 11px; font-weight: 700;
   color: var(--txt-3);
   text-transform: uppercase;
   letter-spacing: .08em;
   margin-bottom: 12px;
+}
+
+@media (max-width: 1100px) {
+  .metric-grid, .g2 { grid-template-columns: 1fr; }
+  .sb { width: 92px; }
+  .sb-logo-text, .sb-group-label, .nav-item { font-size: 0; }
+  .nav-item { justify-content: center; padding: 10px; }
+  .nav-icon { width: 36px; height: 36px; font-size: 16px; }
+  .topbar { padding: 0 16px; }
+  .content { padding: 16px; }
 }
 </style>
 </head>
@@ -675,355 +687,350 @@ body {
 
 <div class="shell">
 
-<!-- ═══ SIDEBAR ═══ -->
-<div class="sb">
-  <div class="sb-logo">
-    <div class="sb-logo-mark">
-      <svg viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1.5" fill="#000"/><rect x="10" y="2" width="6" height="6" rx="1.5" fill="#000" opacity=".5"/><rect x="2" y="10" width="6" height="6" rx="1.5" fill="#000" opacity=".5"/><rect x="10" y="10" width="6" height="6" rx="1.5" fill="#000"/></svg>
+  <div class="sb">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">
+        <svg viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1.5" fill="#000"/><rect x="10" y="2" width="6" height="6" rx="1.5" fill="#000" opacity=".5"/><rect x="2" y="10" width="6" height="6" rx="1.5" fill="#000" opacity=".5"/><rect x="10" y="10" width="6" height="6" rx="1.5" fill="#000"/></svg>
+      </div>
+      <div class="sb-logo-text">
+        <div class="sb-logo-name">Mini ERP</div>
+        <div class="sb-logo-ver">v2.1 · image-url</div>
+      </div>
     </div>
-    <div class="sb-logo-text">
-      <div class="sb-logo-name">Mini ERP</div>
-      <div class="sb-logo-ver">v2.0 · event-driven</div>
+
+    <nav class="sb-nav">
+      <div class="sb-group">
+        <div class="sb-group-label">Control</div>
+        <div class="nav-item active" data-p="dashboard" onclick="nav(this,'dashboard')">
+          <div class="nav-icon">📊</div> Dashboard
+        </div>
+        <div class="nav-item" data-p="sales" onclick="nav(this,'sales')">
+          <div class="nav-icon">🛒</div> Bán hàng
+        </div>
+        <div class="nav-item" data-p="processing" onclick="nav(this,'processing')">
+          <div class="nav-icon">⚙️</div> Xử lý đơn
+        </div>
+        <div class="nav-item" data-p="inventory" onclick="nav(this,'inventory')">
+          <div class="nav-icon">📦</div> Kho hàng
+        </div>
+      </div>
+
+      <div class="sb-group">
+        <div class="sb-group-label">Manage</div>
+        <div class="nav-item" data-p="products" onclick="nav(this,'products')">
+          <div class="nav-icon">🏷️</div> Sản phẩm
+        </div>
+        <div class="nav-item" data-p="analytics" onclick="nav(this,'analytics')">
+          <div class="nav-icon">📈</div> Báo cáo
+        </div>
+        <div class="nav-item" data-p="settings" onclick="nav(this,'settings')">
+          <div class="nav-icon">⚙️</div> Cài đặt
+        </div>
+      </div>
+    </nav>
+
+    <div class="sb-foot">
+      <div class="conn-pill">
+        <div class="dot dot-idle" id="conn-dot"></div>
+        <span id="conn-text" style="flex:1;font-size:11px">Chưa kết nối</span>
+      </div>
+      <div class="sync-row" id="sync-row">—</div>
     </div>
   </div>
 
-  <nav class="sb-nav">
-    <div class="sb-group">
-      <div class="sb-group-label">Control</div>
-      <div class="nav-item active" data-p="dashboard" onclick="nav(this,'dashboard')">
-        <div class="nav-icon">📊</div> Dashboard
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="page-title" id="pg-title">Dashboard</div>
       </div>
-      <div class="nav-item" data-p="sales" onclick="nav(this,'sales')">
-        <div class="nav-icon">🛒</div> Bán hàng
-      </div>
-      <div class="nav-item" data-p="processing" onclick="nav(this,'processing')">
-        <div class="nav-icon">⚙️</div> Xử lý đơn
-      </div>
-      <div class="nav-item" data-p="inventory" onclick="nav(this,'inventory')">
-        <div class="nav-icon">📦</div> Kho hàng
+      <div class="topbar-right">
+        <button class="btn" onclick="loadData()"><div class="spin" id="refresh-spin" style="display:none"></div> ↺ Refresh</button>
+        <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Chuyển theme">🌙</button>
       </div>
     </div>
 
-    <div class="sb-group">
-      <div class="sb-group-label">Manage</div>
-      <div class="nav-item" data-p="products" onclick="nav(this,'products')">
-        <div class="nav-icon">🏷️</div> Sản phẩm
-      </div>
-      <div class="nav-item" data-p="analytics" onclick="nav(this,'analytics')">
-        <div class="nav-icon">📈</div> Báo cáo
-      </div>
-      <div class="nav-item" data-p="settings" onclick="nav(this,'settings')">
-        <div class="nav-icon">⚙️</div> Cài đặt
-      </div>
-    </div>
-  </nav>
+    <div class="content">
 
-  <div class="sb-foot">
-    <div class="conn-pill">
-      <div class="dot dot-idle" id="conn-dot"></div>
-      <span id="conn-text" style="flex:1;font-size:11px">Chưa kết nối</span>
+      <div id="pg-dashboard" class="page active">
+        <div id="dash-alerts"></div>
+
+        <div class="metric-grid">
+          <div class="metric-card" style="--mc-accent:#3b82f6">
+            <div class="metric-label">Tổng đơn</div>
+            <div class="metric-val" id="m-orders">—</div>
+            <div class="metric-sub">Tất cả trạng thái</div>
+          </div>
+          <div class="metric-card" style="--mc-accent:var(--c-brand)">
+            <div class="metric-label">Doanh thu</div>
+            <div class="metric-val" id="m-revenue" style="color:var(--c-brand)">—</div>
+            <div class="metric-sub">VNĐ toàn bộ</div>
+          </div>
+          <div class="metric-card" style="--mc-accent:#f59e0b">
+            <div class="metric-label">Over Sell</div>
+            <div class="metric-val" id="m-oversell" style="color:#fbbf24">0</div>
+            <div class="metric-sub">Cần xử lý ngay</div>
+          </div>
+          <div class="metric-card" style="--mc-accent:#ef4444">
+            <div class="metric-label">Kho âm</div>
+            <div class="metric-val" id="m-negstock" style="color:#f87171">0</div>
+            <div class="metric-sub">SKU cần nhập thêm</div>
+          </div>
+        </div>
+
+        <div class="g2">
+          <div class="card">
+            <div class="card-head"><div class="card-title">⚡ Hành động nhanh</div></div>
+            <div class="card-body">
+              <div class="g2" style="gap:10px">
+                <div class="qa-card" onclick="goNav('sales')">
+                  <div class="qa-icon">🛒</div>
+                  <div class="qa-title">Tạo đơn hàng</div>
+                  <div class="qa-sub">Nhập nhanh từ UI</div>
+                </div>
+                <div class="qa-card" onclick="goNav('inventory')">
+                  <div class="qa-icon">📥</div>
+                  <div class="qa-title">Nhập kho</div>
+                  <div class="qa-sub">+1 / +5 / +N</div>
+                </div>
+                <div class="qa-card" onclick="goNav('processing')">
+                  <div class="qa-icon">🚚</div>
+                  <div class="qa-title">Xử lý đơn</div>
+                  <div class="qa-sub">Tracking, status</div>
+                </div>
+                <div class="qa-card" onclick="goNav('products')">
+                  <div class="qa-icon">➕</div>
+                  <div class="qa-title">Thêm sản phẩm</div>
+                  <div class="qa-sub">Tạo SKU mới</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-title">📦 Tổng quan kho</div></div>
+            <div class="card-body" style="padding:0">
+              <table class="tbl">
+                <tr><td>Tổng SKU</td><td style="text-align:right;font-family:var(--mono);font-weight:600" id="m-sku">—</td></tr>
+                <tr><td>Tổng tồn kho</td><td style="text-align:right;font-family:var(--mono);font-weight:600" id="m-stock">—</td></tr>
+                <tr><td>Đã bán</td><td style="text-align:right;font-family:var(--mono);font-weight:600" id="m-sold">—</td></tr>
+                <tr><td>Còn lại</td><td style="text-align:right;font-family:var(--mono);font-weight:600" id="m-remain">—</td></tr>
+                <tr><td style="color:var(--txt-1);font-weight:600">Lợi nhuận 50%</td>
+                  <td style="text-align:right;font-family:var(--mono);font-weight:700;color:var(--c-brand)" id="m-profit">—</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="pg-sales" class="page">
+        <div class="g2" style="align-items:start">
+          <div>
+            <div class="card">
+              <div class="card-head"><div class="card-title">👤 Khách hàng</div></div>
+              <div class="card-body">
+                <div class="f-row">
+                  <label class="f-label">Tên khách *</label>
+                  <input class="f-input" id="o-customer" placeholder="Nguyễn Văn A" />
+                </div>
+                <div class="f-row">
+                  <label class="f-label">Điện thoại *</label>
+                  <input class="f-input" id="o-phone" placeholder="0912 345 678" />
+                </div>
+                <div class="f-row">
+                  <label class="f-label">Địa chỉ</label>
+                  <input class="f-input" id="o-address" placeholder="123 Lê Duẩn, Đà Nẵng" />
+                </div>
+                <div class="f-row">
+                  <label class="f-label">Ghi chú</label>
+                  <input class="f-input" id="o-note" placeholder="..." />
+                </div>
+              </div>
+            </div>
+
+            <div class="card" id="order-items-card" style="display:none">
+              <div class="card-head"><div class="card-title">🛒 Sản phẩm đã chọn</div></div>
+              <div class="card-body">
+                <div id="order-items-list"></div>
+                <div style="margin-top:14px;display:flex;gap:8px">
+                  <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="submitOrder()">✓ Tạo đơn hàng</button>
+                  <button class="btn btn-ghost" onclick="clearOrderForm()">✕ Xóa</button>
+                </div>
+                <div id="order-result" style="margin-top:10px"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-title">🏷️ Chọn sản phẩm</div></div>
+            <div class="card-body">
+              <div id="sp-grid" class="gauto-sm" style="margin-bottom:14px"></div>
+
+              <div id="sp-sizes-wrap" style="display:none">
+                <div class="divider" style="margin:0 0 14px"></div>
+                <div class="sec-title" id="sp-sizes-label">Chọn size</div>
+                <div class="size-pills" id="sp-sizes"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="pg-processing" class="page">
+        <div class="filter-bar">
+          <button class="btn active-f" onclick="setOF('all',this)">Tất cả</button>
+          <button class="btn" onclick="setOF('New',this)">🔔 Mới</button>
+          <button class="btn" onclick="setOF('Over Sell',this)">⚠️ Over Sell</button>
+          <button class="btn" onclick="setOF('Confirm',this)">✓ Confirm</button>
+          <button class="btn" onclick="setOF('Shipping',this)">🚚 Shipping</button>
+          <button class="btn" onclick="setOF('Done',this)">✅ Done</button>
+          <input class="f-input" style="flex:1;min-width:160px;max-width:240px" placeholder="🔍 Tìm mã / khách..." oninput="searchOrders(this.value)" />
+        </div>
+        <div id="orders-grid" class="gauto">
+          <div class="empty"><div class="empty-icon">📋</div>Đang tải đơn hàng...</div>
+        </div>
+      </div>
+
+      <div id="pg-inventory" class="page">
+        <div class="filter-bar">
+          <input class="f-input" style="min-width:220px;max-width:280px" id="inv-q" placeholder="🔍 Tìm sản phẩm, mã SKU..." oninput="renderInventory()" />
+          <button class="btn active-f" onclick="setSF('all',this)">Tất cả</button>
+          <button class="btn" onclick="setSF('low',this)">🔴 Tồn thấp</button>
+          <button class="btn" onclick="setSF('neg',this)">💀 Kho âm</button>
+        </div>
+        <div id="inv-grid" class="gauto">
+          <div class="empty"><div class="empty-icon">📦</div>Đang tải kho...</div>
+        </div>
+      </div>
+
+      <div id="pg-products" class="page">
+        <div class="g2" style="align-items:start">
+          <div class="card">
+            <div class="card-head"><div class="card-title">➕ Thêm sản phẩm mới</div></div>
+            <div class="card-body">
+              <div class="f-grid" style="margin-bottom:0">
+                <div class="f-row">
+                  <label class="f-label">Tên sản phẩm *</label>
+                  <input class="f-input" id="p-name" placeholder="Blue Pants" />
+                </div>
+                <div class="f-row">
+                  <label class="f-label">Mã code *</label>
+                  <input class="f-input" id="p-code" placeholder="BP" style="text-transform:uppercase" />
+                </div>
+                <div class="f-row">
+                  <label class="f-label">Giá (VNĐ) *</label>
+                  <input class="f-input" id="p-price" type="number" placeholder="159000" />
+                </div>
+                <div class="f-row">
+                  <label class="f-label">Emoji icon</label>
+                  <input class="f-input" id="p-emoji" placeholder="👕" />
+                </div>
+                <div class="f-row" style="grid-column:1 / -1">
+                  <label class="f-label">Image URL</label>
+                  <input class="f-input" id="p-image" placeholder="https://...jpg" />
+                </div>
+              </div>
+              <div class="f-row">
+                <label class="f-label">Sizes (cách nhau dấu cách) *</label>
+                <input class="f-input" id="p-sizes" placeholder="35 36 37 38 39 40 41 42" />
+              </div>
+              <div style="display:flex;gap:8px;margin-top:4px">
+                <button class="btn btn-primary" onclick="submitProduct()">✓ Tạo sản phẩm</button>
+                <button class="btn btn-ghost" onclick="clearPF()">Xóa trắng</button>
+              </div>
+              <div id="prod-result" style="margin-top:10px"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-title">📋 Danh sách sản phẩm</div></div>
+            <div id="prod-list" style="padding:0">
+              <div class="empty" style="padding:24px"><div class="empty-icon">🏷️</div>Chưa có sản phẩm</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="pg-analytics" class="page">
+        <div class="g2">
+          <div class="card">
+            <div class="card-head"><div class="card-title">📊 Đơn hàng</div></div>
+            <div style="padding:0">
+              <table class="tbl">
+                <tr><td>✅ Done</td><td style="text-align:right;font-family:var(--mono);color:var(--c-brand);font-weight:600" id="a-done">—</td></tr>
+                <tr><td>🚚 Shipping</td><td style="text-align:right;font-family:var(--mono);font-weight:600" id="a-ship">—</td></tr>
+                <tr><td>⚠️ Over Sell</td><td style="text-align:right;font-family:var(--mono);color:#fbbf24;font-weight:600" id="a-os">—</td></tr>
+                <tr><td>✕ Hủy</td><td style="text-align:right;font-family:var(--mono);color:#f87171;font-weight:600" id="a-cancel">—</td></tr>
+                <tr><td style="font-weight:700;color:var(--txt-1)">Tổng doanh thu</td>
+                  <td style="text-align:right;font-family:var(--mono);color:var(--c-brand);font-weight:700;font-size:14px" id="a-rev">—</td></tr>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">📦 Phân tầng kho</div></div>
+            <div style="padding:0">
+              <table class="tbl">
+                <tr><td><span class="chip chip-ok">≥ 20</span> Dồi dào</td><td style="text-align:right;font-family:var(--mono);font-weight:600;color:var(--c-brand)" id="a-hi">—</td></tr>
+                <tr><td><span class="chip chip-warn">5–19</span> Cảnh báo</td><td style="text-align:right;font-family:var(--mono);font-weight:600;color:#fbbf24" id="a-md">—</td></tr>
+                <tr><td><span class="chip chip-low">1–4</span> Nguy hiểm</td><td style="text-align:right;font-family:var(--mono);font-weight:600;color:#f87171" id="a-lo">—</td></tr>
+                <tr><td><span class="chip chip-neg">âm</span> Kho âm</td><td style="text-align:right;font-family:var(--mono);font-weight:700;color:#f87171" id="a-ng">—</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">🏆 Top SKU bán chạy</div></div>
+          <div id="a-top" style="padding:0">
+            <div class="empty" style="padding:24px">Chưa có dữ liệu</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="pg-settings" class="page">
+        <div style="max-width:540px">
+          <div class="card">
+            <div class="card-head"><div class="card-title">🔌 Kết nối Apps Script</div></div>
+            <div class="card-body">
+              <div class="f-row">
+                <label class="f-label">Web App URL *</label>
+                <input class="f-input" id="gs-url" placeholder="https://script.google.com/macros/s/.../exec" style="font-family:var(--mono);font-size:11px" />
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-primary" onclick="saveConfig()">✓ Lưu & Test</button>
+                <button class="btn" onclick="testConn()">🔌 Test kết nối</button>
+              </div>
+              <div id="conn-result" style="margin-top:12px"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-title">🎨 Giao diện</div></div>
+            <div class="card-body">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--txt-1)">Chế độ tối / sáng</div>
+                  <div style="font-size:11px;color:var(--txt-3);margin-top:2px">Chuyển đổi giao diện</div>
+                </div>
+                <button class="btn btn-primary" onclick="toggleTheme()" id="theme-label">🌙 Dark mode</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-title">📖 Hướng dẫn deploy</div></div>
+            <div class="card-body" style="font-size:12.5px;color:var(--txt-2);line-height:2">
+              <b style="color:var(--txt-1)">1.</b> Mở Google Sheet → Extensions → Apps Script<br>
+              <b style="color:var(--txt-1)">2.</b> Paste code Apps Script đã sửa imageUrl<br>
+              <b style="color:var(--txt-1)">3.</b> Deploy → New Deployment → Web App<br>
+              &emsp;Execute as: <span style="color:var(--c-brand);font-weight:700">Me</span> | Access: <span style="color:var(--c-brand);font-weight:700">Anyone</span><br>
+              <b style="color:var(--txt-1)">4.</b> Copy URL → Paste vào trường trên → Save
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div class="sync-row" id="sync-row">—</div>
   </div>
 </div>
-
-<!-- ═══ MAIN ═══ -->
-<div class="main">
-  <div class="topbar">
-    <div class="topbar-left">
-      <div class="page-title" id="pg-title">Dashboard</div>
-    </div>
-    <div class="topbar-right">
-      <button class="btn" onclick="loadData()"><div class="spin" id="refresh-spin" style="display:none"></div> ↺ Refresh</button>
-      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Chuyển theme">🌙</button>
-    </div>
-  </div>
-
-  <div class="content">
-
-    <!-- ═══ DASHBOARD ═══ -->
-    <div id="pg-dashboard" class="page active">
-      <div id="dash-alerts"></div>
-
-      <div class="metric-grid">
-        <div class="metric-card" style="--mc-accent:#3b82f6">
-          <div class="metric-label">Tổng đơn</div>
-          <div class="metric-val" id="m-orders">—</div>
-          <div class="metric-sub">Tất cả trạng thái</div>
-        </div>
-        <div class="metric-card" style="--mc-accent:var(--c-brand)">
-          <div class="metric-label">Doanh thu</div>
-          <div class="metric-val" id="m-revenue" style="color:var(--c-brand)">—</div>
-          <div class="metric-sub">VNĐ toàn bộ</div>
-        </div>
-        <div class="metric-card" style="--mc-accent:#f59e0b">
-          <div class="metric-label">Over Sell</div>
-          <div class="metric-val" id="m-oversell" style="color:#fbbf24">0</div>
-          <div class="metric-sub">Cần xử lý ngay</div>
-        </div>
-        <div class="metric-card" style="--mc-accent:#ef4444">
-          <div class="metric-label">Kho âm</div>
-          <div class="metric-val" id="m-negstock" style="color:#f87171">0</div>
-          <div class="metric-sub">SKU cần nhập thêm</div>
-        </div>
-      </div>
-
-      <div class="g2">
-        <div class="card">
-          <div class="card-head"><div class="card-title">⚡ Hành động nhanh</div></div>
-          <div class="card-body">
-            <div class="g2" style="gap:10px">
-              <div class="qa-card" onclick="goNav('sales')">
-                <div class="qa-icon">🛒</div>
-                <div class="qa-title">Tạo đơn hàng</div>
-                <div class="qa-sub">Nhập nhanh từ UI</div>
-              </div>
-              <div class="qa-card" onclick="goNav('inventory')">
-                <div class="qa-icon">📥</div>
-                <div class="qa-title">Nhập kho</div>
-                <div class="qa-sub">+1 / +5 / +N</div>
-              </div>
-              <div class="qa-card" onclick="goNav('processing')">
-                <div class="qa-icon">🚚</div>
-                <div class="qa-title">Xử lý đơn</div>
-                <div class="qa-sub">Tracking, status</div>
-              </div>
-              <div class="qa-card" onclick="goNav('products')">
-                <div class="qa-icon">➕</div>
-                <div class="qa-title">Thêm sản phẩm</div>
-                <div class="qa-sub">Tạo SKU mới</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><div class="card-title">📦 Tổng quan kho</div></div>
-          <div class="card-body" style="padding:0">
-            <table class="tbl">
-              <tr><td>Tổng SKU</td><td style="text-align:right;font-family:var(--mono);font-weight:600" id="m-sku">—</td></tr>
-              <tr><td>Tổng tồn kho</td><td style="text-align:right;font-family:var(--mono);font-weight:600" id="m-stock">—</td></tr>
-              <tr><td>Đã bán</td><td style="text-align:right;font-family:var(--mono);font-weight:600" id="m-sold">—</td></tr>
-              <tr><td>Còn lại</td><td style="text-align:right;font-family:var(--mono);font-weight:600" id="m-remain">—</td></tr>
-              <tr><td style="color:var(--txt-1);font-weight:600">Lợi nhuận 50%</td>
-                <td style="text-align:right;font-family:var(--mono);font-weight:700;color:var(--c-brand)" id="m-profit">—</td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ SALES ═══ -->
-    <div id="pg-sales" class="page">
-      <div class="g2" style="align-items:start">
-        <div>
-          <div class="card">
-            <div class="card-head"><div class="card-title">👤 Khách hàng</div></div>
-            <div class="card-body">
-              <div class="f-row">
-                <label class="f-label">Tên khách *</label>
-                <input class="f-input" id="o-customer" placeholder="Nguyễn Văn A" />
-              </div>
-              <div class="f-row">
-                <label class="f-label">Điện thoại *</label>
-                <input class="f-input" id="o-phone" placeholder="0912 345 678" />
-              </div>
-              <div class="f-row">
-                <label class="f-label">Địa chỉ</label>
-                <input class="f-input" id="o-address" placeholder="123 Lê Duẩn, Đà Nẵng" />
-              </div>
-              <div class="f-row">
-                <label class="f-label">Ghi chú</label>
-                <input class="f-input" id="o-note" placeholder="..." />
-              </div>
-            </div>
-          </div>
-
-          <div class="card" id="order-items-card" style="display:none">
-            <div class="card-head"><div class="card-title">🛒 Sản phẩm đã chọn</div></div>
-            <div class="card-body">
-              <div id="order-items-list"></div>
-              <div style="margin-top:14px;display:flex;gap:8px">
-                <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="submitOrder()">✓ Tạo đơn hàng</button>
-                <button class="btn btn-ghost" onclick="clearOrderForm()">✕ Xóa</button>
-              </div>
-              <div id="order-result" style="margin-top:10px"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><div class="card-title">🏷️ Chọn sản phẩm</div></div>
-          <div class="card-body">
-            <div id="sp-grid" class="gauto-sm" style="margin-bottom:14px"></div>
-
-            <div id="sp-sizes-wrap" style="display:none">
-              <div class="divider" style="margin:0 0 14px"></div>
-              <div class="sec-title" id="sp-sizes-label">Chọn size</div>
-              <div class="size-pills" id="sp-sizes"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ PROCESSING ═══ -->
-    <div id="pg-processing" class="page">
-      <div class="filter-bar">
-        <button class="btn active-f" onclick="setOF('all',this)">Tất cả</button>
-        <button class="btn" onclick="setOF('New',this)">🔔 Mới</button>
-        <button class="btn" onclick="setOF('Over Sell',this)">⚠️ Over Sell</button>
-        <button class="btn" onclick="setOF('Confirm',this)">✓ Confirm</button>
-        <button class="btn" onclick="setOF('Shipping',this)">🚚 Shipping</button>
-        <button class="btn" onclick="setOF('Done',this)">✅ Done</button>
-        <input class="f-input" style="flex:1;min-width:160px;max-width:240px" placeholder="🔍 Tìm mã / khách..." oninput="searchOrders(this.value)" />
-      </div>
-      <div id="orders-grid" class="gauto">
-        <div class="empty"><div class="empty-icon">📋</div>Đang tải đơn hàng...</div>
-      </div>
-    </div>
-
-    <!-- ═══ INVENTORY ═══ -->
-    <div id="pg-inventory" class="page">
-      <div class="filter-bar">
-        <input class="f-input" style="min-width:220px;max-width:280px" id="inv-q" placeholder="🔍 Tìm sản phẩm, mã SKU..." oninput="renderInventory()" />
-        <button class="btn active-f" onclick="setSF('all',this)">Tất cả</button>
-        <button class="btn" onclick="setSF('low',this)">🔴 Tồn thấp</button>
-        <button class="btn" onclick="setSF('neg',this)">💀 Kho âm</button>
-      </div>
-      <div id="inv-grid" class="gauto">
-        <div class="empty"><div class="empty-icon">📦</div>Đang tải kho...</div>
-      </div>
-    </div>
-
-    <!-- ═══ PRODUCTS ═══ -->
-    <div id="pg-products" class="page">
-      <div class="g2" style="align-items:start">
-        <div class="card">
-          <div class="card-head"><div class="card-title">➕ Thêm sản phẩm mới</div></div>
-          <div class="card-body">
-            <div class="f-grid" style="margin-bottom:0">
-              <div class="f-row">
-                <label class="f-label">Tên sản phẩm *</label>
-                <input class="f-input" id="p-name" placeholder="Blue Pants" />
-              </div>
-              <div class="f-row">
-                <label class="f-label">Mã code *</label>
-                <input class="f-input" id="p-code" placeholder="BP" style="text-transform:uppercase" />
-              </div>
-              <div class="f-row">
-                <label class="f-label">Giá (VNĐ) *</label>
-                <input class="f-input" id="p-price" type="number" placeholder="159000" />
-              </div>
-              <div class="f-row">
-                <label class="f-label">Emoji icon</label>
-                <input class="f-input" id="p-emoji" placeholder="👕" />
-              </div>
-            </div>
-            <div class="f-row">
-              <label class="f-label">Sizes (cách nhau dấu cách) *</label>
-              <input class="f-input" id="p-sizes" placeholder="35 36 37 38 39 40 41 42" />
-            </div>
-            <div style="display:flex;gap:8px;margin-top:4px">
-              <button class="btn btn-primary" onclick="submitProduct()">✓ Tạo sản phẩm</button>
-              <button class="btn btn-ghost" onclick="clearPF()">Xóa trắng</button>
-            </div>
-            <div id="prod-result" style="margin-top:10px"></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><div class="card-title">📋 Danh sách sản phẩm</div></div>
-          <div id="prod-list" style="padding:0">
-            <div class="empty" style="padding:24px"><div class="empty-icon">🏷️</div>Chưa có sản phẩm</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ ANALYTICS ═══ -->
-    <div id="pg-analytics" class="page">
-      <div class="g2">
-        <div class="card">
-          <div class="card-head"><div class="card-title">📊 Đơn hàng</div></div>
-          <div style="padding:0">
-            <table class="tbl">
-              <tr><td>✅ Done</td><td style="text-align:right;font-family:var(--mono);color:var(--c-brand);font-weight:600" id="a-done">—</td></tr>
-              <tr><td>🚚 Shipping</td><td style="text-align:right;font-family:var(--mono);font-weight:600" id="a-ship">—</td></tr>
-              <tr><td>⚠️ Over Sell</td><td style="text-align:right;font-family:var(--mono);color:#fbbf24;font-weight:600" id="a-os">—</td></tr>
-              <tr><td>✕ Hủy</td><td style="text-align:right;font-family:var(--mono);color:#f87171;font-weight:600" id="a-cancel">—</td></tr>
-              <tr><td style="font-weight:700;color:var(--txt-1)">Tổng doanh thu</td>
-                <td style="text-align:right;font-family:var(--mono);color:var(--c-brand);font-weight:700;font-size:14px" id="a-rev">—</td></tr>
-            </table>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">📦 Phân tầng kho</div></div>
-          <div style="padding:0">
-            <table class="tbl">
-              <tr><td><span class="chip chip-ok">≥ 20</span> Dồi dào</td><td style="text-align:right;font-family:var(--mono);font-weight:600;color:var(--c-brand)" id="a-hi">—</td></tr>
-              <tr><td><span class="chip chip-warn">5–19</span> Cảnh báo</td><td style="text-align:right;font-family:var(--mono);font-weight:600;color:#fbbf24" id="a-md">—</td></tr>
-              <tr><td><span class="chip chip-low">1–4</span> Nguy hiểm</td><td style="text-align:right;font-family:var(--mono);font-weight:600;color:#f87171" id="a-lo">—</td></tr>
-              <tr><td><span class="chip chip-neg">âm</span> Kho âm</td><td style="text-align:right;font-family:var(--mono);font-weight:700;color:#f87171" id="a-ng">—</td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">🏆 Top SKU bán chạy</div></div>
-        <div id="a-top" style="padding:0">
-          <div class="empty" style="padding:24px">Chưa có dữ liệu</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ SETTINGS ═══ -->
-    <div id="pg-settings" class="page">
-      <div style="max-width:540px">
-        <div class="card">
-          <div class="card-head"><div class="card-title">🔌 Kết nối Apps Script</div></div>
-          <div class="card-body">
-            <div class="f-row">
-              <label class="f-label">Web App URL *</label>
-              <input class="f-input" id="gs-url" placeholder="https://script.google.com/macros/s/.../exec" style="font-family:var(--mono);font-size:11px" />
-            </div>
-            <div style="display:flex;gap:8px">
-              <button class="btn btn-primary" onclick="saveConfig()">✓ Lưu & Test</button>
-              <button class="btn" onclick="testConn()">🔌 Test kết nối</button>
-            </div>
-            <div id="conn-result" style="margin-top:12px"></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><div class="card-title">🎨 Giao diện</div></div>
-          <div class="card-body">
-            <div style="display:flex;align-items:center;justify-content:space-between">
-              <div>
-                <div style="font-size:13px;font-weight:600;color:var(--txt-1)">Chế độ tối / sáng</div>
-                <div style="font-size:11px;color:var(--txt-3);margin-top:2px">Chuyển đổi giao diện</div>
-              </div>
-              <button class="btn btn-primary" onclick="toggleTheme()" id="theme-label">🌙 Dark mode</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head"><div class="card-title">📖 Hướng dẫn deploy</div></div>
-          <div class="card-body" style="font-size:12.5px;color:var(--txt-2);line-height:2">
-            <b style="color:var(--txt-1)">1.</b> Mở Google Sheet → Extensions → Apps Script<br>
-            <b style="color:var(--txt-1)">2.</b> Paste code FullERP_AppScript_V2.gs<br>
-            <b style="color:var(--txt-1)">3.</b> Deploy → New Deployment → Web App<br>
-            &emsp;Execute as: <span style="color:var(--c-brand);font-weight:700">Me</span> | Access: <span style="color:var(--c-brand);font-weight:700">Anyone</span><br>
-            <b style="color:var(--txt-1)">4.</b> Copy URL → Paste vào trường trên → Save
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /content -->
-</div><!-- /main -->
-</div><!-- /shell -->
 
 <script>
 const TITLES = { dashboard:'Dashboard', sales:'Bán hàng', processing:'Xử lý đơn', inventory:'Kho hàng', products:'Sản phẩm', analytics:'Báo cáo', settings:'Cài đặt' };
@@ -1034,7 +1041,6 @@ let st = { products:[], inventory:[], orders:[], imports:[], dashboard:{}, oFilt
 let orderItems = [];
 let selProdId = null;
 
-/* ── INIT ── */
 window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('erp_gs_url') || '';
   const theme = localStorage.getItem('erp_theme') || 'dark';
@@ -1051,7 +1057,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-/* ── NAV ── */
 function nav(el, page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('pg-' + page).classList.add('active');
@@ -1070,7 +1075,6 @@ function goNav(page) {
   if (el) nav(el, page);
 }
 
-/* ── API ── */
 async function gsPost(action, params = {}) {
   if (!GS_URL) throw new Error('Chưa cấu hình Apps Script URL');
   const body = new URLSearchParams({ action, ...params });
@@ -1079,7 +1083,32 @@ async function gsPost(action, params = {}) {
   return res.json();
 }
 
-/* ── LOAD DATA ── */
+function getFallbackEmoji(code='') {
+  const c = String(code).toLowerCase();
+  if (c.includes('shirt') || c.includes('tee')) return '👕';
+  if (c.includes('pant') || c.includes('jean')) return '👖';
+  if (c.includes('shoe') || c.includes('boot')) return '👟';
+  if (c.includes('bag')) return '👜';
+  return '📦';
+}
+
+function safeImage(url='') {
+  const u = String(url || '').trim();
+  if (!u) return '';
+  if (/^https?:\/\//i.test(u)) return u;
+  return '';
+}
+
+function imgOrEmoji(image, emoji, cls='prod-thumb-sm') {
+  const img = safeImage(image);
+  const emj = emoji || '📦';
+  if (img) {
+    return `<img src="${img}" alt="" class="${cls}" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';" />
+            <span style="display:none;width:${cls==='sp-thumb'?'64':'48'}px;height:${cls==='sp-thumb'?'64':'48'}px;align-items:center;justify-content:center;border-radius:${cls==='sp-thumb'?'12':'10'}px;background:var(--bg-2);border:1px solid var(--line);font-size:${cls==='sp-thumb'?'26':'20'}px">${emj}</span>`;
+  }
+  return `<span style="display:inline-flex;width:${cls==='sp-thumb'?'64':cls==='prod-thumb'?'72':'48'}px;height:${cls==='sp-thumb'?'64':cls==='prod-thumb'?'72':'48'}px;align-items:center;justify-content:center;border-radius:${cls==='sp-thumb'?'12':cls==='prod-thumb'?'12':'10'}px;background:var(--bg-2);border:1px solid var(--line);font-size:${cls==='sp-thumb'?'26':cls==='prod-thumb'?'22':'20'}px">${emj}</span>`;
+}
+
 async function loadData() {
   if (!GS_URL) return;
   const spin = document.getElementById('refresh-spin');
@@ -1096,7 +1125,8 @@ async function loadData() {
       name: p.name||'',
       code: p.code||'',
       price: parseInt(p.price)||0,
-      emoji: p.emoji||'📦',
+      emoji: p.emoji || getFallbackEmoji(p.code),
+      image: p.image || '',
       sizes: (p.skus||[]).map(s => s.split('-').pop()),
       rawSkus: p.skus||[],
       status: p.status||'Active'
@@ -1128,7 +1158,6 @@ async function loadData() {
   spin.style.display = 'none';
 }
 
-/* ── DASHBOARD ── */
 function renderDashboard() {
   const m = st.dashboard;
   const n = v => (parseInt(v)||0).toLocaleString('vi');
@@ -1148,7 +1177,6 @@ function renderDashboard() {
   document.getElementById('dash-alerts').innerHTML = alerts;
 }
 
-/* ── INVENTORY ── */
 function renderInventory() {
   const q = (document.getElementById('inv-q')?.value||'').toLowerCase().trim();
   const sf = st.sFilter;
@@ -1201,7 +1229,10 @@ function renderInventory() {
     return `
       <div class="prod-card">
         <div class="prod-card-head">
-          <span class="prod-emoji">${p.emoji}</span>
+          ${safeImage(p.image)
+            ? `<img src="${safeImage(p.image)}" alt="${p.name}" class="prod-thumb" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+               <span class="prod-emoji" style="display:none">${p.emoji}</span>`
+            : `<span class="prod-emoji">${p.emoji}</span>`}
           <div class="prod-name">${p.name}</div>
           <div class="prod-code">${p.code}</div>
           <div class="prod-price">${p.price.toLocaleString('vi')} ₫</div>
@@ -1217,12 +1248,11 @@ function renderInventory() {
 
 function setSF(s, btn) {
   st.sFilter = s;
-  document.querySelectorAll('.filter-bar .btn').forEach(b => b.classList.remove('active-f'));
+  document.querySelectorAll('#pg-inventory .filter-bar .btn').forEach(b => b.classList.remove('active-f'));
   btn?.classList.add('active-f');
   renderInventory();
 }
 
-/* ── IMPORT ── */
 async function doImport(code, size, qty, btn) {
   if (btn) { btn.textContent='...'; btn.classList.add('busy'); }
   try {
@@ -1240,7 +1270,6 @@ function promptImport(code, size) {
   if (q && !isNaN(q) && parseInt(q)>0) doImport(code, size, parseInt(q), null);
 }
 
-/* ── ORDERS ── */
 function renderOrders() {
   const list = st.orders.filter(o => st.oFilter==='all' || o.status===st.oFilter);
   _renderOrderList(list);
@@ -1300,7 +1329,7 @@ function _renderOrderList(list) {
 
 function setOF(f, btn) {
   st.oFilter = f;
-  document.querySelectorAll('.filter-bar .btn').forEach(b => b.classList.remove('active-f'));
+  document.querySelectorAll('#pg-processing .filter-bar .btn').forEach(b => b.classList.remove('active-f'));
   btn?.classList.add('active-f');
   renderOrders();
 }
@@ -1324,11 +1353,13 @@ async function updateOT(code) {
   } catch(e) { toast('err','❌ '+e.message); }
 }
 
-/* ── SALES ── */
 function renderSPGrid() {
   document.getElementById('sp-grid').innerHTML = st.products.map(p => `
     <div class="sp-card" id="sp-${p.id}" onclick="selectProd('${p.id}',this)">
-      <div class="sp-emoji">${p.emoji}</div>
+      ${safeImage(p.image)
+        ? `<img src="${safeImage(p.image)}" alt="${p.name}" class="sp-thumb" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+           <div class="sp-emoji" style="display:none">${p.emoji}</div>`
+        : `<div class="sp-emoji">${p.emoji}</div>`}
       <div class="sp-name">${p.name}</div>
       <div class="sp-price">${p.price.toLocaleString('vi')}₫</div>
     </div>
@@ -1433,43 +1464,82 @@ function clearOrderForm() {
   ['o-customer','o-phone','o-address','o-note'].forEach(id => document.getElementById(id).value='');
 }
 
-/* ── PRODUCTS ── */
 async function submitProduct() {
   const name  = document.getElementById('p-name').value.trim();
   const code  = document.getElementById('p-code').value.trim().toUpperCase();
   const price = document.getElementById('p-price').value;
-  const emoji = document.getElementById('p-emoji').value.trim()||'📦';
+  const emoji = document.getElementById('p-emoji').value.trim() || getFallbackEmoji(code);
+  const image = document.getElementById('p-image').value.trim();
   const sizes = document.getElementById('p-sizes').value.trim().split(/\s+/).filter(Boolean);
-  if (!name||!code||!price||!sizes.length) { showRes('prod-result',false,'Điền đủ thông tin'); return; }
+
+  if (!name||!code||!price||!sizes.length) {
+    showRes('prod-result',false,'Điền đủ thông tin');
+    return;
+  }
+
   try {
-    const res = await gsPost('createProduct', { productName:name, productCode:code, price, emoji, sizes:JSON.stringify(sizes), category:'' });
-    if (res.success) { showRes('prod-result',true,`✓ "${name}" tạo thành công — ${sizes.length} SKU`); clearPF(); setTimeout(loadData,1500); }
-    else showRes('prod-result',false,'❌ '+(res.error||'Lỗi'));
-  } catch(e) { showRes('prod-result',false,'❌ '+e.message); }
+    const res = await gsPost('createProduct', {
+      productName: name,
+      productCode: code,
+      price,
+      emoji,
+      imageUrl: image,
+      sizes: JSON.stringify(sizes),
+      category: ''
+    });
+
+    if (res.success) {
+      showRes('prod-result',true,`✓ "${name}" tạo thành công — ${sizes.length} SKU`);
+      clearPF();
+      setTimeout(loadData,1500);
+    } else {
+      showRes('prod-result',false,'❌ '+(res.error||'Lỗi'));
+    }
+  } catch(e) {
+    showRes('prod-result',false,'❌ '+e.message);
+  }
 }
 
-function clearPF() { ['p-name','p-code','p-price','p-emoji','p-sizes'].forEach(id => document.getElementById(id).value=''); }
+function clearPF() {
+  ['p-name','p-code','p-price','p-emoji','p-image','p-sizes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
 
 function renderProdList() {
   if (!st.products.length) {
     document.getElementById('prod-list').innerHTML = '<div class="empty" style="padding:24px"><div class="empty-icon">🏷️</div>Chưa có sản phẩm</div>';
     return;
   }
+
   document.getElementById('prod-list').innerHTML = `
     <table class="tbl">
-      <thead><tr><th>Sản phẩm</th><th>Code</th><th>Giá</th><th>Sizes</th></tr></thead>
-      <tbody>${st.products.map(p=>`
+      <thead>
         <tr>
-          <td>${p.emoji} ${p.name}</td>
-          <td style="font-family:var(--mono)">${p.code}</td>
-          <td style="font-family:var(--mono)">${p.price.toLocaleString('vi')}₫</td>
-          <td style="font-family:var(--mono);font-size:10.5px;color:var(--txt-3)">${p.sizes.join(', ')}</td>
-        </tr>`).join('')}
+          <th>Ảnh</th>
+          <th>Sản phẩm</th>
+          <th>Code</th>
+          <th>Giá</th>
+          <th>Sizes</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${st.products.map(p => `
+          <tr>
+            <td style="width:72px">
+              ${imgOrEmoji(p.image, p.emoji, 'prod-thumb-sm')}
+            </td>
+            <td>${p.emoji} ${p.name}</td>
+            <td style="font-family:var(--mono)">${p.code}</td>
+            <td style="font-family:var(--mono)">${p.price.toLocaleString('vi')}₫</td>
+            <td style="font-family:var(--mono);font-size:10.5px;color:var(--txt-3)">${p.sizes.join(', ')}</td>
+          </tr>
+        `).join('')}
       </tbody>
     </table>`;
 }
 
-/* ── ANALYTICS ── */
 function renderAnalytics() {
   const orders = st.orders;
   const inv = st.inventory;
@@ -1481,6 +1551,7 @@ function renderAnalytics() {
   document.getElementById('a-os').textContent     = m.overSellCount||0;
   document.getElementById('a-cancel').textContent = orders.filter(o=>o.status==='Cancel').length;
   document.getElementById('a-rev').textContent    = n(m.totalRevenue)+' ₫';
+
   document.getElementById('a-hi').textContent     = inv.filter(i=>(parseInt(i.remaining)||0)>=20).length+' SKU';
   document.getElementById('a-md').textContent     = inv.filter(i=>{const r=parseInt(i.remaining)||0;return r>=5&&r<20}).length+' SKU';
   document.getElementById('a-lo').textContent     = inv.filter(i=>{const r=parseInt(i.remaining)||0;return r>0&&r<5}).length+' SKU';
@@ -1496,7 +1567,6 @@ function renderAnalytics() {
     : '<div class="empty" style="padding:24px">Chưa có dữ liệu</div>';
 }
 
-/* ── SETTINGS ── */
 async function saveConfig() {
   const url = document.getElementById('gs-url').value.trim();
   if (!url) { toast('err','Nhập URL trước'); return; }
@@ -1520,7 +1590,6 @@ async function testConn() {
   }
 }
 
-/* ── THEME ── */
 function toggleTheme() {
   const cur = document.documentElement.getAttribute('data-theme')||'dark';
   const next = cur==='dark' ? 'light' : 'dark';
@@ -1541,7 +1610,6 @@ function updateThemeBtn(theme) {
   }
 }
 
-/* ── UTILS ── */
 function setConn(type, text) {
   const dot  = document.getElementById('conn-dot');
   const span = document.getElementById('conn-text');
