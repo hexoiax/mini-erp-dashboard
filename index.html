@@ -2,8 +2,8 @@
 <html lang="vi" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Mini ERP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mini ERP Unified</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -50,7 +50,17 @@
 }
 
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-html,body { height:100%; overflow:hidden; overscroll-behavior:none; }
+html, body {
+  height:100%;
+  margin:0;
+  overscroll-behavior:none;
+}
+
+body {
+  min-height:100vh;
+  min-height:100dvh;
+  overflow:hidden;
+}
 
 body {
   font-family: var(--sans);
@@ -63,7 +73,15 @@ body {
 }
 
 /* ─── LAYOUT ─────────────────────────────── */
-.shell { display:flex; flex-direction:column; height:100vh; }
+.shell {
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+  height:100dvh;
+  min-height:100vh;
+  min-height:100dvh;
+  overflow:hidden;
+}
 
 /* topbar */
 .topbar {
@@ -90,14 +108,26 @@ body {
 .logo-ver  { font-size:10px; color:var(--t3); font-family:var(--mono); }
 .topbar-right { display:flex; align-items:center; gap:6px; }
 
+/* main */
+.main {
+  flex:1;
+  min-width:0;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+}
+
 /* content */
 .content {
   flex:1;
+  min-height:0;
   overflow-y:auto;
   overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
+  touch-action: pan-y;
   scroll-behavior:smooth;
-  padding-bottom: calc(var(--tab-h) + 8px);
+  padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom) + 16px);
 }
 
 /* pages */
@@ -614,6 +644,8 @@ body {
 
 /* ─── DESKTOP responsive ─────────────────── */
 @media (min-width:768px) {
+  html, body { overflow:hidden; }
+
   .tabbar { display:none; }
   .content { padding-bottom:0; }
   .fab-wrap { bottom:20px; }
@@ -654,16 +686,29 @@ body {
   }
   .sb-item.active .sb-icon { background:rgba(0,229,137,.15); }
   .sb-foot { padding:10px 12px; border-top:1px solid var(--line); }
-  .main { flex:1; display:flex; flex-direction:column; min-width:0; }
+  .main { flex:1; display:flex; flex-direction:column; min-width:0; min-height:0; }
   .metrics-row.row4 { grid-template-columns:repeat(4,1fr); }
   .sp-grid { grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); max-height:none; }
   .page { padding:20px 24px 0; }
 }
 @media (max-width:767px) {
+  html, body { overflow:hidden; }
+  .shell { width:100%; }
+  .main { width:100%; min-height:0; }
+  .content { padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom) + 18px); }
+
   .sidebar { display:none!important; }
   .topbar { height:50px; }
   .metrics-row.row4 { grid-template-columns:1fr 1fr; }
 }
+
+/* unified quality-of-life */
+:root { color-scheme: dark light; }
+img { max-width:100%; }
+button, input, select, textarea { font: inherit; }
+#main-wrap, #content { min-height:0; }
+.topbar, .sidebar, .tabbar, .fab-wrap { will-change: auto; }
+
 </style>
 </head>
 <body>
@@ -684,7 +729,7 @@ body {
   <div class="sidebar" id="sidebar">
     <div style="padding:16px 14px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;">
       <div class="logo-mark"><svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="#000"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="#000" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="#000" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="#000"/></svg></div>
-      <div><div class="logo-name">Mini ERP</div><div style="font-size:9.5px;color:var(--t3);font-family:var(--mono)">v3.0 · mobile-first</div></div>
+      <div><div class="logo-name">Mini ERP</div><div style="font-size:9.5px;color:var(--t3);font-family:var(--mono)">v4.0 · unified desktop + mobile</div></div>
     </div>
     <nav class="sb-nav">
       <div class="sb-group">
@@ -1057,10 +1102,22 @@ window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => goNav('settings'), 300);
   }
 
+
   // close fab on outside tap
   document.addEventListener('click', e => {
     if (fabOpen && !document.getElementById('fab-wrap').contains(e.target)) closeFab();
   });
+
+  // stabilize mobile viewport / scroll container
+  const syncViewport = () => {
+    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+    const c = document.getElementById('content');
+    if (c) c.style.minHeight = '0px';
+  };
+  syncViewport();
+  window.addEventListener('resize', syncViewport, { passive:true });
+  window.addEventListener('orientationchange', syncViewport, { passive:true });
+
 });
 
 /* ─── NAV ─── */
@@ -1080,7 +1137,8 @@ function nav(el, page) {
   if (page === 'products')   renderProdList();
 
   // scroll to top
-  document.getElementById('content').scrollTo(0, 0);
+  const c = document.getElementById('content');
+  if (c) c.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function goNav(page) {
