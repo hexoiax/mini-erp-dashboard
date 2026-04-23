@@ -1,1748 +1,1739 @@
-<!DOCTYPE html>
-<html lang="vi" data-theme="dark">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Mini ERP Unified</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --sans: 'Space Grotesk', system-ui, sans-serif;
-  --mono: 'JetBrains Mono', monospace;
-  --brand: #00e589;
-  --brand-d: #00c27c;
-  --brand-glow: rgba(0,229,137,.14);
-  --r-s: 8px; --r-m: 12px; --r-l: 16px; --r-xl: 22px;
-  --ease: cubic-bezier(.4,0,.2,1);
-  --dur: 160ms;
-  --tab-h: 64px;
-}
-
-[data-theme="dark"] {
-  --bg:    #080a0e;
-  --bg1:   #0f1117;
-  --bg2:   #161b24;
-  --bg3:   #1e2434;
-  --hover: #232942;
-  --line:  rgba(255,255,255,0.06);
-  --line2: rgba(255,255,255,0.11);
-  --t1:    #f0f2f8;
-  --t2:    #7a839a;
-  --t3:    #42485a;
-  --inp-bg: #0c0f16;
-  --inp-b:  rgba(255,255,255,0.09);
-  --shadow: 0 4px 24px rgba(0,0,0,.5);
-}
-[data-theme="light"] {
-  --bg:    #f0f2f7;
-  --bg1:   #ffffff;
-  --bg2:   #f6f7fb;
-  --bg3:   #eceef5;
-  --hover: #e5e7f0;
-  --line:  rgba(0,0,0,0.06);
-  --line2: rgba(0,0,0,0.11);
-  --t1:    #0d1020;
-  --t2:    #52596e;
-  --t3:    #8e96ab;
-  --inp-bg:#f0f2f7;
-  --inp-b: rgba(0,0,0,0.1);
-  --shadow: 0 4px 24px rgba(0,0,0,.1);
-}
-
-*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-html, body {
-  height:100%;
-  margin:0;
-  overscroll-behavior:none;
-}
-
-body {
-  min-height:100vh;
-  min-height:100dvh;
-  overflow:hidden;
-}
-
-body {
-  font-family: var(--sans);
-  background: var(--bg);
-  color: var(--t1);
-  font-size: 14px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* ─── LAYOUT ─────────────────────────────── */
-.shell {
-  display:flex;
-  flex-direction:column;
-  height:100vh;
-  height:100dvh;
-  min-height:100vh;
-  min-height:100dvh;
-  overflow:hidden;
-}
-
-/* topbar */
-.topbar {
-  display:flex; align-items:center; justify-content:space-between;
-  padding: 0 16px;
-  height: 52px;
-  background: var(--bg1);
-  border-bottom: 1px solid var(--line);
-  flex-shrink: 0;
-  position: relative;
-  z-index: 10;
-}
-.topbar-logo {
-  display:flex; align-items:center; gap:9px;
-}
-.logo-mark {
-  width:30px; height:30px;
-  background: var(--brand);
-  border-radius: var(--r-s);
-  display:flex; align-items:center; justify-content:center;
-}
-.logo-mark svg { width:16px; height:16px; }
-.logo-name { font-size:14px; font-weight:700; letter-spacing:-.03em; color:var(--t1); }
-.logo-ver  { font-size:10px; color:var(--t3); font-family:var(--mono); }
-.topbar-right { display:flex; align-items:center; gap:6px; }
-
-/* main */
-.main {
-  flex:1;
-  min-width:0;
-  min-height:0;
-  display:flex;
-  flex-direction:column;
-}
-
-/* content */
-.content {
-  flex:1;
-  min-height:0;
-  overflow-y:auto;
-  overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;
-  overscroll-behavior-y:contain;
-  touch-action: pan-y;
-  scroll-behavior:smooth;
-  padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom) + 16px);
-}
-
-/* pages */
-.page { display:none; padding:14px 14px 0; }
-.page.active { display:block; animation:fadeUp .18s var(--ease); }
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(8px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-
-/* ─── BOTTOM TAB BAR ─────────────────────── */
-.tabbar {
-  display:flex;
-  position: fixed;
-  bottom:0; left:0; right:0;
-  height: var(--tab-h);
-  background: var(--bg1);
-  border-top: 1px solid var(--line);
-  z-index: 100;
-  padding-bottom: env(safe-area-inset-bottom);
-}
-.tab {
-  flex:1; display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  gap:3px; cursor:pointer; position:relative;
-  color: var(--t3);
-  transition: color var(--dur) var(--ease);
-  user-select:none;
-  -webkit-tap-highlight-color:transparent;
-  min-height:44px;
-}
-.tab.active { color: var(--brand); }
-.tab-icon { font-size:20px; line-height:1; }
-.tab-label { font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
-.tab.active .tab-icon { filter:drop-shadow(0 0 6px rgba(0,229,137,.5)); }
-.tab-ink {
-  position:absolute; bottom:0; left:50%; transform:translateX(-50%);
-  width:28px; height:2.5px; border-radius:2px;
-  background: var(--brand);
-  opacity:0; transition: opacity var(--dur) var(--ease);
-}
-.tab.active .tab-ink { opacity:1; }
-
-/* badge on tab */
-.tab-badge {
-  position:absolute; top:6px; right:calc(50% - 20px);
-  min-width:16px; height:16px;
-  background:#ef4444; color:#fff;
-  font-size:9px; font-weight:700;
-  border-radius:99px; padding:0 4px;
-  display:flex; align-items:center; justify-content:center;
-  font-family: var(--mono);
-  border:2px solid var(--bg1);
-}
-
-/* ─── FAB ────────────────────────────────── */
-.fab-wrap {
-  position:fixed; bottom:calc(var(--tab-h) + 12px); right:16px;
-  z-index:200;
-  display:flex; flex-direction:column-reverse; align-items:flex-end; gap:10px;
-}
-.fab {
-  width:52px; height:52px;
-  border-radius:50%;
-  background: var(--brand);
-  border:none; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  font-size:22px; color:#000;
-  box-shadow: 0 4px 20px rgba(0,229,137,.4);
-  transition: transform .2s var(--ease), box-shadow .2s;
-  position:relative; z-index:2;
-}
-.fab:active { transform:scale(.93); }
-.fab.open { transform:rotate(45deg); }
-.fab-items {
-  display:flex; flex-direction:column; gap:8px;
-  opacity:0; pointer-events:none;
-  transform:translateY(12px) scale(.95);
-  transition: all .2s var(--ease);
-}
-.fab-items.open {
-  opacity:1; pointer-events:all;
-  transform:translateY(0) scale(1);
-}
-.fab-item {
-  display:flex; align-items:center; gap:10px;
-  background: var(--bg2); border:1px solid var(--line2);
-  border-radius: var(--r-xl);
-  padding:10px 16px 10px 12px;
-  cursor:pointer;
-  font-size:13px; font-weight:600; color:var(--t1);
-  box-shadow: var(--shadow);
-  white-space:nowrap;
-  transition: background var(--dur);
-}
-.fab-item:active { background: var(--hover); }
-.fab-item-icon { font-size:18px; }
-
-/* ─── CARDS ──────────────────────────────── */
-.card {
-  background: var(--bg1);
-  border:1px solid var(--line);
-  border-radius: var(--r-l);
-  margin-bottom:12px;
-  overflow:hidden;
-}
-.card-head {
-  padding:12px 16px;
-  border-bottom:1px solid var(--line);
-  display:flex; align-items:center; justify-content:space-between;
-}
-.card-title { font-size:12px; font-weight:700; color:var(--t1); display:flex; align-items:center; gap:7px; letter-spacing:.01em; }
-.card-body { padding:14px 16px; }
-
-/* ─── METRICS ────────────────────────────── */
-.metrics-row {
-  display:grid; grid-template-columns:1fr 1fr;
-  gap:10px; margin-bottom:12px;
-}
-.metrics-row.row4 { grid-template-columns:repeat(4,1fr); }
-.mc {
-  background: var(--bg1);
-  border:1px solid var(--line);
-  border-radius: var(--r-l);
-  padding:14px 14px 12px;
-  position:relative; overflow:hidden;
-  transition: transform var(--dur);
-}
-.mc::before {
-  content:'';
-  position:absolute; top:0; left:0; right:0; height:2px;
-  background: var(--mc-c, var(--brand));
-}
-.mc:active { transform:scale(.98); }
-.mc-label { font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:var(--t3); margin-bottom:8px; }
-.mc-val { font-family:var(--mono); font-size:24px; font-weight:600; color:var(--t1); line-height:1; letter-spacing:-.02em; }
-.mc-sub { font-size:10px; color:var(--t3); margin-top:5px; }
-
-/* ─── SKELETON ───────────────────────────── */
-@keyframes shimmer {
-  from { background-position: -200% 0; }
-  to   { background-position: 200% 0; }
-}
-.skel {
-  border-radius:6px;
-  background: linear-gradient(90deg, var(--bg3) 25%, var(--hover) 50%, var(--bg3) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
-}
-.skel-mc { height:70px; border-radius:var(--r-l); margin-bottom:10px; }
-.skel-card { height:100px; border-radius:var(--r-l); margin-bottom:12px; }
-.skel-row { height:52px; border-radius:var(--r-m); margin-bottom:8px; }
-
-/* ─── ORDER CARD (MOBILE) ────────────────── */
-.order-card {
-  background: var(--bg1);
-  border:1px solid var(--line);
-  border-radius: var(--r-l);
-  overflow:hidden;
-  margin-bottom:10px;
-  transition: border-color var(--dur);
-}
-.oc-head {
-  padding:10px 14px;
-  background: var(--bg2);
-  border-bottom:1px solid var(--line);
-  display:flex; align-items:center; justify-content:space-between;
-}
-.oc-code { font-family:var(--mono); font-size:12px; font-weight:600; color:var(--t1); }
-.oc-time { font-size:10px; color:var(--t3); font-family:var(--mono); }
-.oc-body { padding:12px 14px; }
-.oc-row  { display:flex; gap:8px; align-items:flex-start; margin-bottom:6px; font-size:13px; }
-.oc-icon { font-size:14px; opacity:.7; flex-shrink:0; margin-top:1px; }
-.oc-text { color:var(--t1); font-weight:500; line-height:1.4; }
-.oc-total { font-family:var(--mono); color:var(--brand); font-weight:700; font-size:14px; }
-.oc-actions { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
-.oc-track { display:flex; gap:6px; }
-
-/* ─── INVENTORY CARD ─────────────────────── */
-.inv-card {
-  background: var(--bg1);
-  border:1px solid var(--line);
-  border-radius: var(--r-l);
-  overflow:hidden;
-  margin-bottom:10px;
-}
-.inv-head {
-  padding:12px 14px;
-  background: var(--bg2);
-  border-bottom:1px solid var(--line);
-  display:flex; align-items:center; gap:12px;
-}
-.inv-emoji { font-size:24px; }
-.inv-info { flex:1; min-width:0; }
-.inv-name { font-size:13px; font-weight:700; color:var(--t1); }
-.inv-code { font-size:10px; color:var(--t3); font-family:var(--mono); margin-top:1px; }
-.inv-price { font-size:12px; font-weight:600; color:var(--brand); font-family:var(--mono); margin-top:2px; }
-.inv-body { padding:8px 12px; }
-
-.sz-row {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:9px 10px;
-  border-radius:var(--r-m);
-  background: var(--bg2);
-  border:1px solid var(--line);
-  margin-bottom:6px;
-  gap:8px;
-}
-.sz-info { display:flex; align-items:center; gap:10px; flex:1; min-width:0; }
-.sz-name { font-family:var(--mono); font-weight:600; font-size:12px; color:var(--t1); min-width:26px; }
-.sz-nums { font-size:10.5px; color:var(--t3); font-family:var(--mono); }
-.sz-r.ok   { color:var(--brand); font-weight:700; }
-.sz-r.warn { color:#fbbf24; font-weight:700; }
-.sz-r.low  { color:#f87171; font-weight:700; }
-.sz-r.neg  { color:#f87171; font-weight:700; }
-.sz-btns { display:flex; gap:5px; }
-.sz-btn {
-  min-height:36px; padding:0 12px;
-  border-radius:var(--r-m);
-  border:1px solid var(--line2);
-  background:var(--bg3);
-  color:var(--t2); font-size:12px; font-weight:700;
-  cursor:pointer; font-family:var(--mono);
-  transition: background var(--dur), color var(--dur);
-}
-.sz-btn:hover, .sz-btn:active { background:var(--brand); color:#000; border-color:var(--brand); }
-.sz-btn.busy { opacity:.4; pointer-events:none; }
-
-/* ─── QUICK ORDER FORM ───────────────────── */
-.order-form { padding:14px; }
-
-.search-wrap { position:relative; margin-bottom:12px; }
-.search-wrap .search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:15px; opacity:.5; pointer-events:none; }
-.search-wrap .f-input { padding-left:38px; }
-
-.sp-grid {
-  display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
-  max-height:220px; overflow-y:auto; margin-bottom:12px;
-}
-.sp-card {
-  background:var(--bg2);
-  border:1px solid var(--line);
-  border-radius:var(--r-m);
-  padding:10px 8px 9px;
-  cursor:pointer;
-  text-align:center;
-  transition: border-color var(--dur), background var(--dur);
-  position:relative;
-}
-.sp-card:active { transform:scale(.97); }
-.sp-card.sel { border-color:var(--brand); background:var(--brand-glow); }
-.sp-card.sel::after {
-  content:'✓';
-  position:absolute; top:5px; right:6px;
-  font-size:10px; font-weight:700;
-  color:var(--brand);
-}
-.sp-emoji { font-size:22px; margin-bottom:4px; }
-.sp-thumb { width:48px; height:48px; object-fit:cover; border-radius:8px; margin:0 auto 4px; display:block; border:1px solid var(--line); }
-.sp-name { font-size:11px; font-weight:600; color:var(--t1); line-height:1.3; }
-.sp-price { font-size:10px; color:var(--brand); font-family:var(--mono); margin-top:2px; }
-
-/* sizes row */
-.size-row {
-  background:var(--bg2); border:1px solid var(--line);
-  border-radius:var(--r-m); padding:12px; margin-bottom:12px;
-  display:none;
-}
-.size-row.visible { display:block; animation:fadeUp .15s var(--ease); }
-.size-row-label { font-size:10px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.07em; margin-bottom:8px; }
-.size-pills { display:flex; flex-wrap:wrap; gap:6px; }
-.sz-pill {
-  padding:8px 14px; min-height:38px;
-  border-radius:var(--r-m);
-  border:1px solid var(--line2);
-  background:var(--bg3); color:var(--t2);
-  font-size:12px; font-weight:700;
-  cursor:pointer; font-family:var(--mono);
-  transition: all var(--dur);
-  display:flex; align-items:center;
-}
-.sz-pill:active { transform:scale(.95); }
-.sz-pill.sel { background:var(--brand); color:#000; border-color:var(--brand); }
-
-/* qty row */
-.qty-row {
-  display:flex; align-items:center; gap:10px;
-  background:var(--bg2); border:1px solid var(--line);
-  border-radius:var(--r-m); padding:10px 14px; margin-bottom:12px;
-}
-.qty-label { flex:1; font-size:13px; font-weight:600; color:var(--t1); }
-.qty-ctrl { display:flex; align-items:center; gap:8px; }
-.qty-btn {
-  width:36px; height:36px; border-radius:50%;
-  background:var(--bg3); border:1px solid var(--line2);
-  font-size:18px; font-weight:700; color:var(--t1);
-  cursor:pointer; display:flex; align-items:center; justify-content:center;
-  transition: background var(--dur), color var(--dur);
-}
-.qty-btn:active { background:var(--brand); color:#000; border-color:var(--brand); }
-.qty-num {
-  min-width:32px; text-align:center;
-  font-family:var(--mono); font-size:16px; font-weight:700; color:var(--t1);
-}
-
-/* order items */
-.oi-list { margin-bottom:12px; }
-.oi-row {
-  display:flex; align-items:center;
-  padding:10px 12px;
-  background:var(--bg2); border:1px solid var(--line);
-  border-radius:var(--r-m); margin-bottom:6px; gap:10px;
-}
-.oi-info { flex:1; min-width:0; }
-.oi-name { font-size:12.5px; font-weight:600; color:var(--t1); }
-.oi-meta { font-size:10.5px; color:var(--t3); font-family:var(--mono); margin-top:1px; }
-.oi-qty { width:52px; padding:5px 8px; text-align:center; font-family:var(--mono); }
-
-/* ─── FORMS ──────────────────────────────── */
-.f-row { display:flex; flex-direction:column; gap:5px; margin-bottom:12px; }
-.f-label { font-size:10px; font-weight:700; color:var(--t2); text-transform:uppercase; letter-spacing:.07em; }
-.f-input, .f-select {
-  padding:11px 14px;
-  border:1px solid var(--inp-b);
-  border-radius:var(--r-m);
-  background:var(--inp-bg);
-  color:var(--t1); font-size:14px; font-family:var(--sans);
-  width:100%; outline:none;
-  transition: border-color var(--dur), box-shadow var(--dur);
-  min-height:44px;
-}
-.f-input:focus, .f-select:focus {
-  border-color:var(--brand);
-  box-shadow:0 0 0 3px rgba(0,229,137,.15);
-}
-.f-input::placeholder { color:var(--t3); }
-.f-select option { background:var(--bg1); }
-.f-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-
-/* ─── BUTTONS ────────────────────────────── */
-.btn {
-  display:inline-flex; align-items:center; gap:6px;
-  padding:9px 16px; min-height:44px;
-  border-radius:var(--r-m);
-  border:1px solid var(--line2);
-  background:var(--bg2); color:var(--t2);
-  font-size:13px; font-weight:600; font-family:var(--sans);
-  cursor:pointer; white-space:nowrap;
-  transition: background var(--dur), color var(--dur), transform 80ms;
-  -webkit-tap-highlight-color:transparent;
-}
-.btn:active { transform:scale(.97); }
-.btn:hover { background:var(--hover); color:var(--t1); }
-.btn-primary {
-  background:var(--brand); border-color:var(--brand); color:#000; font-weight:700;
-}
-.btn-primary:hover { background:var(--brand-d); border-color:var(--brand-d); }
-.btn-primary:disabled { opacity:.5; pointer-events:none; }
-.btn-primary.loading { position:relative; color:transparent; }
-.btn-primary.loading::after {
-  content:''; position:absolute;
-  width:16px; height:16px; border:2px solid #00000040; border-top-color:#000;
-  border-radius:50%; animation:rot .6s linear infinite;
-  top:50%; left:50%; transform:translate(-50%,-50%);
-}
-.btn-danger { background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.3); color:#f87171; }
-.btn-danger:active { background:#ef4444; color:#fff; }
-.btn-ghost { background:transparent; border-color:transparent; }
-.btn-icon { width:44px; height:44px; padding:0; justify-content:center; }
-.btn-full { width:100%; justify-content:center; }
-.btn-lg { padding:13px 20px; font-size:14px; min-height:52px; border-radius:var(--r-l); }
-
-@keyframes rot { to { transform: rotate(360deg); } }
-
-/* active filter */
-.active-f { background:var(--brand-glow)!important; color:var(--brand)!important; border-color:rgba(0,229,137,.25)!important; }
-
-/* ─── FILTER BAR ─────────────────────────── */
-.filter-bar {
-  display:flex; align-items:center; gap:8px;
-  overflow-x:auto; -webkit-overflow-scrolling:touch;
-  padding:0 0 10px; margin-bottom:4px;
-  scrollbar-width:none;
-}
-.filter-bar::-webkit-scrollbar { display:none; }
-.filter-bar .btn { flex-shrink:0; padding:7px 14px; font-size:12px; }
-
-/* ─── BADGES ─────────────────────────────── */
-.badge {
-  display:inline-flex; align-items:center;
-  padding:3px 9px; border-radius:999px;
-  font-size:9.5px; font-weight:700;
-  letter-spacing:.04em; text-transform:uppercase;
-  font-family:var(--mono); white-space:nowrap;
-}
-.bn { background:rgba(59,130,246,.15); color:#7aadff; }
-.bc { background:rgba(139,92,246,.15); color:#b78aff; }
-.bs { background:rgba(249,115,22,.15); color:#ffaa6e; }
-.bd { background:rgba(0,229,137,.15); color:var(--brand); }
-.bx { background:rgba(248,81,73,.13); color:#ff7875; }
-.bo { background:rgba(239,68,68,.9); color:#fff; }
-
-/* chips */
-.chip { display:inline-flex; align-items:center; font-size:10px; font-weight:600; padding:3px 8px; border-radius:999px; font-family:var(--mono); }
-.chip-ok   { background:rgba(0,229,137,.12); color:var(--brand); }
-.chip-warn { background:rgba(245,158,11,.12); color:#fbbf24; }
-.chip-low  { background:rgba(239,68,68,.12); color:#f87171; }
-.chip-neg  { background:rgba(239,68,68,.9);  color:#fff; }
-
-/* ─── ALERTS ─────────────────────────────── */
-.alert {
-  display:flex; align-items:flex-start; gap:10px;
-  padding:11px 14px; border-radius:var(--r-m);
-  font-size:12.5px; font-weight:500;
-  margin-bottom:10px; border:1px solid;
-}
-.alert-green { background:rgba(0,229,137,.08); color:var(--brand); border-color:rgba(0,229,137,.2); }
-.alert-red   { background:rgba(239,68,68,.08); color:#f87171; border-color:rgba(239,68,68,.2); }
-.alert-yellow{ background:rgba(245,158,11,.08); color:#fbbf24; border-color:rgba(245,158,11,.2); }
-.alert-blue  { background:rgba(59,130,246,.08); color:#60a5fa; border-color:rgba(59,130,246,.2); }
-
-/* ─── TABLE (desktop only) ───────────────── */
-.tbl { width:100%; border-collapse:collapse; font-size:12.5px; }
-.tbl th {
-  text-align:left; padding:9px 14px;
-  font-size:10px; font-weight:700;
-  text-transform:uppercase; letter-spacing:.07em;
-  color:var(--t3); background:var(--bg2);
-  border-bottom:1px solid var(--line);
-}
-.tbl td { padding:10px 14px; border-bottom:1px solid var(--line); color:var(--t2); vertical-align:middle; }
-.tbl tr:last-child td { border-bottom:none; }
-.tbl tr:hover td { background:var(--hover); color:var(--t1); }
-.tbl td:first-child { color:var(--t1); }
-
-/* ─── TOAST ──────────────────────────────── */
-#toasts {
-  position:fixed; bottom:calc(var(--tab-h) + 12px); left:50%;
-  transform:translateX(-50%);
-  display:flex; flex-direction:column; align-items:center; gap:8px;
-  z-index:9999; width:90%; max-width:360px;
-}
-.toast {
-  display:flex; align-items:center; gap:10px;
-  padding:12px 16px; border-radius:var(--r-l);
-  font-size:13px; font-weight:500;
-  width:100%; border:1px solid;
-  background:var(--bg1);
-  animation:tIn .2s var(--ease);
-  box-shadow:0 8px 32px rgba(0,0,0,.4);
-}
-.t-ok   { border-color:rgba(0,229,137,.3); color:var(--brand); }
-.t-err  { border-color:rgba(239,68,68,.3); color:#f87171; }
-.t-info { border-color:rgba(59,130,246,.3); color:#60a5fa; }
-@keyframes tIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
-
-/* ─── SPINNER ────────────────────────────── */
-.spin {
-  width:14px; height:14px;
-  border:2px solid var(--line2); border-top-color:var(--brand);
-  border-radius:50%; animation:rot .6s linear infinite;
-  display:inline-block; flex-shrink:0;
-}
-
-/* ─── MISC ───────────────────────────────── */
-.empty { text-align:center; padding:40px 20px; color:var(--t3); font-size:13px; }
-.empty-icon { font-size:32px; margin-bottom:10px; opacity:.4; }
-.divider { height:1px; background:var(--line); margin:14px 0; }
-.sec-title { font-size:10px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px; }
-
-::-webkit-scrollbar { width:3px; height:3px; }
-::-webkit-scrollbar-track { background:transparent; }
-::-webkit-scrollbar-thumb { background:var(--line2); border-radius:99px; }
-
-/* ─── CONN PILL ──────────────────────────── */
-.conn-row {
-  display:flex; align-items:center; gap:6px;
-  font-size:11px; color:var(--t3); font-family:var(--mono);
-}
-.dot {
-  width:7px; height:7px; border-radius:50%; flex-shrink:0;
-}
-.dot-ok   { background:var(--brand); box-shadow:0 0 0 3px rgba(0,229,137,.2); animation:pulse 2.5s infinite; }
-.dot-idle { background:#f59e0b; }
-.dot-err  { background:#ef4444; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
-
-/* ─── PULL TO REFRESH indicator ─────────── */
-.ptr {
-  height:0; overflow:hidden;
-  display:flex; align-items:center; justify-content:center;
-  transition:height .25s var(--ease); color:var(--t3);
-  font-size:12px; gap:8px;
-}
-.ptr.active { height:44px; }
-
-/* ─── ANALYTICS ──────────────────────────── */
-.stat-row {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:11px 0; border-bottom:1px solid var(--line);
-}
-.stat-row:last-child { border-bottom:none; }
-.stat-label { font-size:13px; color:var(--t2); display:flex; align-items:center; gap:7px; }
-.stat-val { font-family:var(--mono); font-weight:700; font-size:14px; color:var(--t1); }
-
-/* ─── THEME BTN ──────────────────────────── */
-.icon-btn {
-  width:40px; height:40px; border-radius:var(--r-m);
-  border:1px solid var(--line2); background:var(--bg2); color:var(--t2);
-  cursor:pointer; display:flex; align-items:center; justify-content:center;
-  font-size:16px; transition:background var(--dur);
-}
-.icon-btn:active { background:var(--hover); }
-
-/* ─── DESKTOP responsive ─────────────────── */
-@media (min-width:768px) {
-  html, body { overflow:hidden; }
-
-  .tabbar { display:none; }
-  .content { padding-bottom:0; }
-  .fab-wrap { bottom:20px; }
-  #toasts { bottom:20px; }
-  .shell { flex-direction:row; }
-
-  /* Show sidebar on desktop */
-  .sidebar {
-    display:flex!important; flex-direction:column;
-    width:220px; flex-shrink:0;
-    background:var(--bg1); border-right:1px solid var(--line);
-    height:100%;
-  }
-  .sb-nav { padding:12px 10px; flex:1; }
-  .sb-group { margin-bottom:16px; }
-  .sb-group-label {
-    font-size:9px; font-weight:700; color:var(--t3);
-    text-transform:uppercase; letter-spacing:.1em;
-    padding:0 8px 6px;
-  }
-  .sb-item {
-    display:flex; align-items:center; gap:9px;
-    padding:8px 10px; border-radius:var(--r-m);
-    color:var(--t2); font-size:13px; font-weight:500;
-    cursor:pointer; border:1px solid transparent; margin-bottom:1px;
-    transition:all var(--dur); user-select:none;
-  }
-  .sb-item:hover { background:var(--hover); color:var(--t1); }
-  .sb-item.active {
-    background:var(--brand-glow); color:var(--brand);
-    border-color:rgba(0,229,137,.2); font-weight:600;
-  }
-  .sb-icon {
-    width:28px; height:28px; border-radius:var(--r-s);
-    display:flex; align-items:center; justify-content:center;
-    background:var(--bg2); font-size:14px;
-    transition:background var(--dur); flex-shrink:0;
-  }
-  .sb-item.active .sb-icon { background:rgba(0,229,137,.15); }
-  .sb-foot { padding:10px 12px; border-top:1px solid var(--line); }
-  .main { flex:1; display:flex; flex-direction:column; min-width:0; min-height:0; }
-  .metrics-row.row4 { grid-template-columns:repeat(4,1fr); }
-  .sp-grid { grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); max-height:none; }
-  .page { padding:20px 24px 0; }
-}
-@media (max-width:767px) {
-  html, body { overflow:hidden; }
-  .shell { width:100%; }
-  .main { width:100%; min-height:0; }
-  .content { padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom) + 18px); }
-
-  .sidebar { display:none!important; }
-  .topbar { height:50px; }
-  .metrics-row.row4 { grid-template-columns:1fr 1fr; }
-}
-
-/* unified quality-of-life */
-:root { color-scheme: dark light; }
-img { max-width:100%; }
-button, input, select, textarea { font: inherit; }
-#main-wrap, #content { min-height:0; }
-.topbar, .sidebar, .tabbar, .fab-wrap { will-change: auto; }
-
-</style>
-</head>
-<body>
-<div id="toasts"></div>
-
-<!-- FAB -->
-<div class="fab-wrap" id="fab-wrap">
-  <button class="fab" id="fab-btn" onclick="toggleFab()" title="Hành động nhanh">+</button>
-  <div class="fab-items" id="fab-items">
-    <div class="fab-item" onclick="closeFab();goNav('sales')"><span class="fab-item-icon">🛒</span> Tạo đơn mới</div>
-    <div class="fab-item" onclick="closeFab();goNav('inventory')"><span class="fab-item-icon">📥</span> Nhập kho</div>
-    <div class="fab-item" onclick="closeFab();goNav('products')"><span class="fab-item-icon">🏷️</span> Thêm sản phẩm</div>
-  </div>
-</div>
-
-<div class="shell">
-  <!-- SIDEBAR (desktop only) -->
-  <div class="sidebar" id="sidebar">
-    <div style="padding:16px 14px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;">
-      <div class="logo-mark"><svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="#000"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="#000" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="#000" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="#000"/></svg></div>
-      <div><div class="logo-name">Mini ERP</div><div style="font-size:9.5px;color:var(--t3);font-family:var(--mono)">v4.0 · unified desktop + mobile</div></div>
-    </div>
-    <nav class="sb-nav">
-      <div class="sb-group">
-        <div class="sb-group-label">Control</div>
-        <div class="sb-item active" data-p="dashboard" onclick="nav(this,'dashboard')"><div class="sb-icon">📊</div>Dashboard</div>
-        <div class="sb-item" data-p="sales" onclick="nav(this,'sales')"><div class="sb-icon">🛒</div>Bán hàng</div>
-        <div class="sb-item" data-p="processing" onclick="nav(this,'processing')"><div class="sb-icon">⚙️</div>Xử lý đơn</div>
-        <div class="sb-item" data-p="inventory" onclick="nav(this,'inventory')"><div class="sb-icon">📦</div>Kho hàng</div>
-      </div>
-      <div class="sb-group">
-        <div class="sb-group-label">Manage</div>
-        <div class="sb-item" data-p="products" onclick="nav(this,'products')"><div class="sb-icon">🏷️</div>Sản phẩm</div>
-        <div class="sb-item" data-p="analytics" onclick="nav(this,'analytics')"><div class="sb-icon">📈</div>Báo cáo</div>
-        <div class="sb-item" data-p="settings" onclick="nav(this,'settings')"><div class="sb-icon">⚙️</div>Cài đặt</div>
-      </div>
-    </nav>
-    <div class="sb-foot">
-      <div class="conn-row">
-        <div class="dot dot-idle" id="conn-dot-sb"></div>
-        <span id="conn-text-sb">Chưa kết nối</span>
-      </div>
-      <div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:4px" id="sync-row-sb">—</div>
-    </div>
-  </div>
-
-  <div class="main" id="main-wrap">
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <div class="topbar-logo">
-        <div class="logo-mark"><svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="#000"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="#000" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="#000" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="#000"/></svg></div>
-        <div>
-          <div class="logo-name" id="pg-title">Dashboard</div>
-          <div class="conn-row" style="margin-top:1px">
-            <div class="dot dot-idle" id="conn-dot"></div>
-            <span id="conn-text" style="font-size:10px">Chưa kết nối</span>
-          </div>
-        </div>
-      </div>
-      <div class="topbar-right">
-        <button class="icon-btn" onclick="loadData()" title="Refresh">
-          <div class="spin" id="refresh-spin" style="display:none"></div>
-          <span id="refresh-icon">↺</span>
-        </button>
-        <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
-      </div>
-    </div>
-
-    <!-- CONTENT -->
-    <div class="content" id="content">
-
-      <!-- PTR indicator -->
-      <div class="ptr" id="ptr-indicator"><div class="spin"></div> Đang tải...</div>
-
-      <!-- ── DASHBOARD ── -->
-      <div id="pg-dashboard" class="page active">
-        <div id="dash-alerts"></div>
-        <div class="metrics-row row4" id="dash-metrics">
-          <div class="mc skel skel-mc"></div>
-          <div class="mc skel skel-mc"></div>
-          <div class="mc skel skel-mc"></div>
-          <div class="mc skel skel-mc"></div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">⚡ Hành động nhanh</div></div>
-          <div class="card-body">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-              <button class="btn btn-full" style="flex-direction:column;gap:4px;min-height:64px" onclick="goNav('sales')">
-                <span style="font-size:20px">🛒</span><span>Tạo đơn</span>
-              </button>
-              <button class="btn btn-full" style="flex-direction:column;gap:4px;min-height:64px" onclick="goNav('inventory')">
-                <span style="font-size:20px">📥</span><span>Nhập kho</span>
-              </button>
-              <button class="btn btn-full" style="flex-direction:column;gap:4px;min-height:64px" onclick="goNav('processing')">
-                <span style="font-size:20px">🚚</span><span>Xử lý đơn</span>
-              </button>
-              <button class="btn btn-full" style="flex-direction:column;gap:4px;min-height:64px" onclick="goNav('products')">
-                <span style="font-size:20px">➕</span><span>Thêm SP</span>
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">📦 Tổng quan kho</div></div>
-          <div style="padding:0">
-            <table class="tbl">
-              <tr><td>Tổng SKU</td><td style="text-align:right;font-family:var(--mono);font-weight:600" id="m-sku">—</td></tr>
-              <tr><td>Tổng kho</td><td style="text-align:right;font-family:var(--mono);font-weight:600" id="m-stock">—</td></tr>
-              <tr><td>Đã bán</td><td style="text-align:right;font-family:var(--mono);font-weight:600" id="m-sold">—</td></tr>
-              <tr><td>Còn lại</td><td style="text-align:right;font-family:var(--mono);font-weight:600" id="m-remain">—</td></tr>
-              <tr><td style="color:var(--t1);font-weight:700">Lợi nhuận ~50%</td>
-                <td style="text-align:right;font-family:var(--mono);font-weight:700;color:var(--brand)" id="m-profit">—</td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── SALES / TẠO ĐƠN ── -->
-      <div id="pg-sales" class="page">
-        <div class="order-form" style="padding:0">
-
-          <!-- Search sản phẩm -->
-          <div class="search-wrap" style="margin-bottom:12px">
-            <span class="search-icon">🔍</span>
-            <input class="f-input" id="sp-search" placeholder="Tìm sản phẩm..." oninput="renderSPGrid()" />
-          </div>
-
-          <!-- Grid sản phẩm -->
-          <div class="sec-title">Chọn sản phẩm</div>
-          <div id="sp-grid" class="sp-grid" style="margin-bottom:12px"></div>
-
-          <!-- Size picker -->
-          <div class="size-row" id="sp-sizes-wrap">
-            <div class="size-row-label" id="sp-sizes-label">Chọn size</div>
-            <div class="size-pills" id="sp-sizes"></div>
-          </div>
-
-          <!-- Qty control -->
-          <div class="qty-row" id="qty-wrap" style="display:none">
-            <div class="qty-label" id="qty-label">Số lượng</div>
-            <div class="qty-ctrl">
-              <button class="qty-btn" onclick="changeQty(-1)">−</button>
-              <div class="qty-num" id="qty-display">1</div>
-              <button class="qty-btn" onclick="changeQty(1)">+</button>
-            </div>
-          </div>
-
-          <!-- Items đã chọn -->
-          <div id="oi-section" style="display:none">
-            <div class="sec-title" style="display:flex;align-items:center;justify-content:space-between">
-              <span>Giỏ hàng</span>
-              <button class="btn btn-ghost" style="min-height:unset;padding:4px 8px;font-size:11px" onclick="clearOrderForm()">Xóa hết</button>
-            </div>
-            <div id="order-items-list" class="oi-list"></div>
-          </div>
-
-          <div class="divider"></div>
-
-          <!-- Form khách hàng -->
-          <div class="sec-title">Thông tin khách hàng</div>
-          <div class="f-grid">
-            <div class="f-row">
-              <label class="f-label">Tên khách *</label>
-              <input class="f-input" id="o-customer" placeholder="Nguyễn Văn A" />
-            </div>
-            <div class="f-row">
-              <label class="f-label">Điện thoại *</label>
-              <input class="f-input" id="o-phone" type="tel" placeholder="0912 345 678" />
-            </div>
-          </div>
-          <div class="f-row">
-            <label class="f-label">Địa chỉ</label>
-            <input class="f-input" id="o-address" placeholder="123 Lê Duẩn, Đà Nẵng" />
-          </div>
-          <div class="f-row">
-            <label class="f-label">Ghi chú</label>
-            <input class="f-input" id="o-note" placeholder="Ghi chú đơn hàng..." />
-          </div>
-
-          <div id="order-result" style="margin-bottom:8px"></div>
-          <button class="btn btn-primary btn-full btn-lg" id="submit-order-btn" onclick="submitOrder()">✓ Tạo đơn hàng</button>
-          <div style="height:14px"></div>
-        </div>
-      </div>
-
-      <!-- ── XỬ LÝ ĐƠN ── -->
-      <div id="pg-processing" class="page">
-        <div class="filter-bar">
-          <button class="btn active-f" onclick="setOF('all',this)">Tất cả</button>
-          <button class="btn" onclick="setOF('New',this)">🔔 Mới</button>
-          <button class="btn" onclick="setOF('Over Sell',this)">⚠️ OS</button>
-          <button class="btn" onclick="setOF('Confirm',this)">✓ Confirm</button>
-          <button class="btn" onclick="setOF('Shipping',this)">🚚 Ship</button>
-          <button class="btn" onclick="setOF('Done',this)">✅ Done</button>
-        </div>
-        <input class="f-input" style="margin-bottom:12px" placeholder="🔍 Tìm mã đơn / khách / SĐT..." oninput="searchOrders(this.value)" />
-        <div id="orders-grid">
-          <div class="skel skel-card"></div>
-          <div class="skel skel-card"></div>
-          <div class="skel skel-card"></div>
-        </div>
-      </div>
-
-      <!-- ── KHO ── -->
-      <div id="pg-inventory" class="page">
-        <input class="f-input" style="margin-bottom:10px" id="inv-q" placeholder="🔍 Tìm sản phẩm, mã SKU..." oninput="renderInventory()" />
-        <div class="filter-bar">
-          <button class="btn active-f" onclick="setSF('all',this)">Tất cả</button>
-          <button class="btn" onclick="setSF('low',this)">🔴 Tồn thấp</button>
-          <button class="btn" onclick="setSF('neg',this)">💀 Kho âm</button>
-        </div>
-        <div id="inv-grid">
-          <div class="skel skel-card"></div>
-          <div class="skel skel-card"></div>
-        </div>
-      </div>
-
-      <!-- ── SẢN PHẨM ── -->
-      <div id="pg-products" class="page">
-        <div class="card">
-          <div class="card-head"><div class="card-title">➕ Thêm sản phẩm mới</div></div>
-          <div class="card-body">
-            <div class="f-grid">
-              <div class="f-row">
-                <label class="f-label">Tên sản phẩm *</label>
-                <input class="f-input" id="p-name" placeholder="Blue Pants" />
-              </div>
-              <div class="f-row">
-                <label class="f-label">Mã code *</label>
-                <input class="f-input" id="p-code" placeholder="BP" style="text-transform:uppercase" />
-              </div>
-              <div class="f-row">
-                <label class="f-label">Giá (VNĐ) *</label>
-                <input class="f-input" id="p-price" type="number" placeholder="159000" />
-              </div>
-              <div class="f-row">
-                <label class="f-label">Emoji</label>
-                <input class="f-input" id="p-emoji" placeholder="👕" />
-              </div>
-            </div>
-            <div class="f-row">
-              <label class="f-label">Image URL</label>
-              <input class="f-input" id="p-image" placeholder="https://...jpg" />
-            </div>
-            <div class="f-row">
-              <label class="f-label">Sizes (cách nhau dấu cách) *</label>
-              <input class="f-input" id="p-sizes" placeholder="35 36 37 38 39 40" />
-            </div>
-            <div style="display:flex;gap:8px">
-              <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="submitProduct()">✓ Tạo sản phẩm</button>
-              <button class="btn btn-ghost" onclick="clearPF()">Xóa</button>
-            </div>
-            <div id="prod-result" style="margin-top:10px"></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">📋 Danh sách sản phẩm</div></div>
-          <div id="prod-list" style="padding:0">
-            <div class="empty" style="padding:24px"><div class="empty-icon">🏷️</div>Chưa có sản phẩm</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── BÁO CÁO ── -->
-      <div id="pg-analytics" class="page">
-        <div class="card">
-          <div class="card-head"><div class="card-title">📊 Đơn hàng</div></div>
-          <div class="card-body" style="padding:6px 16px">
-            <div class="stat-row"><span class="stat-label">✅ Done</span><span class="stat-val" id="a-done" style="color:var(--brand)">—</span></div>
-            <div class="stat-row"><span class="stat-label">🚚 Shipping</span><span class="stat-val" id="a-ship">—</span></div>
-            <div class="stat-row"><span class="stat-label">⚠️ Over Sell</span><span class="stat-val" id="a-os" style="color:#fbbf24">—</span></div>
-            <div class="stat-row"><span class="stat-label">✕ Hủy</span><span class="stat-val" id="a-cancel" style="color:#f87171">—</span></div>
-            <div class="stat-row"><span class="stat-label" style="color:var(--t1);font-weight:700">Tổng doanh thu</span><span class="stat-val" style="color:var(--brand);font-size:16px" id="a-rev">—</span></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">📦 Phân tầng kho</div></div>
-          <div class="card-body" style="padding:6px 16px">
-            <div class="stat-row"><span class="stat-label"><span class="chip chip-ok">≥20</span> Dồi dào</span><span class="stat-val" style="color:var(--brand)" id="a-hi">—</span></div>
-            <div class="stat-row"><span class="stat-label"><span class="chip chip-warn">5–19</span> Cảnh báo</span><span class="stat-val" style="color:#fbbf24" id="a-md">—</span></div>
-            <div class="stat-row"><span class="stat-label"><span class="chip chip-low">1–4</span> Nguy hiểm</span><span class="stat-val" style="color:#f87171" id="a-lo">—</span></div>
-            <div class="stat-row"><span class="stat-label"><span class="chip chip-neg">âm</span> Kho âm</span><span class="stat-val" style="color:#f87171" id="a-ng">—</span></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">🏆 Top SKU bán chạy</div></div>
-          <div id="a-top" style="padding:0"><div class="empty" style="padding:24px">Chưa có dữ liệu</div></div>
-        </div>
-      </div>
-
-      <!-- ── CÀI ĐẶT ── -->
-      <div id="pg-settings" class="page">
-        <div class="card">
-          <div class="card-head"><div class="card-title">🔌 Kết nối Apps Script</div></div>
-          <div class="card-body">
-            <div class="f-row">
-              <label class="f-label">Web App URL *</label>
-              <input class="f-input" id="gs-url" placeholder="https://script.google.com/macros/s/.../exec" style="font-family:var(--mono);font-size:11px" />
-            </div>
-            <div style="display:flex;gap:8px">
-              <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="saveConfig()">✓ Lưu & Test</button>
-              <button class="btn" onclick="testConn()">🔌 Test</button>
-            </div>
-            <div id="conn-result" style="margin-top:12px"></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">🎨 Giao diện</div></div>
-          <div class="card-body">
-            <div style="display:flex;align-items:center;justify-content:space-between">
-              <div>
-                <div style="font-size:13px;font-weight:600;color:var(--t1)">Chế độ tối / sáng</div>
-                <div style="font-size:11px;color:var(--t3);margin-top:2px">Chuyển đổi giao diện</div>
-              </div>
-              <button class="btn btn-primary" onclick="toggleTheme()" id="theme-label">🌙 Dark</button>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">📖 Hướng dẫn deploy</div></div>
-          <div class="card-body" style="font-size:12.5px;color:var(--t2);line-height:2">
-            <b style="color:var(--t1)">1.</b> Mở Google Sheet → Extensions → Apps Script<br>
-            <b style="color:var(--t1)">2.</b> Paste code Apps Script<br>
-            <b style="color:var(--t1)">3.</b> Deploy → New Deployment → Web App<br>
-            &emsp;Execute as: <span style="color:var(--brand);font-weight:700">Me</span> | Access: <span style="color:var(--brand);font-weight:700">Anyone</span><br>
-            <b style="color:var(--t1)">4.</b> Copy URL → Paste vào trường trên → Save
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /content -->
-
-    <!-- BOTTOM TABBAR -->
-    <div class="tabbar">
-      <div class="tab active" data-p="dashboard" onclick="nav(this,'dashboard')">
-        <div class="tab-ink"></div>
-        <div class="tab-icon">📊</div>
-        <div class="tab-label">Board</div>
-      </div>
-      <div class="tab" data-p="sales" onclick="nav(this,'sales')">
-        <div class="tab-ink"></div>
-        <div class="tab-icon">🛒</div>
-        <div class="tab-label">Bán hàng</div>
-      </div>
-      <div class="tab" data-p="processing" onclick="nav(this,'processing')">
-        <div class="tab-ink"></div>
-        <div class="tab-icon">⚙️</div>
-        <div class="tab-label">Đơn</div>
-        <div class="tab-badge" id="badge-new" style="display:none">0</div>
-      </div>
-      <div class="tab" data-p="inventory" onclick="nav(this,'inventory')">
-        <div class="tab-ink"></div>
-        <div class="tab-icon">📦</div>
-        <div class="tab-label">Kho</div>
-        <div class="tab-badge" id="badge-inv" style="display:none">!</div>
-      </div>
-      <div class="tab" data-p="settings" onclick="nav(this,'settings')">
-        <div class="tab-ink"></div>
-        <div class="tab-icon">⚙️</div>
-        <div class="tab-label">Cài đặt</div>
-      </div>
-    </div>
-  </div><!-- /main -->
-</div><!-- /shell -->
-
-<script>
-const TITLES = { dashboard:'Dashboard', sales:'Bán hàng', processing:'Xử lý đơn', inventory:'Kho hàng', products:'Sản phẩm', analytics:'Báo cáo', settings:'Cài đặt' };
-const BADGE_MAP = { 'New':'bn','Confirm':'bc','Shipping':'bs','Done':'bd','Cancel':'bx','Over Sell':'bo' };
-
-let GS_URL = '';
-let st = { products:[], inventory:[], orders:[], imports:[], dashboard:{}, oFilter:'all', sFilter:'all' };
-let orderItems = [];
-let selProdId = null;
-let selSz = null;
-let curQty = 1;
-let fabOpen = false;
-
-/* ─── INIT ─── */
-window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('erp_gs_url') || '';
-  const theme = localStorage.getItem('erp_theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', theme);
-  updateThemeBtn(theme);
-
-  if (saved) {
-    GS_URL = saved;
-    document.getElementById('gs-url').value = saved;
-    loadData();
-  } else {
-    setConn('idle','Chưa cài URL');
-    setTimeout(() => goNav('settings'), 300);
-  }
-
-
-  // close fab on outside tap
-  document.addEventListener('click', e => {
-    if (fabOpen && !document.getElementById('fab-wrap').contains(e.target)) closeFab();
-  });
-
-  // stabilize mobile viewport / scroll container
-  const syncViewport = () => {
-    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
-    const c = document.getElementById('content');
-    if (c) c.style.minHeight = '0px';
-  };
-  syncViewport();
-  window.addEventListener('resize', syncViewport, { passive:true });
-  window.addEventListener('orientationchange', syncViewport, { passive:true });
-
-});
-
-/* ─── NAV ─── */
-function nav(el, page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('pg-' + page).classList.add('active');
-
-  document.querySelectorAll('.tab, .sb-item').forEach(n => n.classList.remove('active'));
-  document.querySelectorAll(`[data-p="${page}"]`).forEach(n => n.classList.add('active'));
-
-  document.getElementById('pg-title').textContent = TITLES[page] || page;
-
-  if (page === 'inventory')  renderInventory();
-  if (page === 'sales')      renderSPGrid();
-  if (page === 'processing') renderOrders();
-  if (page === 'analytics')  renderAnalytics();
-  if (page === 'products')   renderProdList();
-
-  // scroll to top
-  const c = document.getElementById('content');
-  if (c) c.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function goNav(page) {
-  const el = document.querySelector(`[data-p="${page}"]`);
-  if (el) nav(el, page);
-}
-
-/* ─── FAB ─── */
-function toggleFab() {
-  fabOpen = !fabOpen;
-  document.getElementById('fab-btn').classList.toggle('open', fabOpen);
-  document.getElementById('fab-items').classList.toggle('open', fabOpen);
-}
-function closeFab() {
-  fabOpen = false;
-  document.getElementById('fab-btn').classList.remove('open');
-  document.getElementById('fab-items').classList.remove('open');
-}
-
-/* ─── API ─── */
-async function gsPost(action, params = {}) {
-  if (!GS_URL) throw new Error('Chưa cấu hình Apps Script URL');
-  const body = new URLSearchParams({ action, ...params });
-  const res = await fetch(GS_URL, { method:'POST', body, redirect:'follow' });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
-
-/* ─── HELPERS ─── */
-function getFallbackEmoji(code='') {
-  const c = String(code).toLowerCase();
-  if (c.includes('shirt')||c.includes('tee')) return '👕';
-  if (c.includes('pant')||c.includes('jean')) return '👖';
-  if (c.includes('shoe')||c.includes('boot')) return '👟';
-  if (c.includes('bag')) return '👜';
-  return '📦';
-}
-function safeImage(url='') {
-  const u = String(url||'').trim();
-  if (!u) return '';
-  if (/^https?:\/\//i.test(u)) return u;
-  return '';
-}
-
-/* ─── LOAD DATA ─── */
-async function loadData() {
-  if (!GS_URL) return;
-  const spin = document.getElementById('refresh-spin');
-  const icon = document.getElementById('refresh-icon');
-  spin.style.display='inline-block'; icon.style.display='none';
-  setConn('idle','Đang đồng bộ...');
-
+/************************************************************
+ * AI CHATBOX QUẦN ỦNG - FULL 1 FILE APPS SCRIPT
+ * Multi-page Messenger
+ * Import page_id + page_token từ FB user token
+ * Quản lý conversation theo pageId + userId
+ * Multi-message 2-3 tin
+ * Gửi link web sản phẩm
+ * Check địa chỉ VN thiếu phần nào
+ * Xác nhận OK rồi mới finalize đơn
+ * Đủ info -> recap -> khách confirm -> lưu order + gửi Gmail
+ * AI dùng Groq để phân tích intent/entity
+ ************************************************************/
+
+/* =========================================================
+ * 1) APP CONSTANTS
+ * ========================================================= */
+
+const APP = {
+  SHEETS: {
+    SYSTEM_CONFIG: "SystemConfig",
+    PAGE_CONFIG: "PageConfig",
+    CONVERSATIONS: "Conversations",
+    ORDERS: "Orders",
+    LOGS: "Logs",
+    EVENTS: "Events"
+  },
+
+  DEFAULT_PRODUCT: {
+    name: "Quần ủng Quỳnh Trang",
+    price: 159000,
+    price_text: "159.000đ",
+    discount: "35%",
+    size_range: "36 đến 42",
+    sizes: ["36", "37", "38", "39", "40", "41", "42"],
+    shipping: "miễn phí ship toàn quốc",
+    delivery: "4–5 ngày làm việc",
+    material: "cao su 2 lớp",
+    warranty: "hoàn tiền 100% nếu không đúng mô tả",
+    inspection_policy: "được kiểm tra và thử hàng trước khi thanh toán",
+    fit_guide: "thường đi đúng size đang mang hằng ngày; nếu hay mang tất dày hoặc chân bè, nên tăng 1 size",
+    social_proof: "nhiều khách dùng ruộng, đi mưa, làm vườn đã quay lại mua thêm",
+    product_url: "https://hexoiax.github.io/product-page/"
+  },
+
+  GRAPH_VERSION: "v22.0",
+  DEFAULT_MODEL: "llama-3.3-70b-versatile",
+  GROQ_URL: "https://api.groq.com/openai/v1/chat/completions",
+
+  DEDUPE_TTL_MINUTES: 30,
+  MAX_HISTORY: 30
+};
+
+/* =========================================================
+ * 2) SYSTEM SETUP
+ * ========================================================= */
+
+function setupSystem() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  createOrResetSheet_(ss, APP.SHEETS.SYSTEM_CONFIG, [
+    "KEY",
+    "VALUE",
+    "DESCRIPTION"
+  ], [
+    ["FB_APP_ID", "", "Facebook App ID"],
+    ["FB_APP_SECRET", "", "Facebook App Secret"],
+    ["FB_USER_ACCESS_TOKEN", "", "User access token để kéo danh sách page và page token"],
+    ["GROQ_API_KEY", "", "API key Groq để AI phân tích intent/entity"],
+    ["WEBHOOK_VERIFY_TOKEN", "verify_token_123", "Token dùng verify webhook Facebook"],
+    ["ADMIN_EMAIL", "caovantay2912@gmail.com", "Email nhận đơn hàng mới"],
+    ["SPREADSHEET_ID", ss.getId(), "ID spreadsheet hiện tại"],
+    ["APP_URL", "", "URL web app sau khi deploy"],
+    ["DEFAULT_MODEL", APP.DEFAULT_MODEL, "Model Groq mặc định"],
+    ["GRAPH_VERSION", APP.GRAPH_VERSION, "Facebook Graph version"],
+    ["BOT_DELAY_MS", "500", "Delay giữa nhiều tin nhắn liên tiếp"],
+    ["NOTES", "Điền value ở cột VALUE", "Ghi chú"]
+  ]);
+
+  createOrResetSheet_(ss, APP.SHEETS.PAGE_CONFIG, [
+    "PAGE_ID",
+    "PAGE_NAME",
+    "PAGE_TOKEN",
+    "ACTIVE",
+    "PRODUCT_JSON",
+    "STYLE_NOTE",
+    "NOTES",
+    "CREATED_AT",
+    "UPDATED_AT"
+  ], [
+    [
+      "YOUR_PAGE_ID",
+      "Quỳnh Trang kho quần ủng",
+      "YOUR_PAGE_ACCESS_TOKEN",
+      "1",
+      JSON.stringify(APP.DEFAULT_PRODUCT),
+      "Thân thiện, ngắn, kéo khách trả lời tiếp",
+      "Điền token page ở đây hoặc import từ Facebook",
+      nowIso_(),
+      nowIso_()
+    ]
+  ]);
+
+  createOrResetSheet_(ss, APP.SHEETS.CONVERSATIONS, [
+    "CONVERSATION_KEY",
+    "PAGE_ID",
+    "PAGE_NAME",
+    "USER_ID",
+    "USER_NAME",
+    "STATE_JSON",
+    "LAST_USER_MESSAGE",
+    "LAST_BOT_MESSAGE",
+    "LAST_INTENT",
+    "LAST_SEEN_AT",
+    "CREATED_AT",
+    "UPDATED_AT"
+  ], []);
+
+  createOrResetSheet_(ss, APP.SHEETS.ORDERS, [
+    "ORDER_ID",
+    "PAGE_ID",
+    "PAGE_NAME",
+    "USER_ID",
+    "CUSTOMER_NAME",
+    "PHONE",
+    "ADDRESS",
+    "SIZE",
+    "QUANTITY",
+    "PRODUCT_NAME",
+    "PRICE_TEXT",
+    "STATUS",
+    "SOURCE",
+    "CONVERSATION_KEY",
+    "RAW_ORDER_JSON",
+    "CREATED_AT"
+  ], []);
+
+  createOrResetSheet_(ss, APP.SHEETS.LOGS, [
+    "CREATED_AT",
+    "LEVEL",
+    "TAG",
+    "MESSAGE",
+    "PAYLOAD_JSON"
+  ], []);
+
+  createOrResetSheet_(ss, APP.SHEETS.EVENTS, [
+    "EVENT_KEY",
+    "PAGE_ID",
+    "USER_ID",
+    "MID",
+    "TEXT",
+    "CREATED_AT"
+  ], []);
+
+  logInfo_("setup", "setupSystem completed", {});
+}
+
+/* =========================================================
+ * 3) WEBHOOK
+ * ========================================================= */
+
+function doGet(e) {
   try {
-    const t0 = performance.now();
-    const data = await gsPost('syncAll');
-    const ms = (performance.now()-t0).toFixed(0);
+    const mode = getParam_(e, "hub.mode");
+    const token = getParam_(e, "hub.verify_token");
+    const challenge = getParam_(e, "hub.challenge");
 
-    st.products = (data.products||[]).map(p => ({
-      id: String(p.id||''),
-      name: p.name||'',
-      code: p.code||'',
-      price: parseInt(p.price)||0,
-      emoji: p.emoji || getFallbackEmoji(p.code),
-      image: p.image||'',
-      sizes: (p.skus||[]).map(s => s.split('-').pop()),
-      rawSkus: p.skus||[],
-      status: p.status||'Active'
-    })).filter(p => p.id);
+    const verifyToken = getConfig_("WEBHOOK_VERIFY_TOKEN");
 
-    st.inventory  = data.inventory||[];
-    st.orders     = data.orders||[];
-    st.imports    = data.imports||[];
-    st.dashboard  = data.dashboard||{};
-
-    setConn('ok', `Xong (${ms}ms)`);
-    updateSyncTime();
-    renderDashboard();
-    updateBadges();
-
-    const ap = document.querySelector('.page.active');
-    if (ap) {
-      const pid = ap.id.replace('pg-','');
-      if (pid==='inventory')  renderInventory();
-      if (pid==='processing') renderOrders();
-      if (pid==='sales')      renderSPGrid();
-      if (pid==='analytics')  renderAnalytics();
-      if (pid==='products')   renderProdList();
+    if (mode === "subscribe" && token === verifyToken) {
+      return ContentService.createTextOutput(challenge);
     }
-  } catch(e) {
-    setConn('err','Lỗi kết nối');
-    toast('err','❌ '+e.message);
+
+    return ContentService.createTextOutput("Verification failed");
+  } catch (err) {
+    logError_("webhook_get", "doGet error", { error: String(err) });
+    return ContentService.createTextOutput("Error");
   }
-  spin.style.display='none'; icon.style.display='';
 }
 
-function updateBadges() {
-  const newOrders = st.orders.filter(o => o.status==='New' || o.status==='Over Sell').length;
-  const badge = document.getElementById('badge-new');
-  if (newOrders > 0) { badge.textContent=newOrders; badge.style.display='flex'; }
-  else badge.style.display='none';
-
-  const negInv = st.inventory.filter(i => (parseInt(i.remaining)||0) < 0).length;
-  const bi = document.getElementById('badge-inv');
-  bi.style.display = negInv > 0 ? 'flex' : 'none';
-}
-
-/* ─── DASHBOARD ─── */
-function renderDashboard() {
-  const m = st.dashboard;
-  const n = v => (parseInt(v)||0).toLocaleString('vi');
-
-  document.getElementById('dash-metrics').innerHTML = `
-    <div class="mc" style="--mc-c:#3b82f6">
-      <div class="mc-label">Tổng đơn</div>
-      <div class="mc-val" id="m-orders">${n(m.totalOrders)}</div>
-      <div class="mc-sub">Tất cả trạng thái</div>
-    </div>
-    <div class="mc" style="--mc-c:var(--brand)">
-      <div class="mc-label">Doanh thu</div>
-      <div class="mc-val" id="m-revenue" style="color:var(--brand);font-size:${String(n(m.totalRevenue)).length>8?'16':'24'}px">${n(m.totalRevenue)}</div>
-      <div class="mc-sub">VNĐ</div>
-    </div>
-    <div class="mc" style="--mc-c:#f59e0b">
-      <div class="mc-label">Over Sell</div>
-      <div class="mc-val" style="color:#fbbf24">${n(m.overSellCount)}</div>
-      <div class="mc-sub">Cần xử lý</div>
-    </div>
-    <div class="mc" style="--mc-c:#ef4444">
-      <div class="mc-label">Kho âm</div>
-      <div class="mc-val" style="color:#f87171">${n(m.negativeStockCount)}</div>
-      <div class="mc-sub">SKU cần nhập</div>
-    </div>`;
-
-  document.getElementById('m-sku').textContent     = n(m.totalSkus);
-  document.getElementById('m-stock').textContent   = n(m.totalStock);
-  document.getElementById('m-sold').textContent    = n(m.totalSold);
-  document.getElementById('m-remain').textContent  = n(m.totalRemaining);
-  document.getElementById('m-profit').textContent  = n(m.totalProfit)+' ₫';
-
-  let alerts = '';
-  if ((m.overSellCount||0)>0) alerts += `<div class="alert alert-yellow">⚠️ ${m.overSellCount} đơn Over Sell đang chờ xử lý</div>`;
-  if ((m.negativeStockCount||0)>0) alerts += `<div class="alert alert-red">❌ ${m.negativeStockCount} SKU kho âm — cần nhập gấp</div>`;
-  document.getElementById('dash-alerts').innerHTML = alerts;
-}
-
-/* ─── INVENTORY ─── */
-function renderInventory() {
-  const q  = (document.getElementById('inv-q')?.value||'').toLowerCase().trim();
-  const sf = st.sFilter;
-
-  let prods = st.products.filter(p => !q || p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q));
-  if (sf==='low') prods = prods.filter(p => {
-    const r = st.inventory.filter(i=>i.product===p.name).reduce((s,i)=>s+(parseInt(i.remaining)||0),0);
-    return r < 5 && r >= 0;
-  });
-  if (sf==='neg') prods = prods.filter(p =>
-    st.inventory.filter(i=>i.product===p.name).some(i=>(parseInt(i.remaining)||0)<0)
-  );
-
-  if (!prods.length) {
-    document.getElementById('inv-grid').innerHTML='<div class="empty"><div class="empty-icon">🔍</div>Không tìm thấy</div>';
-    return;
-  }
-
-  document.getElementById('inv-grid').innerHTML = prods.map(p => {
-    const inv = st.inventory.filter(i=>i.product===p.name);
-    const totalR = inv.reduce((s,i)=>s+(parseInt(i.remaining)||0),0);
-
-    const rows = p.sizes.map(sz => {
-      const sku = `${p.code}-${sz}`;
-      const ii  = st.inventory.find(i=>i.sku===sku);
-      const r   = ii ? parseInt(ii.remaining)||0 : 0;
-      const s   = ii ? parseInt(ii.stock)||0 : 0;
-      const d   = ii ? parseInt(ii.sold)||0 : 0;
-      const rc  = r>20?'ok':r>=5?'warn':r>0?'low':'neg';
-      return `
-        <div class="sz-row">
-          <div class="sz-info">
-            <span class="sz-name">${sz}</span>
-            <span class="sz-nums"><span class="sz-r ${rc}">${r}</span> / ${s} <span style="opacity:.5">(${d} sold)</span></span>
-          </div>
-          <div class="sz-btns">
-            <button class="sz-btn" onclick="doImport('${p.code}','${sz}',1,this)">+1</button>
-            <button class="sz-btn" onclick="doImport('${p.code}','${sz}',5,this)">+5</button>
-            <button class="sz-btn" onclick="promptImport('${p.code}','${sz}')">+N</button>
-          </div>
-        </div>`;
-    }).join('');
-
-    const chipCls = totalR < 0 ? 'chip-neg' : totalR < 5 ? 'chip-warn' : 'chip-ok';
-
-    return `
-      <div class="inv-card">
-        <div class="inv-head">
-          <div style="font-size:28px">${p.image ? `<img src="${safeImage(p.image)}" style="width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid var(--line)" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'${p.emoji}',style:'font-size:28px'}))"/>` : p.emoji}</div>
-          <div class="inv-info">
-            <div class="inv-name">${p.name}</div>
-            <div class="inv-code">${p.code}</div>
-            <div class="inv-price">${p.price.toLocaleString('vi')} ₫</div>
-          </div>
-          <span class="chip ${chipCls}">Còn ${totalR}</span>
-        </div>
-        <div class="inv-body">${rows}</div>
-      </div>`;
-  }).join('');
-}
-
-function setSF(s, btn) {
-  st.sFilter = s;
-  document.querySelectorAll('#pg-inventory .filter-bar .btn').forEach(b=>b.classList.remove('active-f'));
-  btn?.classList.add('active-f');
-  renderInventory();
-}
-
-async function doImport(code, size, qty, btn) {
-  if (btn) { btn.textContent='...'; btn.classList.add('busy'); }
+function doPost(e) {
   try {
-    const res = await gsPost('import', { productCode:code, size:String(size), quantity:String(qty), supplier:'Quick', note:'' });
-    if (res.success) { toast('ok',`✓ +${qty}× ${code}-${size} → Còn: ${res.remaining}`); await loadData(); }
-    else toast('err','❌ '+(res.error||'Lỗi'));
-  } catch(e) { toast('err','❌ '+e.message); }
-  if (btn) { btn.textContent='+'+qty; btn.classList.remove('busy'); }
-}
-function promptImport(code, size) {
-  const q = prompt(`Nhập số lượng cho ${code}-${size}:`);
-  if (q && !isNaN(q) && parseInt(q)>0) doImport(code, size, parseInt(q), null);
-}
+    const body = e && e.postData && e.postData.contents
+      ? JSON.parse(e.postData.contents)
+      : {};
 
-/* ─── ORDERS ─── */
-function renderOrders() {
-  const list = st.orders.filter(o => st.oFilter==='all' || o.status===st.oFilter);
-  _renderOrderList(list);
-}
-function searchOrders(q) {
-  if (!q) { renderOrders(); return; }
-  const lq = q.toLowerCase();
-  _renderOrderList(st.orders.filter(o =>
-    (o.orderCode||'').toLowerCase().includes(lq) ||
-    (o.customer||'').toLowerCase().includes(lq) ||
-    (o.phone||'').includes(lq)
-  ));
-}
-function _renderOrderList(list) {
-  if (!list.length) {
-    document.getElementById('orders-grid').innerHTML='<div class="empty"><div class="empty-icon">📋</div>Không có đơn hàng</div>';
-    return;
-  }
-  document.getElementById('orders-grid').innerHTML = list.map(o => {
-    const bc  = BADGE_MAP[o.status]||'bn';
-    const tot = (parseInt(o.total)||0).toLocaleString('vi');
-    const selOpts = ['New','Confirm','Shipping','Done','Cancel'].map(s =>
-      `<option value="${s}"${o.status===s?' selected':''}>${s}</option>`
-    ).join('');
-    return `
-      <div class="order-card">
-        <div class="oc-head">
-          <span class="oc-code">${o.orderCode}</span>
-          <div style="display:flex;gap:6px;align-items:center">
-            <span class="badge ${bc}">${o.status}</span>
-            <span class="oc-time">${o.time||''}</span>
-          </div>
-        </div>
-        <div class="oc-body">
-          <div class="oc-row"><span class="oc-icon">👤</span><span class="oc-text">${o.customer} · ${o.phone}</span></div>
-          ${o.address?`<div class="oc-row"><span class="oc-icon">📍</span><span class="oc-text" style="font-size:12px">${o.address}</span></div>`:''}
-          <div class="oc-row"><span class="oc-icon">📦</span><span class="oc-text" style="font-family:var(--mono);font-size:12px">${o.sku} × ${o.quantity}</span></div>
-          <div class="oc-row"><span class="oc-icon">💰</span><span class="oc-total">${tot} ₫</span></div>
-          ${o.tracking?`<div class="oc-row"><span class="oc-icon">🚚</span><span class="oc-text" style="font-family:var(--mono);font-size:12px">${o.tracking}</span></div>`:''}
-          ${o.note?`<div class="oc-row"><span class="oc-icon">📝</span><span class="oc-text" style="font-size:12px">${o.note}</span></div>`:''}
-          <div class="oc-actions">
-            <select class="f-select" style="font-size:13px" onchange="updateOS('${o.orderCode}',this.value)">
-              <option value="">▼ Đổi trạng thái</option>
-              ${selOpts}
-            </select>
-            <div class="oc-track">
-              <input class="f-input" id="tk-${o.orderCode}" placeholder="Nhập mã tracking..." value="${o.tracking||''}" style="font-size:12px" />
-              <button class="btn btn-primary btn-icon" onclick="updateOT('${o.orderCode}')" title="Lưu tracking">💾</button>
-            </div>
-          </div>
-        </div>
-      </div>`;
-  }).join('');
-}
-function setOF(f, btn) {
-  st.oFilter = f;
-  document.querySelectorAll('#pg-processing .filter-bar .btn').forEach(b=>b.classList.remove('active-f'));
-  btn?.classList.add('active-f');
-  renderOrders();
-}
-async function updateOS(code, status) {
-  if (!status) return;
-  try {
-    const res = await gsPost('updateOrderStatus', { orderCode:code, status });
-    if (res.success) { toast('ok',`✓ ${code} → ${status}`); await loadData(); }
-    else toast('err','❌ '+(res.error||'Lỗi'));
-  } catch(e) { toast('err','❌ '+e.message); }
-}
-async function updateOT(code) {
-  const tk = document.getElementById('tk-'+code)?.value?.trim();
-  if (!tk) { toast('err','Nhập mã tracking trước'); return; }
-  try {
-    const res = await gsPost('updateOrderTracking', { orderCode:code, tracking:tk });
-    if (res.success) { toast('ok',`✓ Tracking ${code} đã lưu`); await loadData(); }
-    else toast('err','❌ '+(res.error||'Lỗi'));
-  } catch(e) { toast('err','❌ '+e.message); }
-}
+    logInfo_("webhook_post", "incoming webhook", body);
 
-/* ─── SALES / ORDER FORM ─── */
-function renderSPGrid() {
-  const q = (document.getElementById('sp-search')?.value||'').toLowerCase();
-  const prods = q
-    ? st.products.filter(p => p.name.toLowerCase().includes(q)||p.code.toLowerCase().includes(q))
-    : st.products;
+    if (body.object !== "page") {
+      return ContentService.createTextOutput("ignored");
+    }
 
-  document.getElementById('sp-grid').innerHTML = prods.map(p => {
-    const img = safeImage(p.image);
-    const thumb = img
-      ? `<img src="${img}" alt="${p.name}" class="sp-thumb" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><div class="sp-emoji" style="display:none">${p.emoji}</div>`
-      : `<div class="sp-emoji">${p.emoji}</div>`;
-    const sel = selProdId === p.id ? 'sel' : '';
-    return `<div class="sp-card ${sel}" id="sp-${p.id}" onclick="selectProd('${p.id}',this)">
-      ${thumb}
-      <div class="sp-name">${p.name}</div>
-      <div class="sp-price">${p.price.toLocaleString('vi')}₫</div>
-    </div>`;
-  }).join('') || '<div class="empty" style="padding:20px;grid-column:1/-1">Không tìm thấy</div>';
-}
+    (body.entry || []).forEach(function(entry) {
+      const pageId = safeString_(entry.id);
+      const messaging = entry.messaging || [];
 
-function selectProd(id, el) {
-  selProdId = id; selSz = null; curQty = 1;
-  document.querySelectorAll('.sp-card').forEach(c=>c.classList.remove('sel'));
-  el.classList.add('sel');
-  const p = st.products.find(x=>x.id===id);
-  if (!p) return;
-  document.getElementById('sp-sizes-label').textContent = `Size — ${p.name}`;
-  document.getElementById('sp-sizes').innerHTML = p.sizes.map(s =>
-    `<button class="sz-pill" onclick="selectSize('${s}','${p.code}',this)">${s}</button>`
-  ).join('');
-  const sw = document.getElementById('sp-sizes-wrap');
-  sw.classList.add('visible');
-  document.getElementById('qty-wrap').style.display = 'none';
-  sw.scrollIntoView({ behavior:'smooth', block:'nearest' });
-}
-
-function selectSize(sz, code, btn) {
-  selSz = sz;
-  btn.closest('.size-pills').querySelectorAll('.sz-pill').forEach(p=>p.classList.remove('sel'));
-  btn.classList.add('sel');
-  const p = st.products.find(x=>x.code===code);
-  if (!p) return;
-  // Show qty
-  const ii = st.inventory.find(i=>i.sku===`${code}-${sz}`);
-  const stock = ii ? parseInt(ii.remaining)||0 : 0;
-  document.getElementById('qty-label').textContent = `${p.name} · ${sz}  (Còn: ${stock})`;
-  document.getElementById('qty-display').textContent = curQty = 1;
-  document.getElementById('qty-wrap').style.display = 'flex';
-}
-
-function changeQty(delta) {
-  curQty = Math.max(1, curQty + delta);
-  document.getElementById('qty-display').textContent = curQty;
-}
-
-// Add to cart via "add" button — let user tap size then confirm
-document.addEventListener('click', e => {
-  if (e.target.closest('.qty-btn')) return; // handled
-  if (e.target.closest('#sp-sizes') && e.target.classList.contains('sz-pill')) {
-    // auto-add after short delay so user sees selected state
-    setTimeout(() => {
-      if (selProdId && selSz) {
-        const code = st.products.find(x=>x.id===selProdId)?.code;
-        if (code) addOI_final(selProdId, selSz, code, curQty);
-      }
-    }, 300);
-  }
-});
-
-function addOI_final(prodId, sz, code, qty) {
-  const prod = st.products.find(x=>x.id===prodId);
-  if (!prod) return;
-  const sku = `${code}-${sz}`;
-  const ex = orderItems.find(i=>i.sku===sku);
-  if (ex) { ex.qty += qty; }
-  else {
-    const ii = st.inventory.find(i=>i.sku===sku);
-    orderItems.push({ sku, name:prod.name, sz, price:prod.price, qty, code, stock: ii?parseInt(ii.remaining)||0:0 });
-  }
-  toast('ok', `✓ +${qty}× ${prod.name} ${sz}`);
-  renderOIList();
-}
-
-function renderOIList() {
-  const sec = document.getElementById('oi-section');
-  if (!orderItems.length) { sec.style.display='none'; return; }
-  sec.style.display='block';
-  document.getElementById('order-items-list').innerHTML = orderItems.map((item,i) => `
-    <div class="oi-row">
-      <div class="oi-info">
-        <div class="oi-name">${item.name} · ${item.sz}</div>
-        <div class="oi-meta">${item.sku} · Còn ${item.stock} · ${item.price.toLocaleString('vi')}₫</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <input class="f-input oi-qty" type="number" min="1" value="${item.qty}" style="min-height:38px" onchange="orderItems[${i}].qty=parseInt(this.value)||1" />
-        <button class="btn btn-danger btn-icon" style="width:38px;height:38px" onclick="removeOI(${i})">✕</button>
-      </div>
-    </div>`
-  ).join('');
-}
-
-function removeOI(i) { orderItems.splice(i,1); renderOIList(); }
-
-async function submitOrder() {
-  const customer = document.getElementById('o-customer').value.trim();
-  const phone    = document.getElementById('o-phone').value.trim();
-  const address  = document.getElementById('o-address').value.trim();
-  const note     = document.getElementById('o-note').value.trim();
-  const btn      = document.getElementById('submit-order-btn');
-
-  if (!customer||!phone) { showRes('order-result',false,'Nhập tên khách và SĐT'); return; }
-  if (!orderItems.length) { showRes('order-result',false,'Chọn ít nhất 1 sản phẩm'); return; }
-
-  btn.classList.add('loading'); btn.disabled=true;
-
-  const results = [];
-  for (const item of orderItems) {
-    try {
-      const res = await gsPost('createOrder', {
-        customerName:customer, phone, address,
-        productCode:item.code, size:item.sz,
-        quantity:String(item.qty), note
+      messaging.forEach(function(event) {
+        handleMessengerEvent_(pageId, event);
       });
-      results.push(res);
-    } catch(e) { results.push({ success:false, error:e.message }); }
-  }
+    });
 
-  btn.classList.remove('loading'); btn.disabled=false;
-
-  const ok   = results.filter(r=>r.success);
-  const fail = results.filter(r=>!r.success);
-  const os   = ok.filter(r=>r.isOverSell);
-
-  if (ok.length) {
-    let msg = `✓ Tạo ${ok.length} đơn: ${ok.map(r=>r.orderCode).join(', ')}`;
-    if (os.length) msg += ` ⚠️ (${os.length} Over Sell)`;
-    if (fail.length) msg += ` · ${fail.length} thất bại`;
-    showRes('order-result', true, msg);
-    clearOrderForm();
-    setTimeout(loadData,1200);
-  } else {
-    showRes('order-result', false, '❌ '+(fail[0]?.error||'Lỗi tạo đơn'));
+    return ContentService.createTextOutput("EVENT_RECEIVED");
+  } catch (err) {
+    logError_("webhook_post", "doPost error", {
+      error: String(err),
+      raw: e && e.postData ? e.postData.contents : ""
+    });
+    return ContentService.createTextOutput("ERROR");
   }
 }
 
-function clearOrderForm() {
-  orderItems = []; selProdId = null; selSz = null; curQty = 1;
-  renderOIList();
-  ['o-customer','o-phone','o-address','o-note'].forEach(id => {
-    const el = document.getElementById(id); if(el) el.value='';
+/* =========================================================
+ * 4) FB IMPORT PAGE LIST + PAGE TOKEN
+ * ========================================================= */
+
+function importPagesFromFacebook() {
+  const userToken = getConfig_("FB_USER_ACCESS_TOKEN");
+  const graphVersion = getConfig_("GRAPH_VERSION") || APP.GRAPH_VERSION;
+
+  if (!userToken) {
+    throw new Error("Thiếu FB_USER_ACCESS_TOKEN trong sheet SystemConfig");
+  }
+
+  const fields = ["id", "name", "access_token", "tasks"].join(",");
+
+  const url =
+    "https://graph.facebook.com/" +
+    graphVersion +
+    "/me/accounts?fields=" +
+    encodeURIComponent(fields) +
+    "&access_token=" +
+    encodeURIComponent(userToken);
+
+  const res = UrlFetchApp.fetch(url, {
+    method: "get",
+    muteHttpExceptions: true
   });
-  document.querySelectorAll('.sp-card').forEach(c=>c.classList.remove('sel'));
-  document.querySelectorAll('.sz-pill').forEach(p=>p.classList.remove('sel'));
-  document.getElementById('sp-sizes-wrap').classList.remove('visible');
-  document.getElementById('qty-wrap').style.display='none';
+
+  const code = res.getResponseCode();
+  const body = res.getContentText();
+
+  if (code < 200 || code >= 300) {
+    logError_("fb_import", "importPagesFromFacebook failed", { code: code, body: body });
+    throw new Error("Không lấy được danh sách page. Check FB_USER_ACCESS_TOKEN hoặc quyền app.");
+  }
+
+  const json = JSON.parse(body);
+  const pages = json.data || [];
+
+  const sh = getSheet_(APP.SHEETS.PAGE_CONFIG);
+  const current = getSheetData_(sh);
+
+  pages.forEach(function(page) {
+    const pageId = safeString_(page.id);
+    const pageName = safeString_(page.name);
+    const pageToken = safeString_(page.access_token);
+
+    const existingIndex = current.findIndex(function(r) {
+      return safeString_(r.PAGE_ID) === pageId;
+    });
+
+    const rowValues = [
+      pageId,
+      pageName,
+      pageToken,
+      "1",
+      JSON.stringify(APP.DEFAULT_PRODUCT),
+      "Thân thiện, ngắn, kéo khách trả lời tiếp",
+      "Imported from /me/accounts",
+      nowIso_(),
+      nowIso_()
+    ];
+
+    if (existingIndex === -1) {
+      sh.appendRow(rowValues);
+      current.push({
+        PAGE_ID: pageId,
+        PAGE_NAME: pageName,
+        PAGE_TOKEN: pageToken
+      });
+    } else {
+      sh.getRange(existingIndex + 2, 1, 1, rowValues.length).setValues([rowValues]);
+    }
+  });
+
+  logInfo_("fb_import", "Pages imported", { total: pages.length });
+  return pages;
 }
 
-/* ─── PRODUCTS ─── */
-async function submitProduct() {
-  const name  = document.getElementById('p-name').value.trim();
-  const code  = document.getElementById('p-code').value.trim().toUpperCase();
-  const price = document.getElementById('p-price').value;
-  const emoji = document.getElementById('p-emoji').value.trim() || getFallbackEmoji(code);
-  const image = document.getElementById('p-image').value.trim();
-  const sizes = document.getElementById('p-sizes').value.trim().split(/\s+/).filter(Boolean);
-  if (!name||!code||!price||!sizes.length) { showRes('prod-result',false,'Điền đủ thông tin'); return; }
+function testFacebookUserToken() {
+  const userToken = getConfig_("FB_USER_ACCESS_TOKEN");
+  const graphVersion = getConfig_("GRAPH_VERSION") || APP.GRAPH_VERSION;
+
+  if (!userToken) {
+    throw new Error("Thiếu FB_USER_ACCESS_TOKEN");
+  }
+
+  const url =
+    "https://graph.facebook.com/" +
+    graphVersion +
+    "/me?fields=id,name&access_token=" +
+    encodeURIComponent(userToken);
+
+  const res = UrlFetchApp.fetch(url, {
+    method: "get",
+    muteHttpExceptions: true
+  });
+
+  Logger.log("CODE: " + res.getResponseCode());
+  Logger.log(res.getContentText());
+}
+
+function exchangeLongLivedUserToken() {
+  const appId = getConfig_("FB_APP_ID");
+  const appSecret = getConfig_("FB_APP_SECRET");
+  const shortToken = getConfig_("FB_USER_ACCESS_TOKEN");
+  const graphVersion = getConfig_("GRAPH_VERSION") || APP.GRAPH_VERSION;
+
+  if (!appId || !appSecret || !shortToken) {
+    throw new Error("Thiếu FB_APP_ID / FB_APP_SECRET / FB_USER_ACCESS_TOKEN");
+  }
+
+  const url =
+    "https://graph.facebook.com/" +
+    graphVersion +
+    "/oauth/access_token" +
+    "?grant_type=fb_exchange_token" +
+    "&client_id=" + encodeURIComponent(appId) +
+    "&client_secret=" + encodeURIComponent(appSecret) +
+    "&fb_exchange_token=" + encodeURIComponent(shortToken);
+
+  const res = UrlFetchApp.fetch(url, {
+    method: "get",
+    muteHttpExceptions: true
+  });
+
+  const code = res.getResponseCode();
+  const body = res.getContentText();
+
+  Logger.log("CODE: " + code);
+  Logger.log(body);
+
+  if (code < 200 || code >= 300) {
+    throw new Error("Đổi long-lived token thất bại");
+  }
+
+  const json = JSON.parse(body);
+  const longToken = json.access_token || "";
+
+  if (!longToken) {
+    throw new Error("Không nhận được access_token mới");
+  }
+
+  setConfigValue_("FB_USER_ACCESS_TOKEN", longToken);
+  return longToken;
+}
+
+/* =========================================================
+ * 5) EVENT HANDLER + DEDUPE
+ * ========================================================= */
+
+function handleMessengerEvent_(pageId, event) {
   try {
-    const res = await gsPost('createProduct', { productName:name, productCode:code, price, emoji, imageUrl:image, sizes:JSON.stringify(sizes), category:'' });
-    if (res.success) { showRes('prod-result',true,`✓ "${name}" tạo xong — ${sizes.length} SKU`); clearPF(); setTimeout(loadData,1200); }
-    else showRes('prod-result',false,'❌ '+(res.error||'Lỗi'));
-  } catch(e) { showRes('prod-result',false,'❌ '+e.message); }
+    if (!event || !event.sender || !event.sender.id) return;
+
+    const senderId = safeString_(event.sender.id);
+
+    if (event.message && event.message.is_echo) return;
+
+    if (event.message && event.message.text) {
+      const userText = safeString_(event.message.text);
+      const mid = safeString_(event.message.mid);
+      const eventKey = buildEventKey_(pageId, senderId, mid, userText);
+
+      if (isDuplicateEvent_(eventKey)) {
+        logInfo_("event_handler", "Duplicate event skipped", { eventKey: eventKey });
+        return;
+      }
+
+      saveEventKey_(eventKey, pageId, senderId, mid, userText);
+
+      const result = processIncomingMessage_(pageId, senderId, userText);
+      const messages = result && result.messages ? result.messages : [];
+
+      if (messages.length) {
+        sendMessengerMessages_(pageId, senderId, messages);
+      }
+    }
+  } catch (err) {
+    logError_("event_handler", "handleMessengerEvent error", {
+      error: String(err),
+      event: event
+    });
+  }
 }
 
-function clearPF() {
-  ['p-name','p-code','p-price','p-emoji','p-image','p-sizes'].forEach(id => {
-    const el = document.getElementById(id); if(el) el.value='';
+function buildEventKey_(pageId, userId, mid, text) {
+  return [safeString_(pageId), safeString_(userId), safeString_(mid), safeString_(text)].join("__");
+}
+
+function isDuplicateEvent_(eventKey) {
+  const sh = getSheet_(APP.SHEETS.EVENTS);
+  const data = getSheetData_(sh);
+  const cutoff = Date.now() - APP.DEDUPE_TTL_MINUTES * 60 * 1000;
+
+  for (var i = data.length - 1; i >= 0; i--) {
+    const row = data[i];
+    const created = new Date(safeString_(row.CREATED_AT)).getTime();
+    if (created && created < cutoff) break;
+    if (safeString_(row.EVENT_KEY) === safeString_(eventKey)) return true;
+  }
+  return false;
+}
+
+function saveEventKey_(eventKey, pageId, userId, mid, text) {
+  const sh = getSheet_(APP.SHEETS.EVENTS);
+  sh.appendRow([
+    eventKey,
+    pageId,
+    userId,
+    mid,
+    text,
+    nowIso_()
+  ]);
+}
+
+/* =========================================================
+ * 6) MAIN CHAT PIPELINE
+ * ========================================================= */
+
+function processIncomingMessage_(pageId, userId, userText) {
+  const page = getPageConfigById_(pageId);
+  if (!page || !page.active) {
+    logError_("main", "Page config missing or inactive", { pageId: pageId });
+    return { messages: [] };
+  }
+
+  const product = page.product || APP.DEFAULT_PRODUCT;
+  let conversation = loadConversation_(pageId, page.pageName, userId);
+
+  conversation.page_id = pageId;
+  conversation.page_name = page.pageName || "";
+  conversation.user_id = userId;
+  conversation.last_user_message = userText;
+
+  pushHistory_(conversation, "user", userText);
+
+  const heuristicIntent = detectIntent_(userText);
+  const heuristicEntities = extractEntities_(userText, product);
+
+  let finalIntent = heuristicIntent;
+  let finalEntities = heuristicEntities;
+  let aiResult = null;
+
+  const shouldUseAI =
+    heuristicIntent === "unknown" ||
+    (
+      !heuristicEntities.phone &&
+      !heuristicEntities.address &&
+      !heuristicEntities.size &&
+      !heuristicEntities.quantity &&
+      String(userText || "").length > 18
+    );
+
+  if (shouldUseAI) {
+    aiResult = callGroqAnalysis_(userText, conversation, product);
+    if (aiResult) {
+      finalIntent = aiResult.intent || finalIntent;
+      finalEntities = {
+        name: aiResult.name || finalEntities.name || "",
+        phone: aiResult.phone || finalEntities.phone || "",
+        address: aiResult.address || finalEntities.address || "",
+        size: aiResult.size || finalEntities.size || "",
+        quantity: Number(aiResult.quantity || finalEntities.quantity || 0)
+      };
+    }
+  }
+
+  updateConversationFromEntities_(conversation, finalEntities, product);
+
+  conversation.intent = finalIntent;
+  conversation.last_intent = finalIntent;
+  conversation.heat = scoreHeat_(conversation, finalIntent, userText);
+
+  const action = decideNextAction_(conversation, finalIntent);
+  let messages = buildReplySequence_(action, conversation, product, aiResult);
+
+  if (action === "finalize_order") {
+    const order = createOrderIfReady_(conversation);
+    if (order) {
+      messages = buildReplySequence_("finalize_order", conversation, product, aiResult);
+    } else {
+      messages = [{
+        type: "text",
+        text: "Dạ em chưa tạo được đơn vì thông tin vẫn còn thiếu hoặc chưa hợp lệ ạ."
+      }];
+    }
+  }
+
+  messages = removeRepeatedMessages_(conversation, messages);
+
+  conversation.last_bot_message = messages.length ? messageToPlainText_(messages[messages.length - 1]) : "";
+  pushHistory_(conversation, "bot", conversation.last_bot_message);
+
+  saveConversation_(conversation);
+
+  return { messages: messages };
+}
+
+/* =========================================================
+ * 7) FACEBOOK SEND MESSAGE
+ * ========================================================= */
+
+function sendMessengerMessages_(pageId, recipientId, messages) {
+  messages = messages || [];
+  const delayMs = Number(getConfig_("BOT_DELAY_MS") || 500);
+
+  messages.forEach(function(msg, idx) {
+    if (msg.type === "text") {
+      sendMessengerText_(pageId, recipientId, msg.text);
+    } else if (msg.type === "button_url") {
+      sendMessengerButtonUrl_(pageId, recipientId, msg.text, msg.buttonTitle, msg.url);
+    }
+
+    if (idx < messages.length - 1) {
+      Utilities.sleep(delayMs);
+    }
   });
 }
 
-function renderProdList() {
-  if (!st.products.length) {
-    document.getElementById('prod-list').innerHTML='<div class="empty" style="padding:24px"><div class="empty-icon">🏷️</div>Chưa có sản phẩm</div>';
+function sendMessengerText_(pageId, recipientId, text) {
+  const page = getPageConfigById_(pageId);
+  if (!page || !page.pageToken) {
+    logError_("send", "Missing page token", { pageId: pageId, recipientId: recipientId });
     return;
   }
-  document.getElementById('prod-list').innerHTML = `
-    <table class="tbl">
-      <thead><tr><th>SP</th><th>Code</th><th>Giá</th><th>Sizes</th></tr></thead>
-      <tbody>
-        ${st.products.map(p => `
-          <tr>
-            <td>${p.emoji} ${p.name}</td>
-            <td style="font-family:var(--mono)">${p.code}</td>
-            <td style="font-family:var(--mono)">${p.price.toLocaleString('vi')}₫</td>
-            <td style="font-family:var(--mono);font-size:10px;color:var(--t3)">${p.sizes.join(', ')}</td>
-          </tr>`).join('')}
-      </tbody>
-    </table>`;
-}
 
-/* ─── ANALYTICS ─── */
-function renderAnalytics() {
-  const orders = st.orders;
-  const inv = st.inventory;
-  const m = st.dashboard;
-  const n = v => (parseInt(v)||0).toLocaleString('vi');
+  const graphVersion = getConfig_("GRAPH_VERSION") || APP.GRAPH_VERSION;
+  const url = "https://graph.facebook.com/" + graphVersion + "/me/messages?access_token=" + encodeURIComponent(page.pageToken);
 
-  document.getElementById('a-done').textContent   = orders.filter(o=>o.status==='Done').length;
-  document.getElementById('a-ship').textContent   = orders.filter(o=>o.status==='Shipping').length;
-  document.getElementById('a-os').textContent     = m.overSellCount||0;
-  document.getElementById('a-cancel').textContent = orders.filter(o=>o.status==='Cancel').length;
-  document.getElementById('a-rev').textContent    = n(m.totalRevenue)+' ₫';
+  const payload = {
+    recipient: { id: recipientId },
+    message: { text: text },
+    messaging_type: "RESPONSE"
+  };
 
-  document.getElementById('a-hi').textContent = inv.filter(i=>(parseInt(i.remaining)||0)>=20).length+' SKU';
-  document.getElementById('a-md').textContent = inv.filter(i=>{const r=parseInt(i.remaining)||0;return r>=5&&r<20}).length+' SKU';
-  document.getElementById('a-lo').textContent = inv.filter(i=>{const r=parseInt(i.remaining)||0;return r>0&&r<5}).length+' SKU';
-  document.getElementById('a-ng').textContent = inv.filter(i=>(parseInt(i.remaining)||0)<0).length+' SKU';
-
-  const skuMap = {};
-  orders.forEach(o => { if(o.sku) skuMap[o.sku]=(skuMap[o.sku]||0)+(parseInt(o.quantity)||0); });
-  const sorted = Object.entries(skuMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  document.getElementById('a-top').innerHTML = sorted.length
-    ? `<table class="tbl"><thead><tr><th>SKU</th><th>SL bán</th></tr></thead><tbody>${
-        sorted.map(([sku,q])=>`<tr><td style="font-family:var(--mono)">${sku}</td><td style="font-family:var(--mono);color:var(--brand);font-weight:700">${q}</td></tr>`).join('')
-      }</tbody></table>`
-    : '<div class="empty" style="padding:24px">Chưa có dữ liệu</div>';
-}
-
-/* ─── CONFIG ─── */
-async function saveConfig() {
-  const url = document.getElementById('gs-url').value.trim();
-  if (!url) { toast('err','Nhập URL trước'); return; }
-  GS_URL = url;
-  localStorage.setItem('erp_gs_url', url);
-  await testConn();
-}
-
-async function testConn() {
-  const el = document.getElementById('conn-result');
-  el.innerHTML='<div class="alert alert-blue"><div class="spin" style="width:12px;height:12px;border-width:2px;margin-right:8px;display:inline-block;vertical-align:middle"></div>Đang kiểm tra...</div>';
   try {
-    const data = await gsPost('syncAll');
-    if (!data) throw new Error('Response rỗng');
-    el.innerHTML=`<div class="alert alert-green">✓ Kết nối thành công! Products: ${data.products?.length||0} · Inventory: ${data.inventory?.length||0} · Orders: ${data.orders?.length||0}</div>`;
-    setConn('ok','Đã kết nối ✓');
-    setTimeout(loadData,400);
-  } catch(e) {
-    el.innerHTML=`<div class="alert alert-red">❌ ${e.message}</div>`;
-    setConn('err','Lỗi kết nối');
+    const res = UrlFetchApp.fetch(url, {
+      method: "post",
+      contentType: "application/json",
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    });
+
+    const code = res.getResponseCode();
+    const body = res.getContentText();
+
+    if (code < 200 || code >= 300) {
+      logError_("send", "Send text failed", {
+        code: code,
+        body: body,
+        payload: payload
+      });
+    } else {
+      logInfo_("send", "Text sent", {
+        pageId: pageId,
+        recipientId: recipientId,
+        text: text
+      });
+    }
+  } catch (err) {
+    logError_("send", "UrlFetch send text error", {
+      error: String(err),
+      pageId: pageId,
+      recipientId: recipientId
+    });
   }
 }
 
-/* ─── THEME ─── */
-function toggleTheme() {
-  const cur  = document.documentElement.getAttribute('data-theme')||'dark';
-  const next = cur==='dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('erp_theme', next);
-  updateThemeBtn(next);
-}
-function updateThemeBtn(theme) {
-  const icon = document.getElementById('theme-btn');
-  const lbl  = document.getElementById('theme-label');
-  const isDark = theme==='dark';
-  if (icon) icon.textContent = isDark ? '🌙' : '☀️';
-  if (lbl) lbl.textContent = isDark ? '🌙 Dark' : '☀️ Light';
+function sendMessengerButtonUrl_(pageId, recipientId, text, buttonTitle, url) {
+  const page = getPageConfigById_(pageId);
+  if (!page || !page.pageToken) {
+    logError_("send", "Missing page token for button", { pageId: pageId, recipientId: recipientId });
+    return;
+  }
+
+  const graphVersion = getConfig_("GRAPH_VERSION") || APP.GRAPH_VERSION;
+  const endpoint = "https://graph.facebook.com/" + graphVersion + "/me/messages?access_token=" + encodeURIComponent(page.pageToken);
+
+  const payload = {
+    recipient: { id: recipientId },
+    message: {
+      attachment: {
+        type: "template",
+        payload: {
+          template_type: "button",
+          text: text,
+          buttons: [
+            {
+              type: "web_url",
+              url: url,
+              title: buttonTitle
+            }
+          ]
+        }
+      }
+    },
+    messaging_type: "RESPONSE"
+  };
+
+  try {
+    const res = UrlFetchApp.fetch(endpoint, {
+      method: "post",
+      contentType: "application/json",
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    });
+
+    const code = res.getResponseCode();
+    const body = res.getContentText();
+
+    if (code < 200 || code >= 300) {
+      logError_("send", "Send button failed", {
+        code: code,
+        body: body,
+        payload: payload
+      });
+    } else {
+      logInfo_("send", "Button sent", {
+        pageId: pageId,
+        recipientId: recipientId,
+        url: url
+      });
+    }
+  } catch (err) {
+    logError_("send", "UrlFetch send button error", {
+      error: String(err),
+      pageId: pageId,
+      recipientId: recipientId
+    });
+  }
 }
 
-/* ─── CONN ─── */
-function setConn(type, text) {
-  ['conn-dot','conn-dot-sb'].forEach(id => {
-    const d = document.getElementById(id);
-    if (d) d.className = 'dot dot-'+(type==='ok'?'ok':type==='err'?'err':'idle');
+/* =========================================================
+ * 8) PAGE CONFIG
+ * ========================================================= */
+
+function getPageConfigById_(pageId) {
+  const sh = getSheet_(APP.SHEETS.PAGE_CONFIG);
+  const data = getSheetData_(sh);
+
+  const row = data.find(function(r) {
+    return safeString_(r.PAGE_ID) === safeString_(pageId);
   });
-  ['conn-text','conn-text-sb'].forEach(id => {
-    const s = document.getElementById(id);
-    if (s) s.textContent = text;
+
+  if (!row) return null;
+
+  let product = APP.DEFAULT_PRODUCT;
+  try {
+    if (row.PRODUCT_JSON) {
+      product = Object.assign({}, APP.DEFAULT_PRODUCT, JSON.parse(row.PRODUCT_JSON));
+    }
+  } catch (e) {}
+
+  return {
+    pageId: safeString_(row.PAGE_ID),
+    pageName: safeString_(row.PAGE_NAME),
+    pageToken: safeString_(row.PAGE_TOKEN),
+    active: safeString_(row.ACTIVE) === "1",
+    product: product,
+    styleNote: safeString_(row.STYLE_NOTE),
+    notes: safeString_(row.NOTES)
+  };
+}
+
+/* =========================================================
+ * 9) CONVERSATION
+ * ========================================================= */
+
+function getDefaultConversation_(pageId, pageName, userId) {
+  return {
+    conversation_key: conversationKey_(pageId, userId),
+    page_id: pageId,
+    page_name: pageName || "",
+    user_id: userId,
+    user_name: "",
+    stage: "new_chat",
+    intent: "",
+    heat: 0,
+    awaiting_confirm: false,
+
+    product_name: APP.DEFAULT_PRODUCT.name,
+    product_price: APP.DEFAULT_PRODUCT.price,
+    product_price_text: APP.DEFAULT_PRODUCT.price_text,
+
+    customer: {
+      name: "",
+      phone: "",
+      address: ""
+    },
+
+    order: {
+      product_name: APP.DEFAULT_PRODUCT.name,
+      size: "",
+      quantity: 0,
+      price: APP.DEFAULT_PRODUCT.price,
+      price_text: APP.DEFAULT_PRODUCT.price_text
+    },
+
+    flags: {
+      asked_price: false,
+      asked_size: false,
+      asked_quantity: false,
+      asked_phone: false,
+      asked_address: false,
+      order_created: false,
+      greeting_sent: false
+    },
+
+    history: [],
+    last_user_message: "",
+    last_bot_message: "",
+    last_intent: "",
+    created_at: nowIso_(),
+    updated_at: nowIso_()
+  };
+}
+
+function loadConversation_(pageId, pageName, userId) {
+  const key = conversationKey_(pageId, userId);
+  const sh = getSheet_(APP.SHEETS.CONVERSATIONS);
+  const data = getSheetData_(sh);
+
+  const row = data.find(function(r) {
+    return safeString_(r.CONVERSATION_KEY) === safeString_(key);
+  });
+
+  if (!row) {
+    return getDefaultConversation_(pageId, pageName, userId);
+  }
+
+  const parsed = parseJson_(row.STATE_JSON, getDefaultConversation_(pageId, pageName, userId));
+  parsed.conversation_key = key;
+  parsed.page_id = pageId;
+  parsed.page_name = pageName || parsed.page_name || "";
+  parsed.user_id = userId;
+
+  return parsed;
+}
+
+function saveConversation_(conversation) {
+  const sh = getSheet_(APP.SHEETS.CONVERSATIONS);
+  const data = getSheetData_(sh);
+  const key = conversation.conversation_key;
+  const now = nowIso_();
+
+  conversation.updated_at = now;
+
+  const rowValues = [
+    key,
+    conversation.page_id,
+    conversation.page_name || "",
+    conversation.user_id,
+    conversation.user_name || "",
+    JSON.stringify(conversation),
+    conversation.last_user_message || "",
+    conversation.last_bot_message || "",
+    conversation.last_intent || "",
+    now,
+    conversation.created_at || now,
+    now
+  ];
+
+  const idx = data.findIndex(function(r) {
+    return safeString_(r.CONVERSATION_KEY) === safeString_(key);
+  });
+
+  if (idx === -1) {
+    sh.appendRow(rowValues);
+  } else {
+    sh.getRange(idx + 2, 1, 1, rowValues.length).setValues([rowValues]);
+  }
+}
+
+function pushHistory_(conversation, role, text) {
+  conversation.history = conversation.history || [];
+  conversation.history.push({
+    role: role,
+    text: text,
+    at: nowIso_()
+  });
+  if (conversation.history.length > APP.MAX_HISTORY) {
+    conversation.history = conversation.history.slice(-APP.MAX_HISTORY);
+  }
+}
+
+function updateConversationFromEntities_(conversation, entities, product) {
+  if (entities.name && !conversation.customer.name) {
+    conversation.customer.name = entities.name;
+  }
+  if (entities.phone) {
+    conversation.customer.phone = entities.phone;
+  }
+  if (entities.address) {
+    conversation.customer.address = entities.address;
+  }
+  if (entities.size) {
+    conversation.order.size = entities.size;
+  }
+  if (entities.quantity && Number(entities.quantity) > 0) {
+    conversation.order.quantity = Number(entities.quantity);
+  }
+
+  conversation.product_name = product.name;
+  conversation.product_price = product.price;
+  conversation.product_price_text = product.price_text;
+  conversation.order.product_name = product.name;
+  conversation.order.price = product.price;
+  conversation.order.price_text = product.price_text;
+}
+
+/* =========================================================
+ * 10) INTENT / ENTITY
+ * ========================================================= */
+
+function detectIntent_(text) {
+  const t = normalizeText_(text);
+
+  if (!t) return "empty";
+  if (/^(hi|hello|alo|shop|ad|em ơi|chị ơi|anh ơi|xin chào|ib)/i.test(t)) return "greeting";
+  if (/(ok|oke|đúng rồi|chuẩn rồi|xác nhận|được|ok rồi|ổn rồi)/i.test(t)) return "confirm_order";
+  if (/(mua|chốt|lên đơn|đặt|đặt hàng|ok lấy|chốt đơn)/i.test(t)) return "buy";
+  if (/(xem ảnh|xem hàng|xem sản phẩm|xem mẫu|link sản phẩm|gửi link|xem web|coi ảnh)/i.test(t)) return "view_product";
+  if (/(giá|bao nhiêu tiền|bn tiền|giá sao|giá nhiêu|bao nhiêu)/i.test(t)) return "ask_price";
+  if (/(size|cỡ|form|vừa chân|chân bè|đi vừa|size bao nhiêu)/i.test(t)) return "ask_size";
+  if (/(ship|giao hàng|bao lâu|mấy ngày|nhận hàng|vận chuyển)/i.test(t)) return "ask_shipping";
+  if (/(chất|chất liệu|cao su|mỏng|dày|2 lớp|bền|mềm)/i.test(t)) return "ask_material";
+  if (/(được kiểm|thử hàng|kiểm tra|thanh toán|cod)/i.test(t)) return "ask_inspection";
+  if (/(địa chỉ|sđt|số điện thoại|người nhận)/i.test(t)) return "provide_order_info";
+  if (/(đổi|trả|hoàn tiền|refund|khiếu nại|hỏng|lỗi|không vừa|sửa)/i.test(t)) return "after_sales";
+  return "unknown";
+}
+
+function extractEntities_(text, product) {
+  return {
+    name: extractNameSimple_(text),
+    phone: detectPhone_(text),
+    address: parseAddressHeuristic_(text),
+    size: detectSize_(text, product.sizes),
+    quantity: detectQuantity_(text)
+  };
+}
+
+function scoreHeat_(conversation, intent, text) {
+  let heat = conversation.heat || 0;
+
+  switch (intent) {
+    case "ask_price": heat += 1; break;
+    case "ask_size": heat += 2; break;
+    case "buy": heat += 4; break;
+    case "provide_order_info": heat += 3; break;
+    case "ask_shipping": heat += 1; break;
+    case "view_product": heat += 2; break;
+  }
+
+  if (/(mua|chốt|lên đơn|ok lấy)/i.test(text)) heat += 3;
+  return Math.min(10, heat);
+}
+
+function missingOrderFields_(conversation) {
+  const missing = [];
+
+  if (!conversation.order.size) missing.push("size");
+  if (!conversation.order.quantity || Number(conversation.order.quantity) < 1) missing.push("quantity");
+  if (!conversation.customer.phone) missing.push("phone");
+
+  const addressCheck = analyzeVietnamAddress_(conversation.customer.address || "");
+  if (!addressCheck.isValid) missing.push("address");
+
+  return missing;
+}
+
+function missingFieldLabel_(field) {
+  const map = {
+    size: "size",
+    quantity: "số lượng",
+    phone: "số điện thoại",
+    address: "địa chỉ nhận hàng"
+  };
+  return map[field] || field;
+}
+
+/* =========================================================
+ * 11) ADDRESS ANALYSIS
+ * ========================================================= */
+
+function analyzeVietnamAddress_(address) {
+  const text = safeString_(address).trim();
+
+  if (!text) {
+    return {
+      isValid: false,
+      normalized: "",
+      partsCount: 0,
+      hasDetail: false,
+      hasWard: false,
+      hasDistrict: false,
+      hasProvince: false,
+      missing: ["detail", "ward", "district", "province"],
+      missingLabel: "địa chỉ nhận hàng đầy đủ"
+    };
+  }
+
+  const normalized = text.replace(/\s+/g, " ").trim();
+  const lower = normalized.toLowerCase();
+  const parts = normalized.split(",").map(function(x) { return x.trim(); }).filter(Boolean);
+
+  const hasDetail =
+    /(số|sn|ngõ|ngách|hẻm|đường|đ\.|ấp|thôn|xóm|tổ|khu phố|block|chung cư|cc|tòa|house|apartment|lane|alley)/i.test(lower) ||
+    /\d+/.test(lower);
+
+  const hasWard =
+    /(phường|phuong|xã|xa|thị trấn|tt\.|p\.|x\.)/i.test(lower);
+
+  const hasDistrict =
+    /(quận|quan|huyện|huyen|thị xã|q\.|h\.|thành phố thủ đức|tp\. ?thủ đức)/i.test(lower);
+
+  const hasProvince =
+    /(hà nội|ha noi|hồ chí minh|ho chi minh|tp\. ?hcm|tp hcm|sài gòn|sai gon|đà nẵng|da nang|hải phòng|hai phong|cần thơ|can tho|an giang|bà rịa|ba ria|bắc giang|bac giang|bắc kạn|bac kan|bạc liêu|bac lieu|bắc ninh|bac ninh|bến tre|ben tre|bình định|binh dinh|bình dương|binh duong|bình phước|binh phuoc|bình thuận|binh thuan|cà mau|ca mau|cao bằng|cao bang|đắk lắk|dak lak|đắk nông|dak nong|điện biên|dien bien|đồng nai|dong nai|đồng tháp|dong thap|gia lai|hà giang|ha giang|hà nam|ha nam|hà tĩnh|ha tinh|hải dương|hai duong|hậu giang|hau giang|hòa bình|hoa binh|hưng yên|hung yen|khánh hòa|khanh hoa|kiên giang|kien giang|kon tum|lai châu|lai chau|lâm đồng|lam dong|lạng sơn|lang son|lào cai|lao cai|long an|nam định|nam dinh|nghệ an|nghe an|ninh bình|ninh binh|ninh thuận|ninh thuan|phú thọ|phu tho|phú yên|phu yen|quảng bình|quang binh|quảng nam|quang nam|quảng ngãi|quang ngai|quảng ninh|quang ninh|quảng trị|quang tri|sóc trăng|soc trang|sơn la|son la|tây ninh|tay ninh|thái bình|thai binh|thái nguyên|thai nguyen|thanh hóa|thanh hoa|thừa thiên huế|hue|tiền giang|tien giang|trà vinh|tra vinh|tuyên quang|tuyen quang|vĩnh long|vinh long|vĩnh phúc|vinh phuc|yên bái|yen bai)/i.test(lower);
+
+  const missing = [];
+  if (!hasDetail) missing.push("detail");
+  if (!hasWard) missing.push("ward");
+  if (!hasDistrict) missing.push("district");
+  if (!hasProvince) missing.push("province");
+
+  const isValid =
+    (parts.length >= 3 && (hasWard || hasDistrict) && hasProvince) ||
+    (hasDetail && hasWard && hasDistrict && hasProvince);
+
+  return {
+    isValid: isValid,
+    normalized: normalized,
+    partsCount: parts.length,
+    hasDetail: hasDetail,
+    hasWard: hasWard,
+    hasDistrict: hasDistrict,
+    hasProvince: hasProvince,
+    missing: missing,
+    missingLabel: buildMissingAddressLabel_(missing)
+  };
+}
+
+function buildMissingAddressLabel_(missing) {
+  if (!missing || !missing.length) return "";
+
+  const map = {
+    detail: "số nhà/ngõ/đường hoặc khu vực cụ thể",
+    ward: "phường/xã",
+    district: "quận/huyện",
+    province: "tỉnh/thành phố"
+  };
+
+  const labels = missing.map(function(k) { return map[k] || k; });
+
+  if (labels.length === 1) return labels[0];
+  if (labels.length === 2) return labels[0] + " và " + labels[1];
+  return labels.slice(0, -1).join(", ") + " và " + labels[labels.length - 1];
+}
+
+function getAddressMissingLabel_(conversation) {
+  const addressCheck = analyzeVietnamAddress_(conversation.customer.address || "");
+  return addressCheck.missingLabel || "địa chỉ nhận hàng đầy đủ";
+}
+
+/* =========================================================
+ * 12) AI GROQ
+ * ========================================================= */
+
+function callGroqAnalysis_(userMessage, conversation, product) {
+  try {
+    const apiKey = getConfig_("GROQ_API_KEY");
+    const model = getConfig_("DEFAULT_MODEL") || APP.DEFAULT_MODEL;
+
+    if (!apiKey) return null;
+
+    const systemPrompt = [
+      "Bạn là bộ phân tích hội thoại cho chatbot bán quần ủng.",
+      "Chỉ trả JSON hợp lệ, không thêm chữ nào khác.",
+      "Không được bịa dữ liệu.",
+      "Nếu không chắc thì để chuỗi rỗng.",
+      "allowed_intent: greeting, ask_price, ask_size, ask_shipping, ask_material, ask_inspection, buy, view_product, provide_order_info, confirm_order, after_sales, unknown",
+      "JSON schema:",
+      "{",
+      '  "intent": "",',
+      '  "name": "",',
+      '  "phone": "",',
+      '  "address": "",',
+      '  "size": "",',
+      '  "quantity": 0,',
+      '  "tone": "",',
+      '  "reply_hint": ""',
+      "}",
+      "Thông tin sản phẩm:",
+      JSON.stringify(product)
+    ].join("\n");
+
+    const userPrompt = JSON.stringify({
+      latest_user_message: userMessage,
+      conversation_summary: {
+        phone: conversation.customer.phone || "",
+        address: conversation.customer.address || "",
+        size: conversation.order.size || "",
+        quantity: conversation.order.quantity || 0,
+        awaiting_confirm: conversation.awaiting_confirm || false,
+        last_intent: conversation.last_intent || "",
+        stage: conversation.stage || ""
+      }
+    });
+
+    const payload = {
+      model: model,
+      temperature: 0.1,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ]
+    };
+
+    const res = UrlFetchApp.fetch(APP.GROQ_URL, {
+      method: "post",
+      contentType: "application/json",
+      headers: {
+        Authorization: "Bearer " + apiKey
+      },
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    });
+
+    const code = res.getResponseCode();
+    const body = res.getContentText();
+
+    if (code < 200 || code >= 300) {
+      logError_("groq", "Groq error", { code: code, body: body });
+      return null;
+    }
+
+    const json = JSON.parse(body);
+    const content = json.choices && json.choices[0] && json.choices[0].message
+      ? json.choices[0].message.content
+      : "{}";
+
+    return JSON.parse(content);
+  } catch (err) {
+    logError_("groq", "Groq exception", { error: String(err) });
+    return null;
+  }
+}
+
+/* =========================================================
+ * 13) DECISION / REPLY
+ * ========================================================= */
+
+const REPLY_TEMPLATES = {
+  greeting: [
+    "Dạ em chào mình ạ, mình đang quan tâm quần ủng bên em đúng không ạ?",
+    "Dạ em đây ạ, mẫu quần ủng bên em đang có sẵn size 36 đến 42 ạ.",
+    "Dạ em hỗ trợ mình đây ạ, mẫu này nhiều khách đi mưa với làm vườn lấy lắm ạ."
+  ],
+
+  ask_price: [
+    "Dạ mẫu {name} bên em đang là {price_text} ạ. Chất {material}, đi mưa hay đi ruộng khá yên tâm.",
+    "Dạ giá hiện tại là {price_text} ạ, đang tốt hơn khoảng {discount}. Mẫu này là {material}, nhiều khách đi làm vườn với đi mưa quay lại lấy thêm.",
+    "Dạ mẫu này {price_text} ạ, bên em còn đủ size {size_range}."
+  ],
+
+  ask_size: [
+    "Dạ mẫu này có size {size_range} ạ. Mình đang mang size bao nhiêu để em chốt chuẩn cho mình luôn ạ?",
+    "Dạ bên em có đủ size {size_range}. Mình đi size mấy để em chọn cho mình ạ?",
+    "Dạ mình đang mang size nào ạ? Mẫu này thường đi đúng size hằng ngày là đẹp chân ạ."
+  ],
+
+  ask_fit_guide: [
+    "Dạ mẫu này thường đi đúng size mình đang mang hằng ngày là ổn ạ. Nếu mình hay mang tất dày hoặc chân bè thì tăng 1 size giúp em nhé.",
+    "Dạ form mẫu này khá dễ đi ạ, đa số khách lấy đúng size đang mang. Ai chân bè hoặc thích thoáng hơn thì lên 1 size là đẹp ạ."
+  ],
+
+  ask_quantity: [
+    "Dạ em đã ghi nhận size {size} rồi ạ. Mình lấy số lượng mấy đôi để em lên đơn cho chuẩn ạ?",
+    "Dạ size {size} bên em có sẵn ạ. Mình lấy 1 đôi hay mấy đôi để em chốt cho mình ạ?",
+    "Dạ em chốt size {size} được rồi ạ. Mình lấy số lượng bao nhiêu đôi giúp em nhé ạ?"
+  ],
+
+  ask_phone_address: [
+    "Dạ em xin mình gửi giúp em luôn số điện thoại và địa chỉ nhận hàng đầy đủ để em lên đơn cho mình nhé ạ.",
+    "Mình gửi em luôn SĐT với địa chỉ nhận hàng đầy đủ giúp em để em chốt đơn nhanh cho mình ạ.",
+    "Dạ mình nhắn giúp em cả số điện thoại và địa chỉ nhận hàng đầy đủ luôn nhé ạ."
+  ],
+
+  ask_address_missing: [
+    "Dạ em đã nhận được địa chỉ rồi ạ, nhưng còn thiếu {address_missing_label} nên em chưa lên đơn chuẩn cho mình được. Mình gửi lại giúp em đầy đủ nhé ạ.",
+    "Dạ địa chỉ mình gửi em gần đủ rồi ạ, mình bổ sung thêm {address_missing_label} giúp em để bên em lên đơn chính xác nhé ạ.",
+    "Dạ em xin mình bổ sung thêm {address_missing_label} trong địa chỉ nhận hàng giúp em nhé ạ."
+  ],
+
+  inspection_policy: [
+    "Dạ bên em hỗ trợ {inspection_policy} ạ.",
+    "Dạ mình được {inspection_policy} ạ.",
+    "Dạ bên em cho kiểm tra và thử hàng trước khi thanh toán ạ."
+  ],
+
+  social_proof: [
+    "Mẫu này nhiều khách đi ruộng, đi mưa, làm vườn quay lại lấy thêm ạ.",
+    "Dạ mẫu này bán khá đều vì đi êm chân, gặp nước với bùn dùng tiện lắm ạ.",
+    "Nhiều khách lấy mẫu này vì chất cao su 2 lớp, đi đỡ mềm yếu hơn mấy mẫu mỏng ạ."
+  ],
+
+  complaint_soft: [
+    "Dạ em hiểu ý mình ạ. Để em hỗ trợ nhanh nhất cho mình, mình nói giúp em phần mình đang lăn tăn nhất là size, giá hay cách dùng ạ?",
+    "Dạ mình cứ nói thẳng phần đang chưa ưng giúp em nhé, em hỗ trợ đúng trọng tâm cho mình ạ.",
+    "Dạ em hiểu ạ, mình đang muốn hỏi kỹ hơn về size, chất liệu hay cách giao hàng để em nói rõ cho mình luôn ạ?"
+  ],
+
+  fallback: [
+    "Dạ em đang hỗ trợ mẫu quần ủng bên em ạ. Mình đang cần em tư vấn size, giá hay lên đơn luôn ạ?",
+    "Dạ em hỗ trợ mình đây ạ. Mình đang muốn hỏi về size, chất liệu hay giao hàng để em trả lời nhanh cho mình nhé ạ?",
+    "Dạ mình cứ nhắn phần mình cần nhất giúp em nhé, như size, giá, địa chỉ nhận hàng hoặc lên đơn luôn ạ."
+  ]
+};
+
+function decideNextAction_(conversation, intent) {
+  const missing = missingOrderFields_(conversation);
+  const addressCheck = analyzeVietnamAddress_(conversation.customer.address || "");
+  const hasValidAddress = addressCheck.isValid;
+
+  if (conversation.flags.order_created) return "already_created";
+
+  if (intent === "confirm_order" && conversation.awaiting_confirm) {
+    return "finalize_order";
+  }
+
+  if (intent === "greeting" && !conversation.flags.greeting_sent) return "greeting";
+  if (intent === "ask_price") return "answer_price";
+  if (intent === "view_product") return "send_product_link";
+  if (intent === "ask_material") return "answer_material";
+  if (intent === "ask_shipping") return "answer_shipping";
+  if (intent === "ask_inspection") return "answer_inspection";
+  if (intent === "after_sales") return "soft_complaint";
+
+  if (missing.length === 0) {
+    conversation.awaiting_confirm = true;
+    return "review_order";
+  }
+
+  if (intent === "ask_size") {
+    if (!conversation.order.size) return "answer_size";
+    if (!conversation.order.quantity) return "ask_quantity";
+    if (!conversation.customer.phone && !conversation.customer.address) return "ask_phone_address";
+    if (!conversation.customer.phone) return "ask_phone";
+    if (!hasValidAddress) return "ask_address_missing";
+    return "review_order";
+  }
+
+  if (intent === "buy" || intent === "provide_order_info") {
+    if (!conversation.order.size) return "ask_size";
+    if (!conversation.order.quantity) return "ask_quantity";
+    if (!conversation.customer.phone && !conversation.customer.address) return "ask_phone_address";
+    if (!conversation.customer.phone) return "ask_phone";
+    if (!hasValidAddress) return "ask_address_missing";
+    return "review_order";
+  }
+
+  if (intent === "unknown") {
+    if (!conversation.order.size && (conversation.heat >= 2 || conversation.flags.asked_price)) return "ask_size";
+    if (conversation.order.size && !conversation.order.quantity) return "ask_quantity";
+    if (conversation.order.size && conversation.order.quantity && !conversation.customer.phone && !conversation.customer.address) return "ask_phone_address";
+    if (!conversation.customer.phone && hasValidAddress) return "ask_phone";
+    if (!hasValidAddress && (conversation.customer.phone || conversation.customer.address)) return "ask_address_missing";
+    return "fallback";
+  }
+
+  if (!conversation.order.size) return "ask_size";
+  if (!conversation.order.quantity) return "ask_quantity";
+  if (!conversation.customer.phone && !conversation.customer.address) return "ask_phone_address";
+  if (!conversation.customer.phone) return "ask_phone";
+  if (!hasValidAddress) return "ask_address_missing";
+
+  conversation.awaiting_confirm = true;
+  return "review_order";
+}
+
+function buildReplySequence_(action, conversation, product, aiHint) {
+  const missing = missingOrderFields_(conversation);
+  const firstMissing = missing[0] || "";
+  const addressMissingLabel = getAddressMissingLabel_(conversation);
+
+  const vars = {
+    name: product.name,
+    price_text: product.price_text,
+    discount: product.discount,
+    size_range: product.size_range,
+    material: product.material,
+    shipping: product.shipping,
+    delivery: product.delivery,
+    warranty: product.warranty,
+    inspection_policy: product.inspection_policy,
+    social_proof: product.social_proof,
+    fit_guide: product.fit_guide,
+    size: conversation.order.size || "",
+    quantity: conversation.order.quantity || "",
+    phone: conversation.customer.phone || "",
+    address: conversation.customer.address || "",
+    missing_label: missingFieldLabel_(firstMissing),
+    address_missing_label: addressMissingLabel,
+    product_url: product.product_url || APP.DEFAULT_PRODUCT.product_url
+  };
+
+  switch (action) {
+    case "greeting":
+      conversation.flags.greeting_sent = true;
+      return [
+        { type: "text", text: renderTemplate_("greeting", vars) }
+      ];
+
+    case "answer_price":
+      conversation.flags.asked_price = true;
+      return [
+        { type: "text", text: renderTemplate_("ask_price", vars) },
+        { type: "text", text: "Mình đang mang size bao nhiêu để em check chuẩn cho mình luôn ạ?" }
+      ];
+
+    case "answer_size":
+      conversation.flags.asked_size = true;
+      return [
+        { type: "text", text: renderTemplate_("ask_size", vars) },
+        { type: "text", text: renderTemplate_("ask_fit_guide", vars) }
+      ];
+
+    case "ask_quantity":
+      conversation.flags.asked_quantity = true;
+      return [
+        { type: "text", text: renderTemplate_("ask_quantity", vars) }
+      ];
+
+    case "ask_phone_address":
+      return [
+        { type: "text", text: "Dạ em đã ghi nhận size " + (conversation.order.size || "") + " và số lượng " + (conversation.order.quantity || "") + " rồi ạ." },
+        { type: "text", text: renderTemplate_("ask_phone_address", vars) }
+      ];
+
+    case "ask_phone":
+      conversation.flags.asked_phone = true;
+      return [
+        { type: "text", text: "Dạ em còn thiếu số điện thoại nhận hàng của mình thôi ạ." },
+        { type: "text", text: "Mình gửi em SĐT để em chốt đơn cho mình nhé ạ?" }
+      ];
+
+    case "ask_address_missing":
+      conversation.flags.asked_address = true;
+      return [
+        { type: "text", text: renderTemplate_("ask_address_missing", vars) }
+      ];
+
+    case "answer_material":
+      return [
+        { type: "text", text: "Dạ mẫu này là " + product.material + " ạ. Đi mưa, làm vườn hay lội bùn dùng khá yên tâm." },
+        { type: "text", text: renderTemplate_("social_proof", vars) }
+      ];
+
+    case "answer_shipping":
+      return [
+        { type: "text", text: "Dạ bên em " + product.shipping + ", dự kiến nhận khoảng " + product.delivery + " ạ." },
+        { type: "text", text: "Mình đi size nào để em tiện lên đơn cho mình luôn ạ?" }
+      ];
+
+    case "answer_inspection":
+      return [
+        { type: "text", text: renderTemplate_("inspection_policy", vars) }
+      ];
+
+    case "soft_complaint":
+      return [
+        { type: "text", text: renderTemplate_("complaint_soft", vars) }
+      ];
+
+    case "send_product_link":
+      return [
+        { type: "text", text: "Dạ em gửi mình link xem sản phẩm, ảnh và thông tin chi tiết ở đây ạ:" },
+        {
+          type: "button_url",
+          text: "Mình bấm vào đây để xem ảnh, mô tả và đặt hàng nhanh nhé ạ.",
+          buttonTitle: "Xem sản phẩm",
+          url: vars.product_url
+        }
+      ];
+
+    case "review_order":
+      return [
+        { type: "text", text: buildConfirmOrderText_(conversation, product) },
+        { type: "text", text: "A/c kiểm tra giúp em thông tin trên đã đúng chưa ạ? Nếu ok mình xác nhận giúp em để em lên đơn nhé ạ." }
+      ];
+
+    case "finalize_order":
+      return [
+        { type: "text", text: "Dạ em đã xác nhận đơn cho mình rồi ạ." },
+        { type: "text", text: buildOrderThankYouText_() }
+      ];
+
+    case "already_created":
+      return [
+        { type: "text", text: "Dạ đơn của mình bên em đã ghi nhận rồi ạ. Nếu mình muốn sửa size, số lượng hoặc địa chỉ thì nhắn lại ngay giúp em nhé ạ." }
+      ];
+
+    case "fallback":
+    default:
+      if (aiHint && aiHint.reply_hint) {
+        return [{ type: "text", text: safeString_(aiHint.reply_hint).trim() }];
+      }
+      return [
+        { type: "text", text: renderTemplate_("fallback", vars) }
+      ];
+  }
+}
+
+function buildConfirmOrderText_(conversation, product) {
+  return [
+    "Dạ em chốt đơn cho mình như này ạ:",
+    "- Sản phẩm: " + product.name,
+    "- Size: " + (conversation.order.size || ""),
+    "- Số lượng: " + (conversation.order.quantity || ""),
+    "- SĐT: " + (conversation.customer.phone || ""),
+    "- Địa chỉ: " + (conversation.customer.address || ""),
+    "- Giá: " + product.price_text,
+    "- Ship: " + product.shipping
+  ].join("\n");
+}
+
+function buildOrderThankYouText_() {
+  return [
+    "Cảm ơn A/c đã đặt hàng bên em ạ.",
+    "",
+    "Quần khoảng 4 - 5 hôm nữa sẽ tới nơi, A/c nhớ kiểm tra và thử hàng kỹ càng trước khi thanh toán giúp em nhé ạ.",
+    "",
+    "Chúng em kính chúc A/c cùng gia đình thật nhiều sức khỏe ạ <3"
+  ].join("\n");
+}
+
+function renderTemplate_(key, vars) {
+  let text = randomPick_(REPLY_TEMPLATES[key] || []);
+  vars = vars || {};
+  Object.keys(vars).forEach(function(k) {
+    text = text.replace(new RegExp("\\{" + k + "\\}", "g"), safeString_(vars[k]));
+  });
+  return text;
+}
+
+function removeRepeatedMessages_(conversation, messages) {
+  const lastBotText = safeString_(conversation.last_bot_message).trim();
+  if (!messages || !messages.length) return messages;
+
+  return messages.filter(function(msg, idx) {
+    const txt = messageToPlainText_(msg).trim();
+    if (!txt) return true;
+    if (idx === 0 && txt === lastBotText) return false;
+    return true;
   });
 }
-function updateSyncTime() {
-  const t = 'Sync: '+new Date().toLocaleTimeString('vi-VN');
-  const el = document.getElementById('sync-row-sb');
-  if (el) el.textContent = t;
+
+function messageToPlainText_(msg) {
+  if (!msg) return "";
+  if (msg.type === "text") return safeString_(msg.text);
+  if (msg.type === "button_url") return safeString_(msg.text) + " " + safeString_(msg.url);
+  return "";
 }
 
-/* ─── TOAST ─── */
-function toast(type, msg, ms=3200) {
-  const el = document.createElement('div');
-  el.className = `toast t-${type}`;
-  el.textContent = msg;
-  document.getElementById('toasts').appendChild(el);
-  setTimeout(()=>el.remove(), ms);
+/* =========================================================
+ * 14) ORDER / EMAIL
+ * ========================================================= */
+
+function isOrderReady_(conversation) {
+  return missingOrderFields_(conversation).length === 0;
 }
 
-function showRes(id, ok, msg) {
-  document.getElementById(id).innerHTML=`<div class="alert ${ok?'alert-green':'alert-red'}">${msg}</div>`;
+function createOrderIfReady_(conversation) {
+  if (!isOrderReady_(conversation)) return null;
+  if (conversation.flags.order_created) return null;
+
+  const page = getPageConfigById_(conversation.page_id) || {};
+  const orderId = "OD" + new Date().getTime();
+
+  const order = {
+    order_id: orderId,
+    page_id: conversation.page_id,
+    page_name: page.pageName || conversation.page_name || "",
+    user_id: conversation.user_id,
+    customer_name: conversation.customer.name || "",
+    phone: conversation.customer.phone || "",
+    address: conversation.customer.address || "",
+    size: conversation.order.size || "",
+    quantity: conversation.order.quantity || 1,
+    product_name: conversation.order.product_name || APP.DEFAULT_PRODUCT.name,
+    price_text: conversation.order.price_text || APP.DEFAULT_PRODUCT.price_text,
+    status: "NEW",
+    source: "messenger",
+    conversation_key: conversation.conversation_key,
+    raw_order_json: JSON.stringify({ conversation: conversation }),
+    created_at: nowIso_()
+  };
+
+  saveOrder_(order);
+  sendOrderEmail_(order);
+
+  conversation.flags.order_created = true;
+  conversation.stage = "ordered";
+  conversation.awaiting_confirm = false;
+
+  return order;
 }
-</script>
-</body>
-</html>
+
+function saveOrder_(order) {
+  const sh = getSheet_(APP.SHEETS.ORDERS);
+  sh.appendRow([
+    order.order_id,
+    order.page_id,
+    order.page_name,
+    order.user_id,
+    order.customer_name,
+    order.phone,
+    order.address,
+    order.size,
+    order.quantity,
+    order.product_name,
+    order.price_text,
+    order.status,
+    order.source,
+    order.conversation_key,
+    order.raw_order_json,
+    order.created_at
+  ]);
+}
+
+function sendOrderEmail_(order) {
+  const adminEmail = getConfig_("ADMIN_EMAIL") || "caovantay2912@gmail.com";
+
+  const subject = "Đơn hàng mới | " + order.product_name + " | " + (order.phone || order.user_id);
+  const body = [
+    "Có đơn hàng mới từ AI Chatbox",
+    "",
+    "Order ID: " + order.order_id,
+    "Page: " + order.page_name + " (" + order.page_id + ")",
+    "User ID: " + order.user_id,
+    "",
+    "SĐT: " + order.phone,
+    "Địa chỉ: " + order.address,
+    "Size: " + order.size,
+    "Số lượng: " + order.quantity,
+    "Sản phẩm: " + order.product_name,
+    "Giá: " + order.price_text,
+    "",
+    "Conversation Key: " + order.conversation_key,
+    "Thời gian: " + order.created_at
+  ].join("\n");
+
+  MailApp.sendEmail(adminEmail, subject, body);
+}
+
+/* =========================================================
+ * 15) UTIL
+ * ========================================================= */
+
+function getSheet_(sheetName) {
+  return SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+}
+
+function getSheetData_(sheet) {
+  const values = sheet.getDataRange().getValues();
+  if (values.length < 2) return [];
+  const headers = values[0];
+  return values.slice(1).map(function(row) {
+    const obj = {};
+    headers.forEach(function(h, i) {
+      obj[h] = row[i];
+    });
+    return obj;
+  });
+}
+
+function createOrResetSheet_(ss, name, headers, rows) {
+  let sh = ss.getSheetByName(name);
+  if (!sh) {
+    sh = ss.insertSheet(name);
+  } else {
+    sh.clearContents();
+    sh.clearFormats();
+  }
+
+  sh.getRange(1, 1, 1, headers.length).setValues([headers]);
+  sh.setFrozenRows(1);
+
+  if (rows && rows.length) {
+    sh.getRange(2, 1, rows.length, headers.length).setValues(rows);
+  }
+
+  sh.autoResizeColumns(1, headers.length);
+}
+
+function nowIso_() {
+  return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss");
+}
+
+function parseJson_(str, fallback) {
+  try {
+    return JSON.parse(str);
+  } catch (e) {
+    return fallback;
+  }
+}
+
+function safeString_(v) {
+  return v == null ? "" : String(v);
+}
+
+function normalizeText_(text) {
+  return safeString_(text)
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .toLowerCase();
+}
+
+function randomPick_(arr) {
+  if (!arr || !arr.length) return "";
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function conversationKey_(pageId, userId) {
+  return safeString_(pageId) + "__" + safeString_(userId);
+}
+
+function getParam_(e, key) {
+  return e && e.parameter ? safeString_(e.parameter[key]) : "";
+}
+
+function getConfig_(key) {
+  const sh = getSheet_(APP.SHEETS.SYSTEM_CONFIG);
+  if (!sh) return "";
+
+  const data = getSheetData_(sh);
+  const row = data.find(function(r) {
+    return safeString_(r.KEY) === safeString_(key);
+  });
+
+  return row ? safeString_(row.VALUE) : "";
+}
+
+function setConfigValue_(key, value) {
+  const sh = getSheet_(APP.SHEETS.SYSTEM_CONFIG);
+  const data = getSheetData_(sh);
+
+  const idx = data.findIndex(function(r) {
+    return safeString_(r.KEY) === safeString_(key);
+  });
+
+  if (idx === -1) {
+    sh.appendRow([key, value, ""]);
+  } else {
+    sh.getRange(idx + 2, 2).setValue(value);
+  }
+}
+
+function onlyDigits_(text) {
+  return safeString_(text).replace(/\D+/g, "");
+}
+
+/* =========================================================
+ * 16) ENTITY HELPERS
+ * ========================================================= */
+
+function detectPhone_(text) {
+  const digits = onlyDigits_(text);
+  if (/^(0|\+?84)/.test(digits) && digits.length >= 9 && digits.length <= 12) {
+    return digits.startsWith("84") && digits.length === 11 ? "0" + digits.slice(2) : digits;
+  }
+  return "";
+}
+
+function detectSize_(text, allowedSizes) {
+  const matches = safeString_(text).match(/\b(36|37|38|39|40|41|42)\b/g);
+  if (!matches || !matches.length) return "";
+  for (let i = matches.length - 1; i >= 0; i--) {
+    if (allowedSizes.indexOf(matches[i]) > -1) return matches[i];
+  }
+  return "";
+}
+
+function detectQuantity_(text) {
+  const t = normalizeText_(text);
+
+  const m1 = t.match(/\b([1-9]|10)\s*(đôi|cái|sp|sản phẩm)\b/);
+  if (m1) return Number(m1[1]);
+
+  const m2 = t.match(/\b(lấy|mua|chốt)\s*([1-9]|10)\b/);
+  if (m2) return Number(m2[2]);
+
+  const m3 = t.match(/\b(sl|số lượng)\s*([1-9]|10)\b/);
+  if (m3) return Number(m3[2]);
+
+  const m4 = t.match(/\b([1-9]|10)\b/);
+  if (m4 && /(đôi|cái|sp|sản phẩm|sl|số lượng)/.test(t)) {
+    return Number(m4[1]);
+  }
+
+  return 0;
+}
+
+function parseAddressHeuristic_(text) {
+  const t = safeString_(text).trim();
+  if (!t) return "";
+
+  const indicators = /(đường|thôn|xóm|ấp|phường|xã|quận|huyện|tỉnh|thành phố|tp\.?|số nhà|ngõ|ngách|khu phố|block|chung cư|p\.|q\.)/i;
+  if (indicators.test(t)) return t;
+  if (t.split(",").length >= 2) return t;
+  return "";
+}
+
+function extractNameSimple_(text) {
+  const t = safeString_(text).trim();
+  if (!t) return "";
+
+  const patterns = [
+    /tên\s*(là|:)?\s*([A-Za-zÀ-ỹà-ỹ\s]{2,40})/i,
+    /em là\s*([A-Za-zÀ-ỹà-ỹ\s]{2,40})/i,
+    /mình là\s*([A-Za-zÀ-ỹà-ỹ\s]{2,40})/i,
+    /anh là\s*([A-Za-zÀ-ỹà-ỹ\s]{2,40})/i,
+    /chị là\s*([A-Za-zÀ-ỹà-ỹ\s]{2,40})/i
+  ];
+
+  for (var i = 0; i < patterns.length; i++) {
+    const m = t.match(patterns[i]);
+    if (m && m[2]) return m[2].trim();
+    if (m && m[1] && !/là|:/.test(m[1])) return m[1].trim();
+  }
+
+  return "";
+}
+
+/* =========================================================
+ * 17) LOG
+ * ========================================================= */
+
+function logInfo_(tag, message, payload) {
+  writeLog_("INFO", tag, message, payload);
+}
+
+function logError_(tag, message, payload) {
+  writeLog_("ERROR", tag, message, payload);
+}
+
+function writeLog_(level, tag, message, payload) {
+  try {
+    const sh = getSheet_(APP.SHEETS.LOGS);
+    if (!sh) return;
+    sh.appendRow([
+      nowIso_(),
+      level,
+      tag,
+      message,
+      JSON.stringify(payload || {})
+    ]);
+  } catch (e) {}
+}
+
+/* =========================================================
+ * 18) TEST
+ * ========================================================= */
+
+function testChatFlow() {
+  const pageId = "YOUR_PAGE_ID";
+  const userId = "TEST_USER_001";
+
+  Logger.log(JSON.stringify(processIncomingMessage_(pageId, userId, "hi"), null, 2));
+  Logger.log(JSON.stringify(processIncomingMessage_(pageId, userId, "giá"), null, 2));
+  Logger.log(JSON.stringify(processIncomingMessage_(pageId, userId, "mua size 38"), null, 2));
+  Logger.log(JSON.stringify(processIncomingMessage_(pageId, userId, "2 đôi"), null, 2));
+  Logger.log(JSON.stringify(processIncomingMessage_(pageId, userId, "0987654321, số 12 ngõ 5 Lạch Tray, Đằng Giang, Ngô Quyền, Hải Phòng"), null, 2));
+  Logger.log(JSON.stringify(processIncomingMessage_(pageId, userId, "ok"), null, 2));
+}
+
+function testGroq() {
+  const conv = getDefaultConversation_("PAGE1", "Test Page", "USER1");
+  const result = callGroqAnalysis_(
+    "mình lấy size 39, 2 đôi, số 0987654321, ship về số 12 ngõ 5 đường Lạch Tray, Đằng Giang, Ngô Quyền, Hải Phòng",
+    conv,
+    APP.DEFAULT_PRODUCT
+  );
+  Logger.log(JSON.stringify(result, null, 2));
+}
+
+function testSendText() {
+  sendMessengerText_("YOUR_PAGE_ID", "RECIPIENT_PSID", "Dạ em test tin nhắn ạ.");
+}
+
+function testSendButton() {
+  sendMessengerButtonUrl_(
+    "YOUR_PAGE_ID",
+    "RECIPIENT_PSID",
+    "Mình bấm vào đây để xem ảnh và thông tin sản phẩm nhé ạ.",
+    "Xem sản phẩm",
+    "https://hexoiax.github.io/product-page/"
+  );
+}
+
+function testSendSequence() {
+  sendMessengerMessages_("YOUR_PAGE_ID", "RECIPIENT_PSID", [
+    { type: "text", text: "Dạ em gửi mình thông tin nhé ạ." },
+    { type: "text", text: "Mẫu này bên em có size 36 đến 42 ạ." },
+    {
+      type: "button_url",
+      text: "Mình bấm vào đây để xem sản phẩm nhé ạ.",
+      buttonTitle: "Xem sản phẩm",
+      url: "https://hexoiax.github.io/product-page/"
+    }
+  ]);
+}
+
+function resetConversationByUser(pageId, userId) {
+  const key = conversationKey_(pageId, userId);
+  const sh = getSheet_(APP.SHEETS.CONVERSATIONS);
+  const data = getSheetData_(sh);
+
+  const idx = data.findIndex(function(r) {
+    return safeString_(r.CONVERSATION_KEY) === safeString_(key);
+  });
+
+  if (idx > -1) {
+    sh.deleteRow(idx + 2);
+  }
+}
