@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Mini ERP Unified</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --sans: 'Space Grotesk', system-ui, sans-serif;
@@ -703,102 +703,291 @@ body {
 }
 
 
-/* ─── PROCESSING DESKTOP COMPACT MODE ───────────────── */
-#orders-grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:10px;
-}
-#orders-grid .empty{
-  grid-column:1 / -1;
-}
-
-@media (min-width:1024px){
-  #orders-grid{
-    grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
-    gap:14px;
-    align-items:start;
+/* ─── DESKTOP MATCH html erp(5) / keep mobile unchanged ───────────────── */
+@media (min-width:768px) {
+  :root {
+    --desk-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --desk-mono: 'IBM Plex Mono', monospace;
+    --desk-brand: #00c27c;
+    --desk-brand-d: #00a066;
+    --desk-brand-glow: rgba(0,194,124,0.18);
   }
 
-  #pg-processing .order-card{
-    margin-bottom:0;
-    border-radius:14px;
-    display:flex;
-    flex-direction:column;
-    min-height:100%;
+  body {
+    font-family: var(--desk-sans);
+    font-size: 13px;
+    background: #0c0e12;
+    color: #eef0f6;
   }
 
-  #pg-processing .oc-head{
-    padding:10px 12px;
+  .shell {
+    flex-direction: row;
+    background: #0c0e12;
   }
 
-  #pg-processing .oc-body{
-    padding:12px;
+  .sidebar {
+    width: 228px !important;
+    background: #13161c;
+    border-right: 1px solid rgba(255,255,255,0.07);
+    height: 100%;
   }
 
-  #pg-processing .oc-row{
-    margin-bottom:7px;
-    gap:7px;
-    font-size:12px;
+  .sidebar > div:first-child {
+    padding: 20px 16px 14px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+    gap: 10px !important;
   }
 
-  #pg-processing .oc-icon{
-    font-size:13px;
-    margin-top:0;
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: var(--desk-brand);
+  }
+  .logo-mark svg { width: 18px; height: 18px; }
+
+  .logo-name {
+    font-family: var(--desk-sans);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #eef0f6;
   }
 
-  #pg-processing .oc-text{
-    font-size:12px;
-    line-height:1.45;
+  .sb-group { margin-bottom: 18px; }
+  .sb-group-label {
+    font-family: var(--desk-sans);
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #50566a;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    padding: 0 8px 6px;
   }
 
-  #pg-processing .oc-address{
-    display:-webkit-box;
-    -webkit-line-clamp:2;
-    -webkit-box-orient:vertical;
-    overflow:hidden;
+  .sb-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 10px;
+    margin-bottom: 1px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    color: #8a92a6;
+    font-size: 13px;
+    font-weight: 500;
+    background: transparent;
+  }
+  .sb-item:hover {
+    background: #272c3a;
+    color: #eef0f6;
+  }
+  .sb-item.active {
+    background: var(--desk-brand-glow);
+    color: var(--desk-brand);
+    border-color: rgba(0,194,124,0.25);
+    font-weight: 600;
   }
 
-  #pg-processing .oc-total{
-    font-size:12px;
+  .sb-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #1b1f28;
+    font-size: 14px;
+  }
+  .sb-item.active .sb-icon { background: rgba(0,194,124,0.15); }
+
+  .sb-foot {
+    padding: 12px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .conn-row, .sync-row, .logo-ver {
+    font-family: var(--desk-mono) !important;
   }
 
-  #pg-processing .oc-code{
-    font-size:11.5px;
+  .main {
+    min-height: 0;
+    background: #0c0e12;
   }
 
-  #pg-processing .oc-time{
-    font-size:10px;
-    white-space:nowrap;
+  .topbar {
+    height: 56px;
+    padding: 0 24px;
+    background: #13161c;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
   }
 
-  #pg-processing .badge{
-    font-size:9px;
-    padding:3px 8px;
+  .page-title {
+    font-family: var(--desk-sans);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #eef0f6;
   }
 
-  #pg-processing .oc-actions{
-    margin-top:10px;
-    gap:7px;
+  .content {
+    padding: 20px 24px 24px;
+    background: #0c0e12;
   }
 
-  #pg-processing .oc-actions .f-select,
-  #pg-processing .oc-actions .f-input{
-    min-height:36px;
-    padding:8px 10px;
-    font-size:11.5px !important;
+  .page {
+    padding: 0;
   }
 
-  #pg-processing .oc-track{
-    gap:7px;
+  .icon-btn, .btn {
+    font-family: var(--desk-sans);
+    border-radius: 10px;
+    border-color: rgba(255,255,255,0.12);
+    background: #1b1f28;
+    color: #8a92a6;
+  }
+  .btn:hover, .icon-btn:hover {
+    background: #272c3a;
+    color: #eef0f6;
+  }
+  .btn-primary {
+    background: var(--desk-brand);
+    border-color: var(--desk-brand);
+    color: #000;
+    font-weight: 700;
+  }
+  .btn-primary:hover {
+    background: var(--desk-brand-d);
+    border-color: var(--desk-brand-d);
+    color: #000;
   }
 
-  #pg-processing .btn.btn-icon{
-    width:36px;
-    height:36px;
-    min-height:36px;
-    flex:0 0 36px;
+  .card, .mc, .order-card, .inv-card, .prod-card {
+    background: #13161c;
+    border-color: rgba(255,255,255,0.07);
+    border-radius: 14px;
   }
+
+  .card-head, .oc-head, .inv-head, .prod-card-head {
+    background: #1b1f28;
+    border-bottom-color: rgba(255,255,255,0.07);
+  }
+
+  .card-title, .prod-name, .inv-name, .oc-code {
+    font-family: var(--desk-sans);
+  }
+
+  .mc-val, .oc-time, .prod-price, .inv-price, .chip, .badge, .f-input, .f-select, .sz-name, .sz-nums, .qty-num {
+    font-family: var(--desk-mono);
+  }
+
+  .f-input, .f-select {
+    background: #0f1218;
+    border-color: rgba(255,255,255,0.1);
+    color: #eef0f6;
+  }
+  .f-input:focus, .f-select:focus {
+    border-color: var(--desk-brand);
+    box-shadow: 0 0 0 3px rgba(0,194,124,0.25);
+  }
+
+  .filter-bar { gap: 8px; margin-bottom: 16px; }
+  .filter-bar .btn {
+    padding: 6px 12px;
+    font-size: 11.5px;
+    border-radius: 10px;
+  }
+  .filter-bar .active-f {
+    background: var(--desk-brand-glow) !important;
+    color: var(--desk-brand) !important;
+    border-color: rgba(0,194,124,.3) !important;
+  }
+
+  /* processing desktop compact grid */
+  #orders-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+    align-items: start;
+  }
+  #orders-grid .empty { grid-column: 1 / -1; }
+
+  #pg-processing .order-card {
+    margin-bottom: 0;
+    overflow: hidden;
+    transition: border-color .18s ease, transform .18s ease;
+  }
+  #pg-processing .order-card:hover {
+    border-color: rgba(255,255,255,0.12);
+    transform: translateY(-2px);
+  }
+  #pg-processing .oc-head {
+    padding: 11px 14px;
+  }
+  #pg-processing .oc-body {
+    padding: 12px 14px;
+  }
+  #pg-processing .oc-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+  #pg-processing .oc-icon {
+    opacity: .75;
+    width: 16px;
+    flex: 0 0 16px;
+    margin-top: 1px;
+  }
+  #pg-processing .oc-text {
+    color: #eef0f6;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+  #pg-processing .oc-text.muted {
+    color: #8a92a6;
+  }
+  #pg-processing .oc-total {
+    color: var(--desk-brand);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  #pg-processing .oc-address,
+  #pg-processing .oc-note {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  #pg-processing .badge {
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 10px;
+  }
+  #pg-processing .oc-actions {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  #pg-processing .oc-track {
+    display: flex;
+    gap: 6px;
+  }
+  #pg-processing .oc-track .f-input,
+  #pg-processing .oc-actions .f-select {
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: 11.5px !important;
+  }
+  #pg-processing .btn.btn-icon {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    min-height: 36px;
+    padding: 0;
+  }
+
+  /* general desktop sizing from uploaded desktop file */
+  .metrics-row.row4 { grid-template-columns: repeat(4, 1fr); }
+  .sp-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); max-height: none; }
 }
 
 
@@ -829,7 +1018,7 @@ button, input, select, textarea { font: inherit; }
   <div class="sidebar" id="sidebar">
     <div style="padding:16px 14px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;">
       <div class="logo-mark"><svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="#000"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="#000" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="#000" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="#000"/></svg></div>
-      <div><div class="logo-name">Mini ERP</div><div style="font-size:9.5px;color:var(--t3);font-family:var(--mono)">v4.0 · unified desktop + mobile</div></div>
+      <div><div class="logo-name">Mini ERP</div><div style="font-size:9.5px;color:var(--t3);font-family:var(--mono)">v5.0 · desktop html-erp + mobile preserved</div></div>
     </div>
     <nav class="sb-nav">
       <div class="sb-group">
@@ -1486,12 +1675,46 @@ function _renderOrderList(list) {
     document.getElementById('orders-grid').innerHTML='<div class="empty"><div class="empty-icon">📋</div>Không có đơn hàng</div>';
     return;
   }
+  const isDesktop = window.innerWidth >= 768;
   document.getElementById('orders-grid').innerHTML = list.map(o => {
     const bc  = BADGE_MAP[o.status]||'bn';
     const tot = (parseInt(o.total)||0).toLocaleString('vi');
     const selOpts = ['New','Confirm','Shipping','Done','Cancel'].map(s =>
       `<option value="${s}"${o.status===s?' selected':''}>${s}</option>`
     ).join('');
+
+    if (isDesktop) {
+      return `
+        <div class="order-card">
+          <div class="oc-head">
+            <span class="oc-code">${o.orderCode}</span>
+            <div style="display:flex;gap:6px;align-items:center">
+              <span class="badge ${bc}">${o.status}</span>
+              <span class="oc-time">${o.time||''}</span>
+            </div>
+          </div>
+          <div class="oc-body">
+            <div class="oc-row"><span class="oc-icon">👤</span><span class="oc-text">${o.customer||''}</span></div>
+            ${o.phone ? `<div class="oc-row"><span class="oc-icon">📞</span><span class="oc-text muted">${o.phone}</span></div>` : ``}
+            ${o.address ? `<div class="oc-row"><span class="oc-icon">📍</span><span class="oc-text oc-address">${o.address}</span></div>` : ``}
+            <div class="oc-row"><span class="oc-icon">📦</span><span class="oc-text" style="font-family:var(--mono)">${o.sku||''} × ${o.quantity||0}</span></div>
+            <div class="oc-row"><span class="oc-icon">💰</span><span class="oc-total">${tot} ₫</span></div>
+            ${o.tracking ? `<div class="oc-row"><span class="oc-icon">🚚</span><span class="oc-text muted" style="font-family:var(--mono)">${o.tracking}</span></div>` : ``}
+            ${o.note ? `<div class="oc-row"><span class="oc-icon">📝</span><span class="oc-text muted oc-note">${o.note}</span></div>` : ``}
+            <div class="oc-actions">
+              <select class="f-select" onchange="updateOS('${o.orderCode}',this.value)">
+                <option value="">▼ Đổi trạng thái</option>
+                ${selOpts}
+              </select>
+              <div class="oc-track">
+                <input class="f-input" id="tk-${o.orderCode}" placeholder="Mã tracking..." value="${o.tracking||''}" />
+                <button class="btn btn-primary btn-icon" onclick="updateOT('${o.orderCode}')" title="Lưu tracking">💾</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }
+
     return `
       <div class="order-card">
         <div class="oc-head">
@@ -1502,20 +1725,19 @@ function _renderOrderList(list) {
           </div>
         </div>
         <div class="oc-body">
-          <div class="oc-row"><span class="oc-icon">👤</span><span class="oc-text">${o.customer}</span></div>
-          ${o.phone?`<div class="oc-row"><span class="oc-icon">📞</span><span class="oc-text" style="font-family:var(--mono)">${o.phone}</span></div>`:''}
-          ${o.address?`<div class="oc-row"><span class="oc-icon">📍</span><span class="oc-text oc-address">${o.address}</span></div>`:''}
-          <div class="oc-row"><span class="oc-icon">📦</span><span class="oc-text" style="font-family:var(--mono)">${o.sku} × ${o.quantity}</span></div>
+          <div class="oc-row"><span class="oc-icon">👤</span><span class="oc-text">${o.customer} · ${o.phone}</span></div>
+          ${o.address?`<div class="oc-row"><span class="oc-icon">📍</span><span class="oc-text" style="font-size:12px">${o.address}</span></div>`:''}
+          <div class="oc-row"><span class="oc-icon">📦</span><span class="oc-text" style="font-family:var(--mono);font-size:12px">${o.sku} × ${o.quantity}</span></div>
           <div class="oc-row"><span class="oc-icon">💰</span><span class="oc-total">${tot} ₫</span></div>
-          ${o.tracking?`<div class="oc-row"><span class="oc-icon">🚚</span><span class="oc-text" style="font-family:var(--mono)">${o.tracking}</span></div>`:''}
-          ${o.note?`<div class="oc-row"><span class="oc-icon">📝</span><span class="oc-text oc-address">${o.note}</span></div>`:''}
+          ${o.tracking?`<div class="oc-row"><span class="oc-icon">🚚</span><span class="oc-text" style="font-family:var(--mono);font-size:12px">${o.tracking}</span></div>`:''}
+          ${o.note?`<div class="oc-row"><span class="oc-icon">📝</span><span class="oc-text" style="font-size:12px">${o.note}</span></div>`:''}
           <div class="oc-actions">
-            <select class="f-select" onchange="updateOS('${o.orderCode}',this.value)">
+            <select class="f-select" style="font-size:13px" onchange="updateOS('${o.orderCode}',this.value)">
               <option value="">▼ Đổi trạng thái</option>
               ${selOpts}
             </select>
             <div class="oc-track">
-              <input class="f-input" id="tk-${o.orderCode}" placeholder="Nhập mã tracking..." value="${o.tracking||''}" />
+              <input class="f-input" id="tk-${o.orderCode}" placeholder="Nhập mã tracking..." value="${o.tracking||''}" style="font-size:12px" />
               <button class="btn btn-primary btn-icon" onclick="updateOT('${o.orderCode}')" title="Lưu tracking">💾</button>
             </div>
           </div>
